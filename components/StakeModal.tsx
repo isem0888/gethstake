@@ -48,6 +48,11 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   const effectivePeriodGain = amount * effectiveApr / 100 * days / 365;
   const effectiveTotal = amount + effectivePeriodGain;
 
+  // Дедлайн платформы 2027-01-01
+  const PLATFORM_CLOSE = new Date('2027-01-01T00:00:00Z');
+  const endsAt = new Date(Date.now() + days * 86_400_000);
+  const exceedsDeadline = endsAt > PLATFORM_CLOSE;
+
   const { sendTransaction, data: txHash, error: txError } = useSendTransaction();
   const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -130,6 +135,16 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
               ))}
             </div>
 
+            {exceedsDeadline && (
+              <div style={{ background: 'rgba(248,113,113,.1)', border: '1px solid #f8717133', borderRadius: 10, padding: '10px 14px', marginBottom: 16 }}>
+                <p style={{ color: '#f87171', fontSize: 12, margin: 0, lineHeight: 1.5 }}>
+                  ⚠️ {lang === 'ru'
+                    ? `Этот план заканчивается ${endsAt.toLocaleDateString('ru-RU')} — после закрытия платформы 01.01.2027. Транзакция будет отклонена.`
+                    : `This plan ends ${endsAt.toLocaleDateString('en-US')} — after platform close date 01.01.2027. Transaction will be rejected.`}
+                </p>
+              </div>
+            )}
+
             <p style={{ color: '#5a6480', fontSize: 11, marginBottom: 20, lineHeight: 1.5 }}>
               {lang === 'ru'
                 ? 'После нажатия кнопки откроется окно вашего кошелька для подтверждения транзакции.'
@@ -138,7 +153,8 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
 
             <button
               onClick={handleConfirm}
-              style={{ width: '100%', background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
+              disabled={exceedsDeadline}
+              style={{ width: '100%', background: exceedsDeadline ? '#3a4566' : '#60a5fa', color: exceedsDeadline ? '#5a6480' : '#040e24', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: '.5px', cursor: exceedsDeadline ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}
             >
               {lang === 'ru' ? 'Подтвердить и оплатить транзакцию' : 'Confirm & Pay Transaction'}
             </button>

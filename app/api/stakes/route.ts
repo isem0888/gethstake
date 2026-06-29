@@ -33,6 +33,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Plan must be 30, 90, or 180 days' }, { status: 400 });
   }
 
+  // Проверка дедлайна платформы
+  const PLATFORM_CLOSE = new Date('2027-01-01T00:00:00Z');
+  const nowTs = new Date();
+  if (nowTs >= PLATFORM_CLOSE) {
+    return NextResponse.json({ error: 'Платформа закрыта для новых стейков с 01.01.2027' }, { status: 403 });
+  }
+  const projectedEnd = new Date(nowTs.getTime() + plan_days * 86_400_000);
+  if (projectedEnd > PLATFORM_CLOSE) {
+    return NextResponse.json({
+      error: `План ${plan_days}д выходит за дату закрытия 01.01.2027. Выберите меньший срок.`,
+    }, { status: 400 });
+  }
+
   const supabase = createServerClient();
   const APY: Record<number, number> = { 30: 7.7, 90: 9.4, 180: 10.5 };
   const apy = APY[plan_days as 30 | 90 | 180];

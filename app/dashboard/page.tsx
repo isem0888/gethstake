@@ -79,18 +79,21 @@ function bonusLabel(eth: number, days: number): string {
 function useEthNetwork() {
   const [data, setData] = useState<EthNetwork | null>(null);
   const fetch_ = useCallback(() => {
-    fetch('https://api.blockcypher.com/v1/eth/main')
+    fetch('/api/network')           // server-side — нет CORS
       .then(r => r.json())
-      .then(d => setData({
-        pendingTx: d.unconfirmed_count || 0,
-        highGas: Math.round((d.high_gas_price || 0) / 1e9),
-        medGas: Math.round((d.medium_gas_price || 0) / 1e9),
-        lowGas: Math.round((d.low_gas_price || 0) / 1e9),
-        blockHeight: d.height || 0,
-      }))
+      .then(d => {
+        if (d.error && !d.blockHeight) return;
+        setData({
+          pendingTx:   d.pendingTx   ?? 0,
+          highGas:     d.highGas     ?? 0,
+          medGas:      d.medGas      ?? 0,
+          lowGas:      d.lowGas      ?? 0,
+          blockHeight: d.blockHeight ?? 0,
+        });
+      })
       .catch(() => {});
   }, []);
-  useEffect(() => { fetch_(); const t = setInterval(fetch_, 30_000); return () => clearInterval(t); }, [fetch_]);
+  useEffect(() => { fetch_(); const t = setInterval(fetch_, 60_000); return () => clearInterval(t); }, [fetch_]);
   return data;
 }
 
@@ -197,13 +200,18 @@ function buildChart(stakes: Stake[]) {
   const days = 30;
   return Array.from({ length: days }, (_, i) => {
     const d = new Date(Date.now() - (days - i - 1) * 86_400_000);
-    const total = stakes
-      .filter(s => new Date(s.started_at) <= d)
+    // Суммарный доход за ЭТОТ день по всем активным стейкам (дневная ставка)
+    const dailyYield = stakes
+      .filter(s => {
+        const start = new Date(s.started_at);
+        const end   = new Date(s.ends_at);
+        return start <= d && d <= end;
+      })
       .reduce((acc, s) => {
-        const dp = (d.getTime() - new Date(s.started_at).getTime()) / 86_400_000;
-        return acc + s.amount_eth * s.apy / 100 * dp / 365;
+        const effectiveApy = s.apy + getBonus(s.amount_eth, s.plan_days);
+        return acc + s.amount_eth * effectiveApy / 100 / 365;
       }, 0);
-    return { day: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), earned: +total.toFixed(4) };
+    return { day: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), earned: +dailyYield.toFixed(4) };
   });
 }
 
@@ -252,24 +260,36 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isConnected || !address) { setLoading(false); return; }
-    fetch(`/api/stakes?wallet=${address}`)
-      .then(r => r.json())
-      .then(d => {
-        const rows = (Array.isArray(d) ? d : []).map((s: any) => ({
-          ...s,
-          amount_eth: Number(s.amount_eth) || 0,
-          plan_days:  Number(s.plan_days)  || 90,
-          apy:        Number(s.apy)        || 0,
-        }));
-        setStakes(rows);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    const fetchStakes = () =>
+      fetch(`/api/stakes?wallet=${address}`)
+        .then(r => r.json())
+        .then(d => {
+          const rows = (Array.isArray(d) ? d : []).map((s: any) => ({
+            ...s,
+            amount_eth: Number(s.amount_eth) || 0,
+            plan_days:  Number(s.plan_days)  || 90,
+            apy:        Number(s.apy)        || 0,
+          }));
+          setStakes(rows);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+
+    fetchStakes();
+    const t = setInterval(fetchStakes, 4 * 60 * 60 * 1000); // авто-обновление каждые 4 часа
+    return () => clearInterval(t);
   }, [isConnected, address]);
+
+  const PLATFORM_CLOSE = new Date('2027-01-01T00:00:00Z');
+  const daysToClose = Math.max(0, Math.ceil((PLATFORM_CLOSE.getTime() - Date.now()) / 86_400_000));
 
   const active = stakes.filter(s => s.status === 'active');
   const totalStaked = active.reduce((a, s) => a + s.amount_eth, 0);
   const totalEarned = active.reduce((a, s) => a + earned(s), 0);
+  const totalDailyYield = active.reduce((a, s) => {
+    const effectiveApy = s.apy + getBonus(s.amount_eth, s.plan_days);
+    return a + s.amount_eth * effectiveApy / 100 / 365;
+  }, 0);
   const maxBonus = active.length > 0
     ? Math.max(...active.map(s => getBonus(s.amount_eth, s.plan_days)))
     : 0;
@@ -296,6 +316,18 @@ export default function DashboardPage() {
           </div>
         </div>
       </nav>
+
+      {/* ── Deadline banner ── */}
+      <div style={{ background: daysToClose < 60 ? 'rgba(248,113,113,.1)' : 'rgba(96,165,250,.07)', borderBottom: `1px solid ${daysToClose < 60 ? '#f87171' : '#60a5fa33'}` }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
+          <span style={{ color: daysToClose < 60 ? '#f87171' : '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, letterSpacing: '.5px' }}>
+            🔒 ПЛАТФОРМА ЗАКРЫВАЕТСЯ 01.01.2027
+          </span>
+          <span style={{ color: '#5a6480' }}>·</span>
+          <span style={{ color: '#8a93b8' }}>Осталось <b style={{ color: daysToClose < 60 ? '#f87171' : '#e8eaf8' }}>{daysToClose} дней</b> для открытия новых стейков</span>
+          <span style={{ marginLeft: 'auto', color: '#3a4566', fontSize: 11 }}>Все активные позиции будут выплачены по истечении срока</span>
+        </div>
+      </div>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
@@ -326,10 +358,16 @@ export default function DashboardPage() {
                   <div style={{ ...val, fontSize: 22 }}>{active.length}</div>
                   <div style={{ fontSize: 11, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Active positions</div>
                 </div>
+                {totalDailyYield > 0 && (
+                  <div style={{ background: '#0a0e20', border: '1px solid #22c55e44', borderRadius: 10, padding: '16px 18px' }}>
+                    <div style={{ ...val, fontSize: 22, color: '#22c55e' }}>+{fmtEth(totalDailyYield)} ETH</div>
+                    <div style={{ fontSize: 11, color: '#22c55e99', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Начисление в день</div>
+                  </div>
+                )}
                 {maxBonus > 0 && (
                   <div style={{ background: '#0a0e20', border: '1px solid #60a5fa', borderRadius: 10, padding: '16px 18px' }}>
                     <div style={{ ...val, fontSize: 22, color: '#60a5fa' }}>+{maxBonus}%</div>
-                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{maxBonusTier} best bonus</div>
+                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{maxBonusTier} лучший бонус</div>
                   </div>
                 )}
               </div>
@@ -349,7 +387,7 @@ export default function DashboardPage() {
             {/* ── Earnings chart ── */}
             {chart.some(p => p.earned > 0) && active.length > 0 && (
               <div style={card}>
-                <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Earnings — 30 days</div>
+                <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Дневной доход ETH — 30 дней <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>обновляется каждые 4ч</span></div>
                 <div style={{ height: 160 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chart} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
@@ -408,11 +446,12 @@ export default function DashboardPage() {
                         { l: 'Node ownership', v: `${ownershipLabel(s.amount_eth)} (${pct}%)` },
                         { l: 'Effective APR', v: `${effectiveApy.toFixed(1)}%` },
                         { l: 'Plan', v: `${s.plan_days}-day lock` },
+                        { l: 'Итого к выплате', v: `${fmtEth(s.amount_eth + s.amount_eth * effectiveApy / 100 * s.plan_days / 365)} ETH`, highlight: true },
                         { l: 'Txs processed (node)', v: fmtNum(tx) },
                         { l: 'Validator uptime', v: `${up}%` },
                       ].map(r => (
-                        <div key={r.l} style={{ background: '#0d1121', borderRadius: 8, padding: '10px 12px' }}>
-                          <div style={{ ...val, fontSize: 14, color: '#e8eaf8' }}>{r.v}</div>
+                        <div key={r.l} style={{ background: (r as any).highlight ? '#0a1a0a' : '#0d1121', border: (r as any).highlight ? '1px solid #22c55e33' : 'none', borderRadius: 8, padding: '10px 12px' }}>
+                          <div style={{ ...val, fontSize: 14, color: (r as any).highlight ? '#22c55e' : '#e8eaf8' }}>{r.v}</div>
                           <div style={{ fontSize: 10, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 3 }}>{r.l}</div>
                         </div>
                       ))}
