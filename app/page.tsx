@@ -37,7 +37,7 @@ const RU: Record<string, string> = {
   m_tag: 'Как работают валидаторы', m_h2: 'Валидация Ethereum — децентрализованно и прозрачно',
   m_p: 'Ethereum использует Proof-of-Stake: валидаторы блокируют ETH и получают вознаграждение за подтверждение транзакций.',
   m_c1: 'ETH требуется на один валидатор', m_c2: 'активных валидаторов в сети',
-  m_c3: 'среднее время финализации блока', m_c4: 'средний APR сети',
+  m_c3: 'среднее время финализации блока', m_c4: 'средний APR сети (~6%)',
   m_why: 'Валидаторы предлагают и аттестуют новые блоки. Сеть случайным образом выбирает, кто предлагает каждый блок — чем больше валидаторов, тем децентрализованнее Ethereum. Пул-стейкинг позволяет участвовать без запуска собственного узла.',
   t_tag: 'Безопасность и прозрачность', t_h2: 'Не доверие, а проверяемость',
   t_1h: 'Резервный фонд', t_1p: 'Часть прибыли идёт в страховой буфер, сглаживающий выплаты в слабые периоды.',
@@ -425,7 +425,7 @@ export default function Home() {
               { mn: '32 ETH', ml: t('m_c1', lang, 'required per validator') },
               { mn: '500K+', ml: t('m_c2', lang, 'active validators worldwide') },
               { mn: '~12s', ml: t('m_c3', lang, 'block finalization time') },
-              { mn: '~4%', ml: t('m_c4', lang, 'average network APR') },
+              { mn: '~6%', ml: t('m_c4', lang, 'average network APR') },
             ].map(m => (
               <div key={m.mn} className="mcard"><div className="mn">{m.mn}</div><div className="ml">{m.ml}</div></div>
             ))}
@@ -531,6 +531,23 @@ export default function Home() {
               <a href="#" aria-label="Discord">◇</a>
               <a href="#" aria-label="Docs">▤</a>
             </div>
+          </div>
+          <div style={{ display: 'flex', gap: 24, marginTop: 16, flexWrap: 'wrap' }}>
+            <a href="/privacy" style={{ fontSize: 12, color: 'var(--mut2)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--acc)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--mut2)')}>
+              Privacy Policy
+            </a>
+            <a href="/terms" style={{ fontSize: 12, color: 'var(--mut2)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--acc)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--mut2)')}>
+              Terms of Use
+            </a>
+            <a href="/crypto-terms" style={{ fontSize: 12, color: 'var(--mut2)', textDecoration: 'none' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--acc)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--mut2)')}>
+              Cryptocurrency Terms
+            </a>
           </div>
         </div>
       </footer>
