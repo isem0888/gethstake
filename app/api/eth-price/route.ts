@@ -19,6 +19,12 @@ export async function GET() {
     const high24h = parseFloat(stats.highPrice);
     const low24h = parseFloat(stats.lowPrice);
 
+    // Если Binance вернул ошибку/rate-limit — price будет NaN.
+    // JSON.stringify(NaN) = "null", что ломает клиент → явно возвращаем ошибку.
+    if (isNaN(price)) {
+      return NextResponse.json({ error: 'Binance returned invalid price' }, { status: 500 });
+    }
+
     // Market cap через CoinGecko как fallback (Binance не даёт market cap)
     let marketCap = 0;
     try {

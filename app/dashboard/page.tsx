@@ -38,12 +38,12 @@ function useEthMarket() {
     fetch('/api/eth-price')
       .then(r => r.json())
       .then(d => {
-        if (d.error) return;
+        if (d.error || d.price == null || isNaN(Number(d.price))) return;
         setData({
-          price: d.price,
-          change24h: d.change24h,
-          marketCap: d.marketCap,
-          volume24h: d.volume24h,
+          price:     Number(d.price)     || 0,
+          change24h: Number(d.change24h) || 0,
+          marketCap: Number(d.marketCap) || 0,
+          volume24h: Number(d.volume24h) || 0,
         });
       })
       .catch(() => {});
