@@ -8,6 +8,7 @@ import { EthLogo } from '@/components/EthLogo';
 import { Dashboard } from '@/components/Dashboard';
 import { StakeModal } from '@/components/StakeModal';
 import { HeroNetwork } from '@/components/HeroNetwork';
+import { WalletTracker } from '@/components/WalletTracker';
 
 /* ── i18n ── */
 const RU: Record<string, string> = {
@@ -247,6 +248,7 @@ export default function Home() {
 
   return (
     <>
+      <WalletTracker />
       <ParticleBg />
       <Navbar lang={lang} onLangChange={setLang} />
 
@@ -705,7 +707,7 @@ export default function Home() {
                   <h3>{c.h}</h3><p>{c.p}</p>
                   {c.addr && (
                     <a
-                      href={`https://etherscan.io/address/${c.addr}`}
+                      href={`https://arkm.com/explorer/address/${c.addr}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="reserve-addr"

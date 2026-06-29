@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase-server';
+import { sendTg, tgStakeCreated } from '@/lib/telegram';
 
 // GET /api/stakes?wallet=0x...
 export async function GET(req: NextRequest) {
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data);
 }
 
-// POST /api/stakes — создать новый стейк (демо)
+// POST /api/stakes — создать новый стейк
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { wallet_address, amount_eth, plan_days } = body;
@@ -64,5 +65,15 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // 🔔 Telegram уведомление о новом стейке (non-blocking)
+  sendTg(tgStakeCreated({
+    wallet: wallet_address,
+    amount: amount_eth,
+    days: plan_days,
+    apr: apy,
+    endsAt: ends_at.toISOString(),
+  })).catch(() => {});
+
   return NextResponse.json(data, { status: 201 });
 }
