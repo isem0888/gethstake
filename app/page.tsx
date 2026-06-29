@@ -86,7 +86,7 @@ function getBonus(eth: number, days: number): number {
 }
 
 /* ── Calculator hook ── */
-const APR_MAP: Record<number, number> = { 30: 7.7, 90: 9.4, 180: 10.5 };
+const APR_MAP: Record<number, number> = { 30: 5.5, 90: 8.3, 180: 9.7 };
 function useCalc() {
   const [amount, setAmountRaw] = useState(8);
   const [inputVal, setInputValRaw] = useState('8');
@@ -287,7 +287,7 @@ export default function Home() {
               {[
                 { lbl: t('sc_tvl', lang, 'Total value locked'), val: `${fmtStat(ps.tvl_eth)} ETH`, chg: `${fmtStat(ps.participants, 0)} ${lang === 'ru' ? 'участников' : 'participants'}`, pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4' },
                 { lbl: t('sc_part', lang, 'Active participants'), val: fmtStat(ps.participants, 0), chg: `${fmtStat(ps.active_validators, 0)} ${lang === 'ru' ? 'валидаторов' : 'validators'}`, pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6' },
-                { lbl: t('sc_apr', lang, 'Best plan APR'), val: '10.5%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
+                { lbl: t('sc_apr', lang, 'Best plan APR'), val: '9.7%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
               ].map(s => (
                 <div key={s.lbl} className="stat-card">
                   <div>
@@ -520,9 +520,9 @@ export default function Home() {
             {/* ── Plan selector ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 28 }}>
               {([
-                { days: 30,  apr: 7.7,  label: t('s_30',  lang, '30-day lock'),  hot: false },
-                { days: 90,  apr: 9.4,  label: t('s_90',  lang, '90-day lock'),  hot: true  },
-                { days: 180, apr: 10.5, label: t('s_180', lang, '180-day lock'), hot: false },
+                { days: 30,  apr: 5.5,  label: t('s_30',  lang, '30-day lock'),  hot: false },
+                { days: 90,  apr: 8.3,  label: t('s_90',  lang, '90-day lock'),  hot: true  },
+                { days: 180, apr: 9.7, label: t('s_180', lang, '180-day lock'), hot: false },
               ] as const).map(p => {
                 const active = calc.days === p.days;
                 return (
