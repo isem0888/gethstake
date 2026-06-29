@@ -52,6 +52,12 @@ function useEthMarket() {
   return data;
 }
 
+/* ── Базовый APR по плану (актуальные значения) ── */
+const BASE_APR: Record<number, number> = { 30: 5.5, 90: 8.3, 180: 9.7 };
+function getBaseApr(days: number): number {
+  return BASE_APR[days] ?? 8.3;
+}
+
 /* ── Bonus APR по количеству ETH + сроку плана ── */
 function getBonus(eth: number, days: number): number {
   if (eth >= 128) return days === 30 ? 1.1 : days === 90 ? 2.0 : 2.2;
@@ -167,7 +173,8 @@ function daysLeft(ends_at: string) {
 }
 function earned(stake: Stake) {
   const days = Math.max(0, (Date.now() - new Date(stake.started_at).getTime()) / 86_400_000);
-  return stake.amount_eth * stake.apy / 100 * days / 365;
+  const effectiveApy = getBaseApr(stake.plan_days) + getBonus(stake.amount_eth, stake.plan_days);
+  return stake.amount_eth * effectiveApy / 100 * days / 365;
 }
 function ownershipPct(eth: number): number {
   return Math.min(100, Math.round(eth / 32 * 100));
@@ -208,7 +215,7 @@ function buildChart(stakes: Stake[]) {
     const periodYield = stakes
       .filter(s => new Date(s.started_at) <= periodEnd && periodEnd <= new Date(s.ends_at))
       .reduce((acc, s) => {
-        const effectiveApy = s.apy + getBonus(s.amount_eth, s.plan_days);
+        const effectiveApy = getBaseApr(s.plan_days) + getBonus(s.amount_eth, s.plan_days);
         return acc + s.amount_eth * effectiveApy / 100 / 365 / (24 / CHART_PERIOD_H);
       }, 0);
     // Метка: дата + час (показываем только каждые 24 столбца ≈ раз в 4 дня)
@@ -433,7 +440,7 @@ export default function DashboardPage() {
                 const up = uptime(s.id);
                 const pct = Math.min(100, Math.round(s.amount_eth / 32 * 100));
                 const stakeBonus = getBonus(s.amount_eth, s.plan_days);
-                const effectiveApy = s.apy + stakeBonus;
+                const effectiveApy = getBaseApr(s.plan_days) + stakeBonus;
                 return (
                   <div key={s.id} style={{ background: '#080b14', border: stakeBonus > 0 ? '1px solid #60a5fa' : '1px solid #1d2c1f', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
                     {stakeBonus > 0 && (
