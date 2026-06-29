@@ -35,18 +35,45 @@ interface NewsItem {
 function useEthMarket() {
   const [data, setData] = useState<EthMarket | null>(null);
   const fetch_ = useCallback(() => {
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true')
+    fetch('/api/eth-price')
       .then(r => r.json())
-      .then(d => setData({
-        price: d.ethereum.usd,
-        change24h: d.ethereum.usd_24h_change,
-        marketCap: d.ethereum.usd_market_cap,
-        volume24h: d.ethereum.usd_24h_vol,
-      }))
+      .then(d => {
+        if (d.error) return;
+        setData({
+          price: d.price,
+          change24h: d.change24h,
+          marketCap: d.marketCap,
+          volume24h: d.volume24h,
+        });
+      })
       .catch(() => {});
   }, []);
   useEffect(() => { fetch_(); const t = setInterval(fetch_, 30_000); return () => clearInterval(t); }, [fetch_]);
   return data;
+}
+
+/* ── Bonus APR по количеству ETH + сроку плана ── */
+function getBonus(eth: number, days: number): number {
+  if (eth >= 128) return days === 30 ? 1.1 : days === 90 ? 2.0 : 2.2;
+  if (eth >= 96)  return days === 30 ? 1.0 : days === 90 ? 1.7 : 1.8;
+  if (eth >= 64)  return days === 30 ? 0.8 : days === 90 ? 1.5 : 1.5;
+  if (eth >= 32)  return days === 30 ? 0.4 : days === 90 ? 0.5 : 1.0;
+  return 0;
+}
+
+function tierName(eth: number): string {
+  if (eth >= 128) return 'Sovereign';
+  if (eth >= 96)  return 'Architect';
+  if (eth >= 64)  return 'Sentinel';
+  if (eth >= 32)  return 'Validator';
+  return '';
+}
+
+function bonusLabel(eth: number, days: number): string {
+  const b = getBonus(eth, days);
+  const name = tierName(eth);
+  if (!name) return '';
+  return `${name} · +${b}% APR`;
 }
 
 function useEthNetwork() {
@@ -234,7 +261,12 @@ export default function DashboardPage() {
   const active = stakes.filter(s => s.status === 'active');
   const totalStaked = active.reduce((a, s) => a + s.amount_eth, 0);
   const totalEarned = active.reduce((a, s) => a + earned(s), 0);
-  const fullNodeBonus = totalStaked >= 32;
+  const maxBonus = active.length > 0
+    ? Math.max(...active.map(s => getBonus(s.amount_eth, s.plan_days)))
+    : 0;
+  const maxBonusTier = active.length > 0
+    ? tierName(Math.max(...active.map(s => s.amount_eth)))
+    : '';
   const chart = buildChart(active);
 
   return (
@@ -285,10 +317,10 @@ export default function DashboardPage() {
                   <div style={{ ...val, fontSize: 22 }}>{active.length}</div>
                   <div style={{ fontSize: 11, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Active positions</div>
                 </div>
-                {fullNodeBonus && (
+                {maxBonus > 0 && (
                   <div style={{ background: '#0a0e20', border: '1px solid #60a5fa', borderRadius: 10, padding: '16px 18px' }}>
-                    <div style={{ ...val, fontSize: 22, color: '#60a5fa' }}>+0.7%</div>
-                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Full node APR bonus</div>
+                    <div style={{ ...val, fontSize: 22, color: '#60a5fa' }}>+{maxBonus}%</div>
+                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{maxBonusTier} best bonus</div>
                   </div>
                 )}
               </div>
@@ -296,7 +328,7 @@ export default function DashboardPage() {
                 <div style={{ marginTop: 16 }}>
                   <div style={{ fontSize: 11, color: '#5a6480', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.6px' }}>
                     Node ownership — {ownershipLabel(totalStaked)} ({ownershipPct(totalStaked)}%)
-                    {fullNodeBonus && <span style={{ color: '#60a5fa', marginLeft: 8 }}>★ Full control</span>}
+                    {maxBonus > 0 && <span style={{ color: '#60a5fa', marginLeft: 8 }}>★ {maxBonusTier}</span>}
                   </div>
                   <div style={{ background: '#1a2040', borderRadius: 6, height: 8 }}>
                     <div style={{ width: `${ownershipPct(totalStaked)}%`, height: '100%', borderRadius: 6, background: 'linear-gradient(90deg,#60a5fa,#a78bfa)' }} />
@@ -340,13 +372,13 @@ export default function DashboardPage() {
                 const tx = txCount(s.id, s.started_at);
                 const up = uptime(s.id);
                 const pct = Math.min(100, Math.round(s.amount_eth / 32 * 100));
-                const isFullNode = s.amount_eth >= 32;
-                const effectiveApy = isFullNode ? s.apy + 0.7 : s.apy;
+                const stakeBonus = getBonus(s.amount_eth, s.plan_days);
+                const effectiveApy = s.apy + stakeBonus;
                 return (
-                  <div key={s.id} style={{ background: '#080b14', border: isFullNode ? '1px solid #60a5fa' : '1px solid #1d2c1f', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
-                    {isFullNode && (
+                  <div key={s.id} style={{ background: '#080b14', border: stakeBonus > 0 ? '1px solid #60a5fa' : '1px solid #1d2c1f', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
+                    {stakeBonus > 0 && (
                       <span style={{ position: 'absolute', top: -10, right: 16, background: '#60a5fa', color: '#040e24', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 10px', borderRadius: 6 }}>
-                        FULL NODE · +0.7% APR
+                        {bonusLabel(s.amount_eth, s.plan_days).toUpperCase()}
                       </span>
                     )}
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 14 }}>

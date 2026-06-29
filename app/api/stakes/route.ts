@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createServerClient();
-  const APY: Record<number, number> = { 30: 8.2, 90: 10.2, 180: 10.9 };
+  const APY: Record<number, number> = { 30: 7.7, 90: 9.4, 180: 10.5 };
   const apy = APY[plan_days as 30 | 90 | 180];
 
   // Найдём или создадим пользователя

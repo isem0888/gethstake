@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>GethStake Dashboard — iPhone Preview</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #111;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 0 40px;
+    font-family: Inter, -apple-system, sans-serif;
+    min-height: 100vh;
+  }
+  .phone-frame {
+    width: 390px;
+    background: #06070f;
+    border-radius: 48px;
+    border: 10px solid #1a1a2e;
+    box-shadow: 0 0 0 3px #2a2a4e, 0 40px 80px rgba(0,0,0,.8);
+    overflow: hidden;
+    position: relative;
+  }
+  /* Status bar */
+  .status-bar {
+    background: #06070f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #e8eaf8;
+  }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+  /* Notch */
+  .notch {
+    width: 120px; height: 34px; background: #1a1a2e;
+    border-radius: 0 0 20px 20px;
+    margin: 0 auto -8px;
+  }
+
+  /* Nav */
+  .nav {
+    background: rgba(6,7,15,.95);
+    border-bottom: 1px solid #1a2040;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo {
+    font-family: 'Chakra Petch', 'Courier New', monospace;
+    font-weight: 700; font-size: 14px; color: #e8eaf8;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .logo-box {
+    width: 22px; height: 22px; border: 2px solid #60a5fa;
+    border-radius: 6px; display: grid; place-items: center;
+    font-size: 9px; color: #60a5fa;
+  }
+  .wallet {
+    margin-left: auto;
+    background: rgba(96,165,250,.08);
+    border: 1px solid rgba(96,165,250,.25);
+    border-radius: 8px; padding: 4px 8px;
+    font-size: 10px; color: #60a5fa; font-family: monospace;
+  }
+
+  /* Content */
+  .content { padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; color: #e8eaf8; }
+
+  .card {
+    background: #0d1121; border: 1px solid #1a2040;
+    border-radius: 14px; padding: 13px 14px;
+  }
+  .tag {
+    font-size: 9px; color: #5a6480;
+    font-family: 'Chakra Petch', monospace;
+    text-transform: uppercase; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 5px; margin-bottom: 10px;
+  }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: #60a5fa; flex-shrink: 0; }
+
+  /* Portfolio */
+  .port-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sb { border-radius: 10px; padding: 10px 12px; }
+  .sb-acc { background: #0a0e20; border: 1px solid rgba(96,165,250,.25); }
+  .sb-plain { background: #080b14; border: 1px solid #1a2040; }
+  .sb-hi { background: #0a0e20; border: 1px solid #a78bfa; }
+  .sb-full { grid-column: 1 / -1; }
+  .sv { font-family: 'Chakra Petch', monospace; font-weight: 700; font-size: 16px; }
+  .sv-sm { font-size: 13px; }
+  .sl { font-size: 9px; color: #5a6480; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+  .sl-usd { font-size: 9px; color: #3a4566; margin-top: 1px; }
+  .blue { color: #60a5fa; }
+  .violet { color: #a78bfa; }
+  .red { color: #f87171; }
+
+  /* Progress bar */
+  .bar-wrap { margin-top: 10px; }
+  .bar-lbl { font-size: 9px; color: #5a6480; margin-bottom: 3px; }
+  .bar-bg { background: #1a2040; border-radius: 4px; height: 6px; }
+  .bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #60a5fa, #a78bfa); }
+
+  /* Chart */
+  .chart-area { display: flex; align-items: flex-end; gap: 2px; height: 70px; margin-top: 6px; }
+  .cb { flex: 1; border-radius: 2px 2px 0 0; min-width: 2px; }
+  .cb-lo { background: rgba(96,165,250,.3); }
+  .cb-hi { background: rgba(96,165,250,.6); }
+  .chart-labels { display: flex; justify-content: space-between; font-size: 8px; color: #5a6480; margin-top: 3px; }
+
+  /* Node card */
+  .node {
+    background: #080b14; border: 1px solid #a78bfa;
+    border-radius: 12px; padding: 12px 13px; margin-bottom: 9px;
+    position: relative;
+  }
+  .node:last-child { margin-bottom: 0; }
+  .nbadge {
+    position: absolute; top: -8px; right: 10px;
+    background: #a78bfa; color: #1a0050;
+    font-size: 8px; font-weight: 700;
+    font-family: 'Chakra Petch', monospace;
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .nh { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 9px; gap: 6px; }
+  .vkey-lbl { font-size: 8px; color: #5a6480; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 2px; }
+  .vkey { font-family: monospace; font-size: 9px; color: #8a93b8; }
+  .earned { font-family: 'Chakra Petch', monospace; font-weight: 700; font-size: 14px; color: #60a5fa; }
+  .esub { font-size: 9px; color: #5a6480; margin-top: 1px; text-align: right; }
+  .eusd { font-size: 9px; color: #3a4566; text-align: right; }
+
+  .ns3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .ns { background: #0d1121; border-radius: 7px; padding: 7px 8px; }
+  .nsv { font-family: 'Chakra Petch', monospace; font-size: 11px; font-weight: 700; }
+  .nsl { font-size: 8px; color: #5a6480; text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
+
+  /* Market card */
+  .price-big { font-family: 'Chakra Petch', monospace; font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+  .m2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 10px; }
+  .mc { background: #080b14; border-radius: 7px; padding: 7px 9px; }
+  .mv { font-family: 'Chakra Petch', monospace; font-size: 11px; font-weight: 700; }
+  .ml { font-size: 9px; color: #5a6480; margin-bottom: 2px; }
+
+  /* Platform stats */
+  .p4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pv { font-family: 'Chakra Petch', monospace; font-weight: 700; font-size: 14px; }
+  .pl { font-size: 9px; color: #5a6480; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <!-- Notch -->
+  <div class="notch"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="#e8eaf8">
+        <rect x="0" y="4" width="3" height="7" rx="1"/>
+        <rect x="4.5" y="2.5" width="3" height="8.5" rx="1"/>
+        <rect x="9" y="0.5" width="3" height="10.5" rx="1"/>
+        <rect x="13.5" y="0" width="2.5" height="11" rx="1" opacity=".4"/>
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="#e8eaf8" stroke-width="1.2">
+        <path d="M7.5 2.5 C10.5 2.5 13 4.5 13 7" stroke-linecap="round"/>
+        <path d="M7.5 2.5 C4.5 2.5 2 4.5 2 7" stroke-linecap="round"/>
+        <path d="M7.5 5.5 C9 5.5 10.5 6.5 10.5 7.5" stroke-linecap="round"/>
+        <path d="M7.5 5.5 C6 5.5 4.5 6.5 4.5 7.5" stroke-linecap="round"/>
+        <circle cx="7.5" cy="9.5" r="1.2" fill="#e8eaf8" stroke="none"/>
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#e8eaf8" stroke-opacity=".4"/>
+        <rect x="2" y="2" width="17" height="8" rx="2" fill="#e8eaf8"/>
+        <path d="M23 4v4c.8-.4 1.3-1 1.3-2s-.5-1.6-1.3-2z" fill="#e8eaf8" opacity=".4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="logo">
+      <div class="logo-box">◆</div>
+      GETHSTAKE
+    </div>
+    <div class="wallet">0x7f3a…9e4b</div>
+  </nav>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Portfolio -->
+    <div class="card">
+      <div class="tag"><span class="dot"></span> Your portfolio</div>
+      <div class="port-grid">
+        <div class="sb sb-acc sb-full">
+          <div class="sv">256.0000 ETH</div>
+          <div class="sl-usd">≈ $481,896.96</div>
+          <div class="sl">Total staked</div>
+        </div>
+        <div class="sb sb-plain">
+          <div class="sv sv-sm blue">+2.7984 ETH</div>
+          <div class="sl-usd">≈ $5,267.97</div>
+          <div class="sl">Earned</div>
+        </div>
+        <div class="sb sb-hi">
+          <div class="sv sv-sm violet">+3.1%</div>
+          <div class="sl" style="color:#a78bfa;">Sovereign bonus</div>
+        </div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-lbl">8 validators · Sovereign tier ★ +3.1% APR · 2 active positions</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+      <div class="tag"><span class="dot"></span> Earnings — 30 days</div>
+      <div class="chart-area">
+        <div class="cb cb-lo" style="height:26%"></div><div class="cb cb-lo" style="height:28%"></div><div class="cb cb-lo" style="height:30%"></div><div class="cb cb-lo" style="height:32%"></div><div class="cb cb-lo" style="height:34%"></div><div class="cb cb-lo" style="height:36%"></div><div class="cb cb-lo" style="height:38%"></div><div class="cb cb-lo" style="height:40%"></div><div class="cb cb-lo" style="height:42%"></div><div class="cb cb-lo" style="height:44%"></div><div class="cb cb-lo" style="height:46%"></div><div class="cb cb-lo" style="height:48%"></div><div class="cb cb-lo" style="height:50%"></div><div class="cb cb-lo" style="height:52%"></div><div class="cb cb-lo" style="height:54%"></div>
+        <div class="cb cb-hi" style="height:59%"></div><div class="cb cb-hi" style="height:63%"></div><div class="cb cb-hi" style="height:67%"></div><div class="cb cb-hi" style="height:71%"></div><div class="cb cb-hi" style="height:75%"></div><div class="cb cb-hi" style="height:78%"></div><div class="cb cb-hi" style="height:81%"></div><div class="cb cb-hi" style="height:84%"></div><div class="cb cb-hi" style="height:87%"></div><div class="cb cb-hi" style="height:89%"></div><div class="cb cb-hi" style="height:91%"></div><div class="cb cb-hi" style="height:93%"></div><div class="cb cb-hi" style="height:95%"></div><div class="cb cb-hi" style="height:98%"></div><div class="cb cb-hi" style="height:100%"></div>
+      </div>
+      <div class="chart-labels">
+        <span>Jun 1 · 0.70 ETH</span>
+        <span style="color:#a78bfa">+pos 2 Jun 15</span>
+        <span>Jun 29 · 2.80 ETH</span>
+      </div>
+    </div>
+
+    <!-- Nodes -->
+    <div class="card">
+      <div class="tag"><span class="dot" style="background:#a78bfa"></span> Your validator nodes</div>
+
+      <div class="node">
+        <div class="nbadge">SOVEREIGN · +3.1% APR</div>
+        <div class="nh">
+          <div>
+            <div class="vkey-lbl">Position 1 · Validator key</div>
+            <div class="vkey">0x3f8a1d2c…b74e9f1a</div>
+          </div>
+          <div style="text-align:right">
+            <div class="earned">+2.0988 ETH</div>
+            <div class="eusd">≈ $3,950.46</div>
+            <div class="esub">45d left</div>
+          </div>
+        </div>
+        <div class="ns3">
+          <div class="ns"><div class="nsv">128 ETH</div><div class="nsl">Stake</div></div>
+          <div class="ns"><div class="nsv violet">13.3%</div><div class="nsl">APR</div></div>
+          <div class="ns"><div class="nsv">4 nodes</div><div class="nsl">Validators</div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-lbl">50% complete · 90-day plan</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:50%"></div></div>
+        </div>
+      </div>
+
+      <div class="node">
+        <div class="nbadge">SOVEREIGN · +3.1% APR</div>
+        <div class="nh">
+          <div>
+            <div class="vkey-lbl">Position 2 · Validator key</div>
+            <div class="vkey">0xa12c8e3b…c83f0b2d</div>
+          </div>
+          <div style="text-align:right">
+            <div class="earned">+0.6996 ETH</div>
+            <div class="eusd">≈ $1,317.51</div>
+            <div class="esub">75d left</div>
+          </div>
+        </div>
+        <div class="ns3">
+          <div class="ns"><div class="nsv">128 ETH</div><div class="nsl">Stake</div></div>
+          <div class="ns"><div class="nsv violet">13.3%</div><div class="nsl">APR</div></div>
+          <div class="ns"><div class="nsv">4 nodes</div><div class="nsl">Validators</div></div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-lbl">17% complete · 90-day plan</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:17%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETH Price -->
+    <div class="card">
+      <div class="tag"><span class="dot"></span> ETH / USD · Live</div>
+      <div class="price-big">$1,882.41</div>
+      <div style="font-size:12px;color:#f87171;font-weight:700;">▼ 3.84%  <span style="color:#5a6480;font-weight:400;font-size:10px;">за 24ч</span></div>
+      <div class="m2">
+        <div class="mc"><div class="ml">Market cap</div><div class="mv">$226.7B</div></div>
+        <div class="mc"><div class="ml">24h volume</div><div class="mv">$11.2B</div></div>
+        <div class="mc"><div class="ml">Gas · fast</div><div class="mv">8 Gwei</div></div>
+        <div class="mc"><div class="ml">Consensus</div><div class="mv" style="font-size:9px">Proof-of-Stake</div></div>
+      </div>
+    </div>
+
+    <!-- Bottom padding for home indicator -->
+    <div style="height:20px"></div>
+
+  </div>
+</div>
+</body>
+</html>

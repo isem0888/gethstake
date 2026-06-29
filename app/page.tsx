@@ -76,23 +76,23 @@ function t(key: string, lang: 'en' | 'ru', fallback: string) {
   return lang === 'ru' ? (RU[key] ?? fallback) : fallback;
 }
 
-/* ── Bonus APR by deposit size ── */
-function getBonus(eth: number): number {
-  if (eth >= 128) return 3.1;
-  if (eth >= 96)  return 2.2;
-  if (eth >= 64)  return 1.5;
-  if (eth >= 32)  return 0.7;
+/* ── Bonus APR by deposit size + plan duration ── */
+function getBonus(eth: number, days: number): number {
+  if (eth >= 128) return days === 30 ? 1.1 : days === 90 ? 2.0 : 2.2;
+  if (eth >= 96)  return days === 30 ? 1.0 : days === 90 ? 1.7 : 1.8;
+  if (eth >= 64)  return days === 30 ? 0.8 : days === 90 ? 1.5 : 1.5;
+  if (eth >= 32)  return days === 30 ? 0.4 : days === 90 ? 0.5 : 1.0;
   return 0;
 }
 
 /* ── Calculator hook ── */
-const APR_MAP: Record<number, number> = { 30: 8.2, 90: 10.2, 180: 10.9 };
+const APR_MAP: Record<number, number> = { 30: 7.7, 90: 9.4, 180: 10.5 };
 function useCalc() {
   const [amount, setAmountRaw] = useState(8);
   const [inputVal, setInputValRaw] = useState('8');
   const [days, setDays] = useState(90);
   const baseApr = APR_MAP[days];
-  const bonus = getBonus(amount);
+  const bonus = getBonus(amount, days);
   const apr = baseApr + bonus;
 
   const dailyGain    = amount * apr / 100 / 365;
@@ -287,7 +287,7 @@ export default function Home() {
               {[
                 { lbl: t('sc_tvl', lang, 'Total value locked'), val: `${fmtStat(ps.tvl_eth)} ETH`, chg: `${fmtStat(ps.participants, 0)} ${lang === 'ru' ? 'участников' : 'participants'}`, pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4' },
                 { lbl: t('sc_part', lang, 'Active participants'), val: fmtStat(ps.participants, 0), chg: `${fmtStat(ps.active_validators, 0)} ${lang === 'ru' ? 'валидаторов' : 'validators'}`, pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6' },
-                { lbl: t('sc_apr', lang, 'Best plan APR'), val: '10.2%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
+                { lbl: t('sc_apr', lang, 'Best plan APR'), val: '10.5%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
               ].map(s => (
                 <div key={s.lbl} className="stat-card">
                   <div>
@@ -406,9 +406,9 @@ export default function Home() {
           <div className="stake-grid">
             <div>
               {[
-                { days: 30, apr: 8.2, name: t('s_30', lang, '30-day lock'), hot: false },
-                { days: 90, apr: 10.2, name: t('s_90', lang, '90-day lock'), hot: true },
-                { days: 180, apr: 10.9, name: t('s_180', lang, '180-day lock'), hot: false },
+                { days: 30, apr: 7.7, name: t('s_30', lang, '30-day lock'), hot: false },
+                { days: 90, apr: 9.4, name: t('s_90', lang, '90-day lock'), hot: true },
+                { days: 180, apr: 10.5, name: t('s_180', lang, '180-day lock'), hot: false },
               ].map(p => (
                 <div key={p.days} className={`prow${p.hot ? ' hot' : ''}`}>
                   <div className="pl-left">
@@ -463,7 +463,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginTop: 8 }}>
             {([
               {
-                eth: 32, bonus: 0.7, pct: 25, name: 'Validator', nameRu: 'Валидатор',
+                eth: 32, bonusRange: '+0.4%–1.0%', pct: 25, name: 'Validator', nameRu: 'Валидатор',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
                     <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.2" strokeOpacity=".4"/>
@@ -471,12 +471,12 @@ export default function Home() {
                     <path d="M15 19l3 3 5-5" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ),
-                descEn: 'You run a complete Ethereum validator. Your node proposes and attests blocks, earning base staking rewards plus a +0.7% bonus for your direct contribution to network consensus.',
-                descRu: 'Вы управляете полным валидатором Ethereum. Узел предлагает и аттестует блоки, получая базовое вознаграждение плюс +0.7% за прямой вклад в консенсус сети.',
+                descEn: 'One full Ethereum validator. Your node proposes and attests blocks, earning base staking rewards plus a +0.4% to +1.0% bonus depending on your chosen lock period.',
+                descRu: 'Один полный валидатор Ethereum. Узел предлагает и аттестует блоки, получая базовое вознаграждение плюс +0.4%–1.0% бонус в зависимости от срока блокировки.',
                 highlight: false,
               },
               {
-                eth: 64, bonus: 1.5, pct: 50, name: 'Sentinel', nameRu: 'Страж',
+                eth: 64, bonusRange: '+0.8%–1.5%', pct: 50, name: 'Sentinel', nameRu: 'Страж',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
                     <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.2" strokeOpacity=".4"/>
@@ -485,12 +485,12 @@ export default function Home() {
                     <path d="M19 10v3M19 26v3M10 19h3M26 19h3" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round"/>
                   </svg>
                 ),
-                descEn: 'Two full validators under your control. Double the block proposals, double the attestation rewards. Your expanded presence strengthens network redundancy and earns a +1.5% APR bonus.',
-                descRu: 'Два полных валидатора под вашим управлением. Двойные предложения блоков и двойные аттестации. Расширенное присутствие усиливает надёжность сети и приносит +1.5% к APR.',
+                descEn: 'Two full validators under your control. Double attestation rewards and a +0.8% to +1.5% APR bonus that scales with your lock period.',
+                descRu: 'Два полных валидатора под управлением. Двойные аттестации и бонус +0.8%–1.5% к APR в зависимости от срока.',
                 highlight: false,
               },
               {
-                eth: 96, bonus: 2.2, pct: 75, name: 'Architect', nameRu: 'Архитектор',
+                eth: 96, bonusRange: '+1.0%–1.8%', pct: 75, name: 'Architect', nameRu: 'Архитектор',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
                     <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.2" strokeOpacity=".4"/>
@@ -498,12 +498,12 @@ export default function Home() {
                     <polygon points="19,14 23,16.5 23,21.5 19,24 15,21.5 15,16.5" stroke="#60a5fa" strokeWidth="1" fill="none" strokeOpacity=".5"/>
                   </svg>
                 ),
-                descEn: 'Three-node cluster operator. Your validator trio significantly impacts block finality speed and MEV distribution. A +2.2% APR bonus reflects your infrastructure-level commitment.',
-                descRu: 'Оператор кластера из трёх узлов. Ваше трио валидаторов существенно влияет на скорость финализации блоков и распределение MEV. Бонус +2.2% отражает инфраструктурный вклад.',
+                descEn: 'Three-node cluster operator. Your validator trio strengthens finality and MEV distribution, earning a +1.0% to +1.8% APR bonus tied to your commitment period.',
+                descRu: 'Оператор кластера из трёх узлов. Трио влияет на скорость финализации и MEV, принося +1.0%–1.8% к APR в зависимости от срока блокировки.',
                 highlight: false,
               },
               {
-                eth: 128, bonus: 3.1, pct: 100, name: 'Sovereign', nameRu: 'Суверен',
+                eth: 128, bonusRange: '+1.1%–2.2%', pct: 100, name: 'Sovereign', nameRu: 'Суверен',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
                     <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.4"/>
@@ -516,8 +516,8 @@ export default function Home() {
                     <circle cx="11" cy="23" r="1.5" fill="#60a5fa"/>
                   </svg>
                 ),
-                descEn: 'Maximum tier. Four full validators, maximum decentralization impact. Your quad-node setup earns the highest +3.1% APR bonus and represents the pinnacle of participation on the gethstake platform.',
-                descRu: 'Максимальный тир. Четыре полных валидатора, максимальный вклад в децентрализацию. Четыре узла приносят наивысший бонус +3.1% к APR — высшая форма участия на платформе gethstake.',
+                descEn: 'Maximum tier. Four full validators, maximum decentralization impact. Earn the highest +1.1% to +2.2% APR bonus — the pinnacle of participation on the gethstake platform.',
+                descRu: 'Максимальный тир. Четыре полных валидатора, максимальный вклад в децентрализацию. Наивысший бонус +1.1%–2.2% к APR — высшая форма участия на платформе.',
                 highlight: true,
               },
             ] as const).map(tier => (
@@ -533,7 +533,7 @@ export default function Home() {
 
                 {/* APR badge */}
                 <div style={{ display: 'inline-block', background: 'rgba(96,165,250,.12)', border: '1px solid rgba(96,165,250,.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 12 }}>
-                  <span style={{ color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{tier.bonus}% APR</span>
+                  <span style={{ color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>{tier.bonusRange} APR bonus</span>
                 </div>
 
                 {/* Name */}

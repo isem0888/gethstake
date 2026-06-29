@@ -16,11 +16,11 @@ interface Props {
   onClose: () => void;
 }
 
-function getBonus(eth: number): number {
-  if (eth >= 128) return 3.1;
-  if (eth >= 96)  return 2.2;
-  if (eth >= 64)  return 1.5;
-  if (eth >= 32)  return 0.7;
+function getBonus(eth: number, days: number): number {
+  if (eth >= 128) return days === 30 ? 1.1 : days === 90 ? 2.0 : 2.2;
+  if (eth >= 96)  return days === 30 ? 1.0 : days === 90 ? 1.7 : 1.8;
+  if (eth >= 64)  return days === 30 ? 0.8 : days === 90 ? 1.5 : 1.5;
+  if (eth >= 32)  return days === 30 ? 0.4 : days === 90 ? 0.5 : 1.0;
   return 0;
 }
 
@@ -43,7 +43,7 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   const [step, setStep] = useState<'confirm' | 'pending' | 'success' | 'error'>('confirm');
   const [errMsg, setErrMsg] = useState('');
 
-  const bonus = getBonus(amount);         // только для отображения строки "APR bonus"
+  const bonus = getBonus(amount, days);   // для отображения строки "APR bonus"
   const effectiveApr = apr;              // apr уже включает бонус (baseApr + bonus из page.tsx)
   const effectivePeriodGain = amount * effectiveApr / 100 * days / 365;
   const effectiveTotal = amount + effectivePeriodGain;
