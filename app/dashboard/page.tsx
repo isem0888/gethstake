@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useAccount } from 'wagmi';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { EthLogo } from '@/components/EthLogo';
 import { WalletButton } from '@/components/WalletButton';
 import Link from 'next/link';
@@ -196,22 +196,27 @@ interface PlatformStats {
   updated_at: string;
 }
 
+const CHART_PERIOD_H = 4;   // каждый столбец = 4 часа
+const CHART_DAYS    = 30;   // за последние 30 дней
+const CHART_BARS    = CHART_DAYS * (24 / CHART_PERIOD_H); // 180 столбцов
+
 function buildChart(stakes: Stake[]) {
-  const days = 30;
-  return Array.from({ length: days }, (_, i) => {
-    const d = new Date(Date.now() - (days - i - 1) * 86_400_000);
-    // Суммарный доход за ЭТОТ день по всем активным стейкам (дневная ставка)
-    const dailyYield = stakes
-      .filter(s => {
-        const start = new Date(s.started_at);
-        const end   = new Date(s.ends_at);
-        return start <= d && d <= end;
-      })
+  const periodMs = CHART_PERIOD_H * 60 * 60 * 1000;
+  return Array.from({ length: CHART_BARS }, (_, i) => {
+    const periodEnd = new Date(Date.now() - (CHART_BARS - i - 1) * periodMs);
+    // Начисление за этот 4-часовой интервал по всем активным стейкам
+    const periodYield = stakes
+      .filter(s => new Date(s.started_at) <= periodEnd && periodEnd <= new Date(s.ends_at))
       .reduce((acc, s) => {
         const effectiveApy = s.apy + getBonus(s.amount_eth, s.plan_days);
-        return acc + s.amount_eth * effectiveApy / 100 / 365;
+        return acc + s.amount_eth * effectiveApy / 100 / 365 / (24 / CHART_PERIOD_H);
       }, 0);
-    return { day: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), earned: +dailyYield.toFixed(4) };
+    // Метка: дата + час (показываем только каждые 24 столбца ≈ раз в 4 дня)
+    const h = periodEnd.getHours();
+    const label = i % 24 === 0
+      ? periodEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : (h === 0 || h === 8 || h === 16) ? `${String(h).padStart(2,'0')}:00` : '';
+    return { label, earned: +periodYield.toFixed(6) };
   });
 }
 
@@ -387,21 +392,44 @@ export default function DashboardPage() {
             {/* ── Earnings chart ── */}
             {chart.some(p => p.earned > 0) && active.length > 0 && (
               <div style={card}>
-                <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Дневной доход ETH — 30 дней <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>обновляется каждые 4ч</span></div>
-                <div style={{ height: 160 }}>
+                <div style={tag}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
+                  Начисление ETH · 4-часовые столбцы · 30 дней
+                  <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>каждый столбец = 4ч</span>
+                </div>
+                <div style={{ height: 180 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chart} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.25} />
-                          <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="day" tick={{ fill: '#5a6480', fontSize: 10 }} tickLine={false} axisLine={false} interval={6} />
-                      <YAxis tick={{ fill: '#5a6480', fontSize: 10 }} tickLine={false} axisLine={false} />
-                      <Tooltip contentStyle={{ background: '#0d1121', border: '1px solid #1a2040', borderRadius: 8, fontSize: 12 }} labelStyle={{ color: '#8a93b8' }} itemStyle={{ color: '#60a5fa' }} />
-                      <Area type="monotone" dataKey="earned" stroke="#60a5fa" strokeWidth={2} fill="url(#eg)" name="ETH earned" />
-                    </AreaChart>
+                    <BarChart data={chart} margin={{ top: 4, right: 0, left: -10, bottom: 0 }} barCategoryGap="10%">
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fill: '#5a6480', fontSize: 9 }}
+                        tickLine={false}
+                        axisLine={false}
+                        interval={23}
+                      />
+                      <YAxis
+                        tick={{ fill: '#5a6480', fontSize: 9 }}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(v: number) => v === 0 ? '0' : v.toFixed(4)}
+                        width={52}
+                      />
+                      <Tooltip
+                        contentStyle={{ background: '#0d1121', border: '1px solid #1a2040', borderRadius: 8, fontSize: 11 }}
+                        labelStyle={{ color: '#8a93b8', marginBottom: 4 }}
+                        itemStyle={{ color: '#60a5fa' }}
+                        formatter={(v: number) => [`+${v.toFixed(6)} ETH`, 'Начислено']}
+                      />
+                      <Bar dataKey="earned" name="ETH" radius={[2, 2, 0, 0]} maxBarSize={8}>
+                        {chart.map((entry, idx) => (
+                          <Cell
+                            key={idx}
+                            fill={entry.earned > 0 ? '#60a5fa' : '#1a2040'}
+                            fillOpacity={entry.earned > 0 ? (0.5 + (idx / chart.length) * 0.5) : 1}
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
