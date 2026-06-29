@@ -317,3 +317,132 @@ footer { border-top: 1px solid var(--line); padding: 34px 0; margin-top: 30px; c
   .cta-form input { min-width: auto; width: 100%; }
   .cta-form .btn { width: 100%; justify-content: center; }
 }
+
+/* ── DASHBOARD LAYOUT CLASSES ── */
+.dash-nav-inner {
+  display: flex; align-items: center; height: 64px;
+  gap: 16px; padding: 0 24px;
+  max-width: 1100px; margin: 0 auto;
+}
+.dash-page-content {
+  max-width: 1100px; margin: 0 auto;
+  padding: 32px 24px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+
+/* ── DEADLINE BANNER MOBILE ── */
+.deadline-inner {
+  max-width: 1100px; margin: 0 auto;
+  padding: 7px 24px;
+  display: flex; align-items: center;
+  flex-wrap: wrap; gap: 6px 20px;
+}
+.deadline-plans { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+.deadline-expire { margin-left: auto; color: #ffaaaa; font-size: 11px; white-space: nowrap; font-weight: 600; }
+
+/* ── NAV-RIGHT MOBILE ── */
+@media(max-width:640px) {
+  .nav-right { gap: 8px; }
+  .nav-dashboard-btn { display: none; }
+  .lang { font-size: 11px; }
+  .lang button { padding: 6px 8px; }
+}
+
+/* ── DASHBOARD MOBILE ── */
+@media(max-width:640px) {
+  .dash-nav-inner { padding: 0 14px; height: 54px; gap: 8px; }
+  .dash-nav-title { display: none; }
+  .dash-page-content { padding: 14px 14px; gap: 14px; }
+}
+
+/* ── DEADLINE BANNER MOBILE ── */
+@media(max-width:640px) {
+  .deadline-inner { padding: 6px 12px; gap: 4px 12px; }
+  .deadline-plans { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; gap: 12px; }
+  .deadline-expire { display: none; }
+}
+
+/* ── GLOBAL MOBILE ≤480px ── */
+@media(max-width:480px) {
+  html, body { overflow-x: hidden; }
+  .wrap { padding: 0 12px; }
+  section { padding: 34px 0; }
+
+  /* Hero */
+  h1.hero-h1 { font-size: 26px; line-height: 1.05; letter-spacing: -.2px; }
+  .hero { padding: 24px 0 32px; }
+  .hero p.sub { font-size: 13px; }
+  .hero-cta { flex-direction: column; gap: 10px; }
+  .hero-cta .btn { width: 100%; justify-content: center; }
+  .eyebrow { font-size: 10px; }
+
+  /* Nav */
+  .nav-in { height: 52px; }
+  .logo { font-size: 13px; letter-spacing: .3px; gap: 7px; }
+  .logo .dot { width: 22px; height: 22px; }
+
+  /* Sections */
+  .sec-head h2 { font-size: 17px; }
+  .sec-head { margin-bottom: 24px; }
+  .sec-head p { font-size: 14px; }
+  .panel { padding: 14px 12px; }
+
+  /* Features */
+  .feat { grid-template-columns: 1fr; gap: 10px; }
+  .fcard { padding: 18px 16px; }
+
+  /* Stat cards */
+  .stat-card { padding: 12px 14px; }
+  .stat-card .val { font-size: 17px; }
+  .spark { width: 60px; height: 30px; }
+
+  /* Plans */
+  .prow { flex-wrap: wrap; gap: 10px; }
+  .prow .papr { min-width: auto; }
+  .prow .pbtn { flex: 1; text-align: center; }
+
+  /* Calculator */
+  .calc-out { padding: 16px 14px; }
+  .calc-out .big { font-size: 24px; }
+
+  /* Market */
+  .mkt { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mcard { padding: 16px 12px; }
+  .mcard .mn { font-size: 20px; }
+
+  /* Powered */
+  .powered { padding: 12px; gap: 10px; flex-direction: column; align-items: flex-start; }
+  .powered .slot { font-size: 12px; padding: 6px 10px; }
+
+  /* Validators */
+  .vsplit { padding: 18px; }
+  .q { height: 52px; font-size: 13px; }
+
+  /* FAQ */
+  .faq-item { padding: 2px 14px; }
+  .faq-item summary { font-size: 13px; padding: 14px 0; }
+
+  /* CTA */
+  .cta-band { padding: 18px 14px; }
+  .cta-band h2 { font-size: 17px; }
+
+  /* Footer */
+  footer { padding: 24px 0; }
+
+  /* Dashboard */
+  .dash-nav-inner { padding: 0 12px; height: 50px; gap: 6px; }
+  .dash-page-content { padding: 10px 10px; gap: 10px; }
+
+  /* Avatars */
+  .avatars .av { width: 28px; height: 28px; margin-left: -6px; }
+  .trusted { font-size: 10px; }
+  .avatars .more { font-size: 12px; }
+}
+
+/* ── SMALL MOBILE ≤375px ── */
+@media(max-width:375px) {
+  h1.hero-h1 { font-size: 22px; }
+  .sec-head h2 { font-size: 15px; }
+  .stat-card .val { font-size: 15px; }
+  .dash-page-content { padding: 8px; }
+}

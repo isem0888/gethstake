@@ -32,16 +32,9 @@ export function DeadlineBanner() {
       background: 'linear-gradient(90deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%)',
       borderBottom: '1px solid #ef444444',
       fontFamily: "'Chakra Petch', sans-serif",
+      overflow: 'hidden',
     }}>
-      <div style={{
-        maxWidth: 1100,
-        margin: '0 auto',
-        padding: '7px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: '6px 20px',
-      }}>
+      <div className="deadline-inner">
 
         {/* Иконка + заголовок */}
         <span style={{
@@ -51,14 +44,15 @@ export function DeadlineBanner() {
           letterSpacing: '1.2px',
           textTransform: 'uppercase',
           whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}>
           ⚠ Final Staking Window
         </span>
 
-        <span style={{ color: '#ffffff44', fontSize: 14 }}>|</span>
+        <span style={{ color: '#ffffff44', fontSize: 14, flexShrink: 0 }}>|</span>
 
         {/* Планы */}
-        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="deadline-plans">
           {plans.map(p => {
             const urgent = p.daysLeft <= 14;
             const badgeBg    = urgent ? '#fbbf24' : '#ffffff22';
@@ -68,32 +62,34 @@ export function DeadlineBanner() {
               <span key={p.days} style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
-                fontSize: 12,
+                gap: 6,
+                fontSize: 11,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}>
                 <span style={{
                   background: badgeBg,
                   borderRadius: 4,
-                  padding: '2px 9px',
+                  padding: '2px 8px',
                   color: badgeColor,
                   fontWeight: 700,
-                  fontSize: 11,
+                  fontSize: 10,
                   letterSpacing: '.5px',
                 }}>
                   {p.label}
                 </span>
                 <span style={{ color: '#ffcccc' }}>
-                  last start <b style={{ color: '#ffffff' }}>{fmtDate(p.deadline)}</b>
+                  <b style={{ color: '#ffffff' }}>{fmtDate(p.deadline)}</b>
                 </span>
                 <span style={{
                   background: '#00000033',
                   borderRadius: 4,
-                  padding: '1px 8px',
+                  padding: '1px 7px',
                   color: daysColor,
                   fontWeight: 700,
-                  fontSize: 11,
+                  fontSize: 10,
                 }}>
-                  {p.daysLeft === 0 ? 'CLOSED' : `${p.daysLeft}d left`}
+                  {p.daysLeft === 0 ? 'CLOSED' : `${p.daysLeft}d`}
                 </span>
               </span>
             );
@@ -101,13 +97,7 @@ export function DeadlineBanner() {
         </div>
 
         {/* Крайний срок */}
-        <span style={{
-          marginLeft: 'auto',
-          color: '#ffaaaa',
-          fontSize: 11,
-          whiteSpace: 'nowrap',
-          fontWeight: 600,
-        }}>
+        <span className="deadline-expire">
           All plans expire Jan 1, 2027
         </span>
 

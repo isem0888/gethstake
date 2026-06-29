@@ -304,22 +304,22 @@ export default function DashboardPage() {
     <div style={S}>
       {/* Nav */}
       <nav style={{ borderBottom: '1px solid #1d2c1f', background: 'rgba(6,7,15,.9)', backdropFilter: 'blur(14px)', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', height: 64, gap: 16 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: 1, color: '#e8eaf8', textDecoration: 'none' }}>
-            <span style={{ width: 28, height: 28, border: '2px solid #60a5fa', borderRadius: 7, display: 'grid', placeItems: 'center' }}>
+        <div className="dash-nav-inner">
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: 1, color: '#e8eaf8', textDecoration: 'none', flexShrink: 0 }}>
+            <span style={{ width: 28, height: 28, border: '2px solid #60a5fa', borderRadius: 7, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
               <EthLogo size={12} />
             </span>
             GETHSTAKE
           </Link>
-          <span style={{ color: '#1a2040', fontSize: 20 }}>·</span>
-          <span style={{ fontSize: 13, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>Dashboard</span>
+          <span className="dash-nav-title" style={{ color: '#1a2040', fontSize: 20 }}>·</span>
+          <span className="dash-nav-title" style={{ fontSize: 13, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>Dashboard</span>
           <div style={{ marginLeft: 'auto' }}>
             <WalletButton />
           </div>
         </div>
       </nav>
 
-<div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+<div className="dash-page-content">
 
         {/* ── Portfolio (top) ── */}
         {!isConnected ? (

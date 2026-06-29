@@ -38,7 +38,7 @@ export function Navbar({ lang, onLangChange }: NavbarProps) {
 
         <div className="nav-right">
           {isConnected && (
-            <a href="/dashboard" className="btn btn-wallet" style={{ fontSize: 12, padding: '9px 16px', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px', textTransform: 'uppercase' }}>
+            <a href="/dashboard" className="btn btn-wallet nav-dashboard-btn" style={{ fontSize: 12, padding: '9px 16px', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px', textTransform: 'uppercase' }}>
               {lang === 'ru' ? 'Кабинет' : 'Dashboard'}
             </a>
           )}
@@ -62,6 +62,11 @@ export function Navbar({ lang, onLangChange }: NavbarProps) {
               {lang === 'ru' ? l.ru : l.en}
             </a>
           ))}
+          {isConnected && (
+            <a href="/dashboard" onClick={() => setMenuOpen(false)} style={{ color: '#60a5fa' }}>
+              {lang === 'ru' ? '📊 Кабинет' : '📊 Dashboard'}
+            </a>
+          )}
           <div className="lang" style={{ marginTop: 12 }}>
             <button className={lang === 'en' ? 'on' : ''} onClick={() => onLangChange('en')}>EN</button>
             <button className={lang === 'ru' ? 'on' : ''} onClick={() => onLangChange('ru')}>RU</button>
