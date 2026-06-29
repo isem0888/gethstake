@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     early: Boolean(early),
   })).catch(() => {});
 
-  return NextResponse.json({ ok: true, id: data?.id }, { status: 201 });
+  return NextResponse.json({ ok: true, id: (data as any)?.id }, { status: 201 });
 }
 
 // GET — история выводов по кошельку
