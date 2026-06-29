@@ -150,10 +150,23 @@ const EthSvg = ({ w = 22 }: { w?: number }) => (
   </svg>
 );
 
+interface PlatformStats { tvl_eth: number; participants: number; active_validators: number; rewards_paid_eth: number; }
+
+function fmtStat(n: number, decimals = 2) {
+  return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
 /* ── PAGE ── */
 export default function Home() {
   const [lang, setLang] = useState<'en' | 'ru'>('en');
+  const [ps, setPs] = useState<PlatformStats>({ tvl_eth: 227936, participants: 28492, active_validators: 7123, rewards_paid_eth: 5733.15 });
   const calc = useCalc();
+
+  useEffect(() => {
+    fetch('/api/platform').then(r => r.json()).then(d => {
+      if (d && d.tvl_eth) setPs(d);
+    }).catch(() => {});
+  }, []);
 
   const fmt = (n: number, d = 4) =>
     n.toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -206,9 +219,9 @@ export default function Home() {
                 <div className="ring" />
               </div>
               {[
-                { lbl: t('sc_tvl', lang, 'Total value locked'), val: '48,392 ETH', chg: '+24.35%', pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4' },
-                { lbl: t('sc_part', lang, 'Active participants'), val: '28,492', chg: '+18.27%', pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6' },
-                { lbl: t('sc_apr', lang, 'Best plan APR · 90 days'), val: '10.2%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
+                { lbl: t('sc_tvl', lang, 'Total value locked'), val: `${fmtStat(ps.tvl_eth)} ETH`, chg: `${fmtStat(ps.participants, 0)} ${lang === 'ru' ? 'участников' : 'participants'}`, pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4' },
+                { lbl: t('sc_part', lang, 'Active participants'), val: fmtStat(ps.participants, 0), chg: `${fmtStat(ps.active_validators, 0)} ${lang === 'ru' ? 'валидаторов' : 'validators'}`, pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6' },
+                { lbl: t('sc_apr', lang, 'Best plan APR'), val: '10.2%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
               ].map(s => (
                 <div key={s.lbl} className="stat-card">
                   <div>
@@ -348,14 +361,14 @@ export default function Home() {
               <div className="gl">{t('sc_tvl', lang, 'Total value locked')}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
                 <EthLogo size={28} />
-                <div className="gv">48,392 ETH</div>
+                <div className="gv">{fmtStat(ps.tvl_eth)} ETH</div>
               </div>
               <div className="gsphere" />
               <div className="gmini">
                 {[
                   { v: 'Ethereum', l: lang === 'ru' ? 'Сеть' : 'Network' },
-                  { v: '28,492', l: lang === 'ru' ? 'Участники' : 'Participants' },
-                  { v: '3,271 ETH', l: lang === 'ru' ? 'Выплачено' : 'Rewards paid' },
+                  { v: fmtStat(ps.participants, 0), l: lang === 'ru' ? 'Участники' : 'Participants' },
+                  { v: `${fmtStat(ps.rewards_paid_eth)} ETH`, l: lang === 'ru' ? 'Выплачено' : 'Rewards paid' },
                 ].map(g => (
                   <div key={g.l} className="gm"><div className="v">{g.v}</div><div className="l">{g.l}</div></div>
                 ))}
