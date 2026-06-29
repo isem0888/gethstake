@@ -683,7 +683,12 @@ export default function Home() {
           </div>
           {[
             [
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>, h: t('t_1h', lang, 'Reserve fund'), p: t('t_1p', lang, 'Part of the profit goes into an insurance buffer that smooths payouts in weak periods.') },
+              {
+                icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>,
+                h: t('t_1h', lang, 'Reserve fund'),
+                p: t('t_1p', lang, 'Part of the profit goes into an insurance buffer that smooths payouts in weak periods.'),
+                addr: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe',
+              },
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>, h: t('t_2h', lang, 'Transparent accounting'), p: t('t_2p', lang, 'Reporting on how deposits combine into validators and on actual yield.') },
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
             ],
@@ -698,6 +703,19 @@ export default function Home() {
                 <div key={c.h} className="tcard">
                   <div className="ic">{c.icon}</div>
                   <h3>{c.h}</h3><p>{c.p}</p>
+                  {c.addr && (
+                    <a
+                      href={`https://etherscan.io/address/${c.addr}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="reserve-addr"
+                      title={c.addr}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: .7 }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      {c.addr.slice(0, 8)}…{c.addr.slice(-6)}
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: .55 }}><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+                  )}
                   {c.pwr && <div className="pwr">{c.pwr}</div>}
                 </div>
               ))}
