@@ -456,50 +456,106 @@ export default function Home() {
       <section id="nodes" style={{ background: 'var(--bg2)' }}>
         <div className="wrap">
           <div className="sec-head center">
-            <div className="tag">{lang === 'ru' ? 'Владение узлом' : 'Node ownership'}</div>
-            <h2>{lang === 'ru' ? 'Больше ETH — выше бонус к APR' : 'More ETH — higher APR bonus'}</h2>
+            <div className="tag">{lang === 'ru' ? 'Программа бонусов узла' : 'Node Bonus Program'}</div>
+            <h2>{lang === 'ru' ? 'Четыре статуса. Четыре уровня дохода.' : 'Four tiers. Four levels of yield.'}</h2>
             <p>{lang === 'ru'
-              ? 'Чем больше узлов вы контролируете, тем выше бонус к базовой ставке. Четыре участника по 8 ETH формируют один валидатор. Максимум — 128 ETH (4 валидатора, +3.1% к APR).'
-              : 'The more validator nodes you control, the higher your APR bonus on top of the base rate. Four 8 ETH deposits form one validator. Maximum — 128 ETH (4 validators, +3.1% APR).'
+              ? 'Чем больше валидаторов вы контролируете — тем выше ваш статус и бонус к APR. Каждые 32 ETH дают вам полный контроль над одним узлом и дополнительный доход за вклад в децентрализацию сети.'
+              : 'The more validators you control, the higher your status and APR bonus. Every 32 ETH gives you full control of one node and extra yield for contributing to network decentralization.'
             }</p>
           </div>
-          {/* Quarter-node info */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 28 }}>
-            {[
-              { eth: 8,  share: '¼', label: lang === 'ru' ? 'Четверть узла' : 'Quarter node' },
-              { eth: 16, share: '½', label: lang === 'ru' ? 'Половина узла' : 'Half node' },
-              { eth: 24, share: '¾', label: lang === 'ru' ? 'Три четверти'  : 'Three-quarter' },
-              { eth: 32, share: '1×', label: lang === 'ru' ? 'Полный узел' : 'Full node' },
-            ].map(tier => (
-              <div key={tier.eth} style={{ background: 'var(--bg)', border: '1px solid #1d2c1f', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
-                <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 22, fontWeight: 700, color: 'var(--acc)' }}>{tier.share}</div>
-                <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 15, fontWeight: 700, marginTop: 4 }}>{tier.eth} ETH</div>
-                <div style={{ fontSize: 12, color: 'var(--mut)', marginTop: 4 }}>{tier.label}</div>
-              </div>
-            ))}
-          </div>
-          {/* Bonus tiers */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-            {[
-              { eth: 32,  nodes: 1, bonus: 0.7,  pct: 25,  label: lang === 'ru' ? '1 полный валидатор' : '1 full validator',  highlight: false },
-              { eth: 64,  nodes: 2, bonus: 1.5,  pct: 50,  label: lang === 'ru' ? '2 валидатора'       : '2 validators',      highlight: false },
-              { eth: 96,  nodes: 3, bonus: 2.2,  pct: 75,  label: lang === 'ru' ? '3 валидатора'       : '3 validators',      highlight: false },
-              { eth: 128, nodes: 4, bonus: 3.1,  pct: 100, label: lang === 'ru' ? '4 валидатора (макс)' : '4 validators (max)', highlight: true  },
-            ].map(tier => (
-              <div key={tier.eth} className="fcard" style={{ position: 'relative', border: tier.highlight ? '1px solid var(--acc)' : undefined }}>
-                <span style={{ position: 'absolute', top: -11, right: 12, background: 'var(--acc)', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 6 }}>
-                  +{tier.bonus}% APR
-                </span>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700, color: 'var(--acc)' }}>{tier.nodes} {lang === 'ru' ? 'узл.' : 'node'}{tier.nodes > 1 ? (lang === 'ru' ? '' : 's') : ''}</span>
-                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, fontWeight: 700 }}>{tier.eth} ETH</span>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginTop: 8 }}>
+            {([
+              {
+                eth: 32, bonus: 0.7, pct: 25, name: 'Validator', nameRu: 'Валидатор',
+                icon: (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.2" strokeOpacity=".4"/>
+                    <path d="M19 8L11 14v7c0 5 3.4 7.8 8 9 4.6-1.2 8-4 8-9v-7L19 8z" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
+                    <path d="M15 19l3 3 5-5" stroke="#9bfd4e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ),
+                descEn: 'You run a complete Ethereum validator. Your node proposes and attests blocks, earning base staking rewards plus a +0.7% bonus for your direct contribution to network consensus.',
+                descRu: 'Вы управляете полным валидатором Ethereum. Узел предлагает и аттестует блоки, получая базовое вознаграждение плюс +0.7% за прямой вклад в консенсус сети.',
+                highlight: false,
+              },
+              {
+                eth: 64, bonus: 1.5, pct: 50, name: 'Sentinel', nameRu: 'Страж',
+                icon: (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.2" strokeOpacity=".4"/>
+                    <path d="M12 19a7 7 0 1 0 14 0 7 7 0 0 0-14 0z" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
+                    <circle cx="19" cy="19" r="3" fill="#9bfd4e" fillOpacity=".7"/>
+                    <path d="M19 10v3M19 26v3M10 19h3M26 19h3" stroke="#9bfd4e" strokeWidth="1.2" strokeLinecap="round"/>
+                  </svg>
+                ),
+                descEn: 'Two full validators under your control. Double the block proposals, double the attestation rewards. Your expanded presence strengthens network redundancy and earns a +1.5% APR bonus.',
+                descRu: 'Два полных валидатора под вашим управлением. Двойные предложения блоков и двойные аттестации. Расширенное присутствие усиливает надёжность сети и приносит +1.5% к APR.',
+                highlight: false,
+              },
+              {
+                eth: 96, bonus: 2.2, pct: 75, name: 'Architect', nameRu: 'Архитектор',
+                icon: (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.2" strokeOpacity=".4"/>
+                    <polygon points="19,9 27,14 27,24 19,29 11,24 11,14" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
+                    <polygon points="19,14 23,16.5 23,21.5 19,24 15,21.5 15,16.5" stroke="#9bfd4e" strokeWidth="1" fill="none" strokeOpacity=".5"/>
+                  </svg>
+                ),
+                descEn: 'Three-node cluster operator. Your validator trio significantly impacts block finality speed and MEV distribution. A +2.2% APR bonus reflects your infrastructure-level commitment.',
+                descRu: 'Оператор кластера из трёх узлов. Ваше трио валидаторов существенно влияет на скорость финализации блоков и распределение MEV. Бонус +2.2% отражает инфраструктурный вклад.',
+                highlight: false,
+              },
+              {
+                eth: 128, bonus: 3.1, pct: 100, name: 'Sovereign', nameRu: 'Суверен',
+                icon: (
+                  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.4"/>
+                    <path d="M11 15l8-6 8 6v8l-8 6-8-6v-8z" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
+                    <path d="M15 19l2.5 2.5L23 16" stroke="#9bfd4e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="19" cy="10" r="1.5" fill="#9bfd4e"/>
+                    <circle cx="27" cy="15" r="1.5" fill="#9bfd4e"/>
+                    <circle cx="27" cy="23" r="1.5" fill="#9bfd4e"/>
+                    <circle cx="11" cy="15" r="1.5" fill="#9bfd4e"/>
+                    <circle cx="11" cy="23" r="1.5" fill="#9bfd4e"/>
+                  </svg>
+                ),
+                descEn: 'Maximum tier. Four full validators, maximum decentralization impact. Your quad-node setup earns the highest +3.1% APR bonus and represents the pinnacle of participation on the gethstake platform.',
+                descRu: 'Максимальный тир. Четыре полных валидатора, максимальный вклад в децентрализацию. Четыре узла приносят наивысший бонус +3.1% к APR — высшая форма участия на платформе gethstake.',
+                highlight: true,
+              },
+            ] as const).map(tier => (
+              <div key={tier.eth} className="fcard" style={{ position: 'relative', border: tier.highlight ? '1px solid var(--acc)' : '1px solid #1d2c1f', textAlign: 'center', padding: '32px 24px 24px' }}>
+                {tier.highlight && (
+                  <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'var(--acc)', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '3px 14px', borderRadius: 6, whiteSpace: 'nowrap' }}>
+                    {lang === 'ru' ? 'МАКСИМАЛЬНЫЙ ТИР' : 'MAXIMUM TIER'}
+                  </span>
+                )}
+
+                {/* Icon */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>{tier.icon}</div>
+
+                {/* APR badge */}
+                <div style={{ display: 'inline-block', background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 12 }}>
+                  <span style={{ color: '#9bfd4e', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{tier.bonus}% APR</span>
                 </div>
-                <div style={{ background: 'var(--bg)', borderRadius: 6, height: 6, marginBottom: 10 }}>
-                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'var(--acc)', opacity: 0.65 + tier.pct / 400 }} />
+
+                {/* Name */}
+                <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700, marginBottom: 4 }}>
+                  {lang === 'ru' ? tier.nameRu : tier.name}
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--mut)' }}>{tier.label}</div>
-                <div style={{ fontSize: 12, color: 'var(--acc)', marginTop: 6, fontWeight: 600 }}>
-                  {lang === 'ru' ? `Бонус +${tier.bonus}% к базовому APR` : `+${tier.bonus}% on top of base APR`}
+                <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, color: 'var(--acc)', marginBottom: 16 }}>
+                  {tier.eth} ETH · {tier.eth / 32} {lang === 'ru' ? (tier.eth / 32 === 1 ? 'валидатор' : 'валидатора') : (tier.eth / 32 === 1 ? 'validator' : 'validators')}
+                </div>
+
+                {/* Description */}
+                <p style={{ fontSize: 13, color: 'var(--mut)', lineHeight: 1.6, margin: 0 }}>
+                  {lang === 'ru' ? tier.descRu : tier.descEn}
+                </p>
+
+                {/* Progress bar */}
+                <div style={{ background: 'var(--bg)', borderRadius: 6, height: 4, marginTop: 20 }}>
+                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'linear-gradient(90deg, #4dff8f, #9bfd4e)' }} />
                 </div>
               </div>
             ))}
