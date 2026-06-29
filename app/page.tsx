@@ -186,7 +186,7 @@ function BonusTooltip({ lang }: { lang: 'en' | 'ru' }) {
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen(v => !v)}
-        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '50%', border: '1px solid #5f7062', color: '#5f7062', fontSize: 10, fontWeight: 700, cursor: 'pointer', userSelect: 'none', flexShrink: 0 }}
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '50%', border: '1px solid #5a6480', color: '#5a6480', fontSize: 10, fontWeight: 700, cursor: 'pointer', userSelect: 'none', flexShrink: 0 }}
       >?</span>
       {open && (
         <span style={{ position: 'absolute', bottom: 22, left: '50%', transform: 'translateX(-50%)', width: 240, background: '#0d1f0f', border: '1px solid #2a3f2c', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: '#b8ccba', lineHeight: 1.55, zIndex: 50, pointerEvents: 'none', boxShadow: '0 4px 24px rgba(0,0,0,.5)' }}>
@@ -201,12 +201,12 @@ function BonusTooltip({ lang }: { lang: 'en' | 'ru' }) {
 /* ── SVG helpers ── */
 const EthSvg = ({ w = 22 }: { w?: number }) => (
   <svg viewBox="0 0 28 44" fill="none" width={w}>
-    <polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75" />
-    <polygon points="14,0 28,22 14,16" fill="#9bfd4e" />
-    <polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75" />
-    <polygon points="28,25 14,44 14,31" fill="#9bfd4e" />
-    <polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45" />
-    <polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65" />
+    <polygon points="14,0 0,22 14,16" fill="#60a5fa" opacity=".75" />
+    <polygon points="14,0 28,22 14,16" fill="#60a5fa" />
+    <polygon points="0,25 14,44 14,31" fill="#60a5fa" opacity=".75" />
+    <polygon points="28,25 14,44 14,31" fill="#60a5fa" />
+    <polygon points="0,22 14,16 14,31 0,25" fill="#60a5fa" opacity=".45" />
+    <polygon points="28,22 14,16 14,31 28,25" fill="#60a5fa" opacity=".65" />
   </svg>
 );
 
@@ -294,7 +294,7 @@ export default function Home() {
                     <div className="chg">{s.chg}</div>
                   </div>
                   <svg className="spark" viewBox="0 0 84 38">
-                    <polyline fill="none" stroke="#9bfd4e" strokeWidth="2" points={s.pts} />
+                    <polyline fill="none" stroke="#60a5fa" strokeWidth="2" points={s.pts} />
                   </svg>
                 </div>
               ))}
@@ -335,9 +335,9 @@ export default function Home() {
           <div className="feat">
             {[
               { icon: <EthSvg w={26} />, h: t('bf_1h', lang, 'Real ETH yield'), p: t('bf_1p', lang, 'Competitive staking-based returns, denominated and paid in ETH — not in points.') },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>, h: t('bf_2h', lang, 'Secure'), p: t('bf_2p', lang, 'Audited contracts and institutional-grade infrastructure with built-in risk limits.') },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M14 6l6 6-6 6"/><path d="M3 6v12"/></svg>, h: t('bf_3h', lang, 'Flexible exit'), p: t('bf_3p', lang, 'Early withdrawal available — you get your principal back, forfeiting accrued yield.') },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" strokeDasharray="2 3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>, h: t('bf_4h', lang, 'Pooled validators'), p: t('bf_4p', lang, 'Four 8 ETH deposits form one 32 ETH validator — retail access to Ethereum staking.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>, h: t('bf_2h', lang, 'Secure'), p: t('bf_2p', lang, 'Audited contracts and institutional-grade infrastructure with built-in risk limits.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M14 6l6 6-6 6"/><path d="M3 6v12"/></svg>, h: t('bf_3h', lang, 'Flexible exit'), p: t('bf_3p', lang, 'Early withdrawal available — you get your principal back, forfeiting accrued yield.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" strokeDasharray="2 3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>, h: t('bf_4h', lang, 'Pooled validators'), p: t('bf_4p', lang, 'Four 8 ETH deposits form one 32 ETH validator — retail access to Ethereum staking.') },
             ].map(f => (
               <div key={f.h} className="fcard">
                 <div className="fic">{f.icon}</div>
@@ -464,9 +464,9 @@ export default function Home() {
                 eth: 32, bonus: 0.7, pct: 25, name: 'Validator', nameRu: 'Валидатор',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.2" strokeOpacity=".4"/>
-                    <path d="M19 8L11 14v7c0 5 3.4 7.8 8 9 4.6-1.2 8-4 8-9v-7L19 8z" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
-                    <path d="M15 19l3 3 5-5" stroke="#9bfd4e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.2" strokeOpacity=".4"/>
+                    <path d="M19 8L11 14v7c0 5 3.4 7.8 8 9 4.6-1.2 8-4 8-9v-7L19 8z" stroke="#60a5fa" strokeWidth="1.5" fill="none"/>
+                    <path d="M15 19l3 3 5-5" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ),
                 descEn: 'You run a complete Ethereum validator. Your node proposes and attests blocks, earning base staking rewards plus a +0.7% bonus for your direct contribution to network consensus.',
@@ -477,10 +477,10 @@ export default function Home() {
                 eth: 64, bonus: 1.5, pct: 50, name: 'Sentinel', nameRu: 'Страж',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.2" strokeOpacity=".4"/>
-                    <path d="M12 19a7 7 0 1 0 14 0 7 7 0 0 0-14 0z" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
-                    <circle cx="19" cy="19" r="3" fill="#9bfd4e" fillOpacity=".7"/>
-                    <path d="M19 10v3M19 26v3M10 19h3M26 19h3" stroke="#9bfd4e" strokeWidth="1.2" strokeLinecap="round"/>
+                    <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.2" strokeOpacity=".4"/>
+                    <path d="M12 19a7 7 0 1 0 14 0 7 7 0 0 0-14 0z" stroke="#60a5fa" strokeWidth="1.5" fill="none"/>
+                    <circle cx="19" cy="19" r="3" fill="#60a5fa" fillOpacity=".7"/>
+                    <path d="M19 10v3M19 26v3M10 19h3M26 19h3" stroke="#60a5fa" strokeWidth="1.2" strokeLinecap="round"/>
                   </svg>
                 ),
                 descEn: 'Two full validators under your control. Double the block proposals, double the attestation rewards. Your expanded presence strengthens network redundancy and earns a +1.5% APR bonus.',
@@ -491,9 +491,9 @@ export default function Home() {
                 eth: 96, bonus: 2.2, pct: 75, name: 'Architect', nameRu: 'Архитектор',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.2" strokeOpacity=".4"/>
-                    <polygon points="19,9 27,14 27,24 19,29 11,24 11,14" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
-                    <polygon points="19,14 23,16.5 23,21.5 19,24 15,21.5 15,16.5" stroke="#9bfd4e" strokeWidth="1" fill="none" strokeOpacity=".5"/>
+                    <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.2" strokeOpacity=".4"/>
+                    <polygon points="19,9 27,14 27,24 19,29 11,24 11,14" stroke="#60a5fa" strokeWidth="1.5" fill="none"/>
+                    <polygon points="19,14 23,16.5 23,21.5 19,24 15,21.5 15,16.5" stroke="#60a5fa" strokeWidth="1" fill="none" strokeOpacity=".5"/>
                   </svg>
                 ),
                 descEn: 'Three-node cluster operator. Your validator trio significantly impacts block finality speed and MEV distribution. A +2.2% APR bonus reflects your infrastructure-level commitment.',
@@ -504,14 +504,14 @@ export default function Home() {
                 eth: 128, bonus: 3.1, pct: 100, name: 'Sovereign', nameRu: 'Суверен',
                 icon: (
                   <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-                    <circle cx="19" cy="19" r="18" stroke="#9bfd4e" strokeWidth="1.4"/>
-                    <path d="M11 15l8-6 8 6v8l-8 6-8-6v-8z" stroke="#9bfd4e" strokeWidth="1.5" fill="none"/>
-                    <path d="M15 19l2.5 2.5L23 16" stroke="#9bfd4e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="19" cy="10" r="1.5" fill="#9bfd4e"/>
-                    <circle cx="27" cy="15" r="1.5" fill="#9bfd4e"/>
-                    <circle cx="27" cy="23" r="1.5" fill="#9bfd4e"/>
-                    <circle cx="11" cy="15" r="1.5" fill="#9bfd4e"/>
-                    <circle cx="11" cy="23" r="1.5" fill="#9bfd4e"/>
+                    <circle cx="19" cy="19" r="18" stroke="#60a5fa" strokeWidth="1.4"/>
+                    <path d="M11 15l8-6 8 6v8l-8 6-8-6v-8z" stroke="#60a5fa" strokeWidth="1.5" fill="none"/>
+                    <path d="M15 19l2.5 2.5L23 16" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="19" cy="10" r="1.5" fill="#60a5fa"/>
+                    <circle cx="27" cy="15" r="1.5" fill="#60a5fa"/>
+                    <circle cx="27" cy="23" r="1.5" fill="#60a5fa"/>
+                    <circle cx="11" cy="15" r="1.5" fill="#60a5fa"/>
+                    <circle cx="11" cy="23" r="1.5" fill="#60a5fa"/>
                   </svg>
                 ),
                 descEn: 'Maximum tier. Four full validators, maximum decentralization impact. Your quad-node setup earns the highest +3.1% APR bonus and represents the pinnacle of participation on the gethstake platform.',
@@ -521,7 +521,7 @@ export default function Home() {
             ] as const).map(tier => (
               <div key={tier.eth} className="fcard" style={{ position: 'relative', border: tier.highlight ? '1px solid var(--acc)' : '1px solid #1d2c1f', textAlign: 'center', padding: '32px 24px 24px' }}>
                 {tier.highlight && (
-                  <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'var(--acc)', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '3px 14px', borderRadius: 6, whiteSpace: 'nowrap' }}>
+                  <span style={{ position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)', background: 'var(--acc)', color: '#040e24', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '3px 14px', borderRadius: 6, whiteSpace: 'nowrap' }}>
                     {lang === 'ru' ? 'МАКСИМАЛЬНЫЙ ТИР' : 'MAXIMUM TIER'}
                   </span>
                 )}
@@ -530,8 +530,8 @@ export default function Home() {
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>{tier.icon}</div>
 
                 {/* APR badge */}
-                <div style={{ display: 'inline-block', background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 12 }}>
-                  <span style={{ color: '#9bfd4e', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{tier.bonus}% APR</span>
+                <div style={{ display: 'inline-block', background: 'rgba(96,165,250,.12)', border: '1px solid rgba(96,165,250,.3)', borderRadius: 20, padding: '4px 14px', marginBottom: 12 }}>
+                  <span style={{ color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{tier.bonus}% APR</span>
                 </div>
 
                 {/* Name */}
@@ -549,7 +549,7 @@ export default function Home() {
 
                 {/* Progress bar */}
                 <div style={{ background: 'var(--bg)', borderRadius: 6, height: 4, marginTop: 20 }}>
-                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'linear-gradient(90deg, #4dff8f, #9bfd4e)' }} />
+                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'linear-gradient(90deg, #60a5fa, #a78bfa)' }} />
                 </div>
               </div>
             ))}
@@ -585,7 +585,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={handleStartStaking}
-                  style={{ width: '100%', marginTop: 22, background: 'var(--acc)', color: '#06210a', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
+                  style={{ width: '100%', marginTop: 22, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
                 >
                   {lang === 'ru'
                     ? (isConnected ? 'Запустить стейкинг →' : 'Подключить кошелёк →')
@@ -599,8 +599,8 @@ export default function Home() {
                     {lang === 'ru' ? `Доход за ${calc.days} дней` : `Yield for ${calc.days} days`}
                   </div>
                   {calc.bonus > 0 && (
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 6, padding: '3px 10px' }}>
-                      <span style={{ color: '#9bfd4e', fontSize: 11, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(96,165,250,.12)', border: '1px solid rgba(96,165,250,.3)', borderRadius: 6, padding: '3px 10px' }}>
+                      <span style={{ color: '#60a5fa', fontSize: 11, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
                       <BonusTooltip lang={lang} />
                     </div>
                   )}
@@ -611,8 +611,8 @@ export default function Home() {
 
                 {/* APR line */}
                 <div className="row" style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #1d2c1f' }}>
-                  <span style={{ color: '#5f7062', fontSize: 13 }}>APR</span>
-                  <b style={{ color: calc.bonus > 0 ? '#9bfd4e' : undefined }}>
+                  <span style={{ color: '#5a6480', fontSize: 13 }}>APR</span>
+                  <b style={{ color: calc.bonus > 0 ? '#60a5fa' : undefined }}>
                     {calc.bonus > 0 ? `${calc.baseApr}% + ${calc.bonus}% = ${calc.apr.toFixed(1)}%` : `${calc.apr}%`}
                   </b>
                 </div>
@@ -625,9 +625,9 @@ export default function Home() {
                     { l: lang === 'ru' ? 'За квартал' : 'Per quarter', v: fmt(calc.quarterGain, 4) },
                     { l: lang === 'ru' ? 'В год' : 'Per year',       v: fmt(calc.yearGain, 4) },
                   ].map(r => (
-                    <div key={r.l} style={{ background: 'rgba(155,253,78,.04)', border: '1px solid #1d2c1f', borderRadius: 8, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 11, color: '#5f7062', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>{r.l}</div>
-                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 14, fontWeight: 700, color: '#9bfd4e' }}>{r.v}</div>
+                    <div key={r.l} style={{ background: 'rgba(96,165,250,.04)', border: '1px solid #1d2c1f', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 11, color: '#5a6480', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>{r.l}</div>
+                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 14, fontWeight: 700, color: '#60a5fa' }}>{r.v}</div>
                       <div style={{ fontSize: 10, color: '#3d5040', marginTop: 2 }}>ETH</div>
                     </div>
                   ))}
@@ -640,8 +640,8 @@ export default function Home() {
                   { l: lang === 'ru' ? 'Итого к выводу' : 'Total payout', v: `${fmt(calc.total)} ETH`, accent: false, bold: true },
                 ].map(r => (
                   <div key={r.l} className="row" style={{ borderColor: r.bold ? 'transparent' : undefined, paddingTop: r.bold ? 10 : undefined }}>
-                    <span style={{ color: r.bold ? '#eaf3ea' : '#5f7062', fontWeight: r.bold ? 600 : undefined }}>{r.l}</span>
-                    <b style={{ color: r.accent ? '#9bfd4e' : r.bold ? '#fff' : undefined, fontSize: r.bold ? 15 : undefined }}>{r.v}</b>
+                    <span style={{ color: r.bold ? '#e8eaf8' : '#5a6480', fontWeight: r.bold ? 600 : undefined }}>{r.l}</span>
+                    <b style={{ color: r.accent ? '#60a5fa' : r.bold ? '#fff' : undefined, fontSize: r.bold ? 15 : undefined }}>{r.v}</b>
                   </div>
                 ))}
               </div>
@@ -684,18 +684,18 @@ export default function Home() {
           {[
             [
               {
-                icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>,
+                icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>,
                 h: t('t_1h', lang, 'Reserve fund'),
                 p: t('t_1p', lang, 'Part of the profit goes into an insurance buffer that smooths payouts in weak periods.'),
                 addr: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe',
               },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>, h: t('t_2h', lang, 'Transparent accounting'), p: t('t_2p', lang, 'Reporting on how deposits combine into validators and on actual yield.') },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>, h: t('t_2h', lang, 'Transparent accounting'), p: t('t_2p', lang, 'Reporting on how deposits combine into validators and on actual yield.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#60a5fa" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
             ],
             [
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><svg viewBox="0 0 22 22" width={22} height={22} style={{ borderRadius: '50%', flexShrink: 0 }}><rect width="22" height="22" rx="11" fill="#0d2580"/><text x="11" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial,sans-serif">Z</text></svg><span>Zodia Custody</span></div> },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Wallets'), p: t('pr_2p', lang, 'Non-custodial wallet infrastructure for secure key management.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/MetaMask.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="MetaMask" /><img src="https://github.com/trustwallet.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Trust Wallet" /><span>MetaMask · Trust Wallet</span></div> },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/hknio.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Hacken" onError={(e) => { e.currentTarget.src='https://avatars.githubusercontent.com/u/34027067?s=22'; }} /><span>Hacken</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><svg viewBox="0 0 22 22" width={22} height={22} style={{ borderRadius: '50%', flexShrink: 0 }}><rect width="22" height="22" rx="11" fill="#0d2580"/><text x="11" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial,sans-serif">Z</text></svg><span>Zodia Custody</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Wallets'), p: t('pr_2p', lang, 'Non-custodial wallet infrastructure for secure key management.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/MetaMask.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="MetaMask" /><img src="https://github.com/trustwallet.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Trust Wallet" /><span>MetaMask · Trust Wallet</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/hknio.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Hacken" onError={(e) => { e.currentTarget.src='https://avatars.githubusercontent.com/u/34027067?s=22'; }} /><span>Hacken</span></div> },
             ],
           ].map((row, ri) => (
             <div key={ri} className="trust" style={ri > 0 ? { marginTop: 16 } : {}}>

@@ -141,8 +141,8 @@ export function Dashboard() {
                   <AreaChart data={chartData} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="earnGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#9bfd4e" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="#9bfd4e" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <XAxis dataKey="day" tick={{ fill: '#5f7062', fontSize: 10 }} tickLine={false} axisLine={false} interval={6} />
@@ -150,9 +150,9 @@ export function Dashboard() {
                     <Tooltip
                       contentStyle={{ background: '#0d130e', border: '1px solid #1d2c1f', borderRadius: 8, fontSize: 12 }}
                       labelStyle={{ color: '#8a9b8c' }}
-                      itemStyle={{ color: '#9bfd4e' }}
+                      itemStyle={{ color: '#60a5fa' }}
                     />
-                    <Area type="monotone" dataKey="earned" stroke="#9bfd4e" strokeWidth={2} fill="url(#earnGrad)" name="ETH earned" />
+                    <Area type="monotone" dataKey="earned" stroke="#60a5fa" strokeWidth={2} fill="url(#earnGrad)" name="ETH earned" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>

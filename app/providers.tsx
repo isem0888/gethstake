@@ -9,8 +9,8 @@ import '@rainbow-me/rainbowkit/styles.css';
 const queryClient = new QueryClient();
 
 const gethstakeTheme = darkTheme({
-  accentColor: '#9bfd4e',
-  accentColorForeground: '#06210a',
+  accentColor: '#60a5fa',
+  accentColorForeground: '#040e24',
   borderRadius: 'medium',
   fontStack: 'system',
   overlayBlur: 'small',
@@ -21,12 +21,12 @@ const customTheme = {
   ...gethstakeTheme,
   colors: {
     ...gethstakeTheme.colors,
-    modalBackground: '#0d130e',
-    modalBorder: '#1d2c1f',
-    menuItemBackground: '#111a12',
-    profileForeground: '#0a0f0b',
+    modalBackground: '#0d1121',
+    modalBorder: '#1a2040',
+    menuItemBackground: '#101629',
+    profileForeground: '#080b14',
     connectButtonBackground: 'transparent',
-    connectButtonInnerBackground: '#0d130e',
+    connectButtonInnerBackground: '#0d1121',
   },
 };
 

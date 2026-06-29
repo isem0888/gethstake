@@ -89,48 +89,48 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
   };
   const box: React.CSSProperties = {
-    background: '#0d130e', border: '1px solid #1d2c1f', borderRadius: 20,
+    background: '#0d1121', border: '1px solid #1a2040', borderRadius: 20,
     padding: '32px 28px', maxWidth: 460, width: '100%', position: 'relative',
     fontFamily: 'Inter, sans-serif',
   };
   const row: React.CSSProperties = {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    padding: '10px 0', borderBottom: '1px solid #1d2c1f', fontSize: 14,
+    padding: '10px 0', borderBottom: '1px solid #1a2040', fontSize: 14,
   };
 
   return (
     <div style={overlay} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={box}>
         {/* Close */}
-        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 18, background: 'none', border: 'none', color: '#5f7062', cursor: 'pointer', fontSize: 20 }}>✕</button>
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 18, background: 'none', border: 'none', color: '#5a6480', cursor: 'pointer', fontSize: 20 }}>✕</button>
 
         {step === 'confirm' && (
           <>
             <h2 style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, marginBottom: 6 }}>
               {lang === 'ru' ? 'Подтверждение стейкинга' : 'Confirm your staking position'}
             </h2>
-            <p style={{ color: '#5f7062', fontSize: 12, marginBottom: 24 }}>
+            <p style={{ color: '#5a6480', fontSize: 12, marginBottom: 24 }}>
               {lang === 'ru' ? 'Проверьте параметры перед отправкой транзакции' : 'Review your parameters before sending the transaction'}
             </p>
 
-            <div style={{ background: '#0a0f0b', borderRadius: 12, padding: '4px 16px', marginBottom: 20 }}>
+            <div style={{ background: '#080b14', borderRadius: 12, padding: '4px 16px', marginBottom: 20 }}>
               {[
                 { l: lang === 'ru' ? 'План' : 'Plan', v: `${days}-day lock` },
                 { l: lang === 'ru' ? 'Сумма депозита' : 'Deposit amount', v: `${amount} ETH`, bold: true },
-                { l: 'APR', v: `${effectiveApr.toFixed(1)}%`, color: '#9bfd4e' },
-                { l: lang === 'ru' ? 'Доход за период' : 'Yield for period', v: `+${fmtEth(effectivePeriodGain)} ETH`, color: '#9bfd4e' },
+                { l: 'APR', v: `${effectiveApr.toFixed(1)}%`, color: '#60a5fa' },
+                { l: lang === 'ru' ? 'Доход за период' : 'Yield for period', v: `+${fmtEth(effectivePeriodGain)} ETH`, color: '#60a5fa' },
                 { l: lang === 'ru' ? 'Итого к выводу' : 'Total payout', v: `${fmtEth(effectiveTotal)} ETH` },
                 { l: lang === 'ru' ? 'Доля узла' : 'Node ownership', v: ownershipLabel(amount, lang) },
-                ...(bonus > 0 ? [{ l: lang === 'ru' ? 'Бонус к APR' : 'APR bonus', v: `+${bonus}% (${ownershipLabel(amount, lang)})`, color: '#9bfd4e' }] : []),
+                ...(bonus > 0 ? [{ l: lang === 'ru' ? 'Бонус к APR' : 'APR bonus', v: `+${bonus}% (${ownershipLabel(amount, lang)})`, color: '#60a5fa' }] : []),
               ].map((r: any) => (
                 <div key={r.l} style={row}>
-                  <span style={{ color: '#8a9b8c' }}>{r.l}</span>
+                  <span style={{ color: '#8a93b8' }}>{r.l}</span>
                   <b style={{ color: r.color || '#eaf3ea', fontFamily: r.bold ? "'Chakra Petch',sans-serif" : undefined, fontSize: r.bold ? 16 : 14 }}>{r.v}</b>
                 </div>
               ))}
             </div>
 
-            <p style={{ color: '#5f7062', fontSize: 11, marginBottom: 20, lineHeight: 1.5 }}>
+            <p style={{ color: '#5a6480', fontSize: 11, marginBottom: 20, lineHeight: 1.5 }}>
               {lang === 'ru'
                 ? 'После нажатия кнопки откроется окно вашего кошелька для подтверждения транзакции.'
                 : 'After clicking the button, your wallet will open to confirm the transaction.'}
@@ -138,11 +138,11 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
 
             <button
               onClick={handleConfirm}
-              style={{ width: '100%', background: '#9bfd4e', color: '#06210a', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
+              style={{ width: '100%', background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
             >
               {lang === 'ru' ? 'Подтвердить и оплатить транзакцию' : 'Confirm & Pay Transaction'}
             </button>
-            <button onClick={onClose} style={{ width: '100%', background: 'none', border: '1px solid #1d2c1f', borderRadius: 10, padding: '11px 0', marginTop: 10, color: '#5f7062', cursor: 'pointer', fontSize: 13 }}>
+            <button onClick={onClose} style={{ width: '100%', background: 'none', border: '1px solid #1a2040', borderRadius: 10, padding: '11px 0', marginTop: 10, color: '#5a6480', cursor: 'pointer', fontSize: 13 }}>
               {lang === 'ru' ? 'Отмена' : 'Cancel'}
             </button>
           </>
@@ -157,7 +157,7 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
                 : (lang === 'ru' ? 'Транзакция отправлена' : 'Transaction submitted')}
             </h3>
             {txHash && (
-              <p style={{ fontSize: 11, color: '#5f7062', wordBreak: 'break-all', marginTop: 8 }}>
+              <p style={{ fontSize: 11, color: '#5a6480', wordBreak: 'break-all', marginTop: 8 }}>
                 Tx: {txHash.slice(0, 12)}…{txHash.slice(-8)}
               </p>
             )}
@@ -167,13 +167,13 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
         {step === 'success' && (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", color: '#9bfd4e', marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", color: '#60a5fa', marginBottom: 8 }}>
               {lang === 'ru' ? 'Стейкинг запущен!' : 'Staking activated!'}
             </h3>
-            <p style={{ color: '#8a9b8c', fontSize: 13, marginBottom: 24 }}>
+            <p style={{ color: '#8a93b8', fontSize: 13, marginBottom: 24 }}>
               {amount} ETH · {days}-day · {effectiveApr.toFixed(1)}% APR
             </p>
-            <button onClick={() => { onClose(); window.location.href = '/dashboard'; }} style={{ background: '#9bfd4e', color: '#06210a', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+            <button onClick={() => { onClose(); window.location.href = '/dashboard'; }} style={{ background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
               {lang === 'ru' ? 'Открыть кабинет' : 'Open Dashboard'}
             </button>
           </div>
@@ -185,8 +185,8 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
             <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", marginBottom: 8 }}>
               {lang === 'ru' ? 'Ошибка транзакции' : 'Transaction failed'}
             </h3>
-            <p style={{ color: '#5f7062', fontSize: 12, marginBottom: 24 }}>{errMsg}</p>
-            <button onClick={() => setStep('confirm')} style={{ background: '#9bfd4e', color: '#06210a', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+            <p style={{ color: '#5a6480', fontSize: 12, marginBottom: 24 }}>{errMsg}</p>
+            <button onClick={() => setStep('confirm')} style={{ background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
               {lang === 'ru' ? 'Попробовать снова' : 'Try again'}
             </button>
           </div>

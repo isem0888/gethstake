@@ -182,19 +182,19 @@ function buildChart(stakes: Stake[]) {
 
 const S: React.CSSProperties = {
   fontFamily: 'Inter, sans-serif',
-  background: '#060a07',
+  background: '#06070f',
   minHeight: '100vh',
-  color: '#eaf3ea',
+  color: '#e8eaf8',
 };
 const card: React.CSSProperties = {
-  background: '#0d130e',
-  border: '1px solid #1d2c1f',
+  background: '#0d1121',
+  border: '1px solid #1a2040',
   borderRadius: 14,
   padding: '20px 24px',
 };
 const tag: React.CSSProperties = {
   fontSize: 10,
-  color: '#5f7062',
+  color: '#5a6480',
   fontFamily: "'Chakra Petch',sans-serif",
   textTransform: 'uppercase',
   letterSpacing: '1px',
@@ -240,16 +240,16 @@ export default function DashboardPage() {
   return (
     <div style={S}>
       {/* Nav */}
-      <nav style={{ borderBottom: '1px solid #1d2c1f', background: 'rgba(6,10,7,.9)', backdropFilter: 'blur(14px)', position: 'sticky', top: 0, zIndex: 50 }}>
+      <nav style={{ borderBottom: '1px solid #1d2c1f', background: 'rgba(6,7,15,.9)', backdropFilter: 'blur(14px)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', height: 64, gap: 16 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: 1, color: '#eaf3ea', textDecoration: 'none' }}>
-            <span style={{ width: 28, height: 28, border: '2px solid #9bfd4e', borderRadius: 7, display: 'grid', placeItems: 'center' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: 1, color: '#e8eaf8', textDecoration: 'none' }}>
+            <span style={{ width: 28, height: 28, border: '2px solid #60a5fa', borderRadius: 7, display: 'grid', placeItems: 'center' }}>
               <EthLogo size={12} />
             </span>
             GETHSTAKE
           </Link>
-          <span style={{ color: '#1d2c1f', fontSize: 20 }}>·</span>
-          <span style={{ fontSize: 13, color: '#5f7062', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>Dashboard</span>
+          <span style={{ color: '#1a2040', fontSize: 20 }}>·</span>
+          <span style={{ fontSize: 13, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>Dashboard</span>
           <div style={{ marginLeft: 'auto' }}>
             <WalletButton />
           </div>
@@ -262,44 +262,44 @@ export default function DashboardPage() {
         {!isConnected ? (
           <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 16, padding: '18px 24px' }}>
             <EthLogo size={28} />
-            <p style={{ color: '#5f7062', fontSize: 14, margin: 0 }}>Connect your wallet to view your portfolio and validator nodes</p>
+            <p style={{ color: '#5a6480', fontSize: 14, margin: 0 }}>Connect your wallet to view your portfolio and validator nodes</p>
             <div style={{ marginLeft: 'auto' }}><WalletButton /></div>
           </div>
         ) : loading ? (
-          <div style={{ ...card, textAlign: 'center', color: '#5f7062', padding: 32 }}>Loading portfolio…</div>
+          <div style={{ ...card, textAlign: 'center', color: '#5a6480', padding: 32 }}>Loading portfolio…</div>
         ) : (
           <>
             {/* ── Portfolio ── */}
             <div style={card}>
-              <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Your portfolio</div>
+              <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Your portfolio</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16 }}>
-                <div style={{ background: '#0a160b', border: '1px solid #9bfd4e33', borderRadius: 10, padding: '16px 18px' }}>
+                <div style={{ background: '#0a0e20', border: '1px solid #60a5fa33', borderRadius: 10, padding: '16px 18px' }}>
                   <div style={{ ...val, fontSize: 22 }}>{fmtEth(totalStaked)} ETH</div>
-                  <div style={{ fontSize: 11, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Total staked</div>
+                  <div style={{ fontSize: 11, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Total staked</div>
                 </div>
-                <div style={{ background: '#0d130e', border: '1px solid #1d2c1f', borderRadius: 10, padding: '16px 18px' }}>
-                  <div style={{ ...val, fontSize: 22, color: '#9bfd4e' }}>+{fmtEth(totalEarned)} ETH</div>
-                  <div style={{ fontSize: 11, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Earned (accrued)</div>
+                <div style={{ background: '#0d1121', border: '1px solid #1a2040', borderRadius: 10, padding: '16px 18px' }}>
+                  <div style={{ ...val, fontSize: 22, color: '#60a5fa' }}>+{fmtEth(totalEarned)} ETH</div>
+                  <div style={{ fontSize: 11, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Earned (accrued)</div>
                 </div>
-                <div style={{ background: '#0d130e', border: '1px solid #1d2c1f', borderRadius: 10, padding: '16px 18px' }}>
+                <div style={{ background: '#0d1121', border: '1px solid #1a2040', borderRadius: 10, padding: '16px 18px' }}>
                   <div style={{ ...val, fontSize: 22 }}>{active.length}</div>
-                  <div style={{ fontSize: 11, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Active positions</div>
+                  <div style={{ fontSize: 11, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Active positions</div>
                 </div>
                 {fullNodeBonus && (
-                  <div style={{ background: '#0a160b', border: '1px solid #9bfd4e', borderRadius: 10, padding: '16px 18px' }}>
-                    <div style={{ ...val, fontSize: 22, color: '#9bfd4e' }}>+0.7%</div>
-                    <div style={{ fontSize: 11, color: '#9bfd4e', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Full node APR bonus</div>
+                  <div style={{ background: '#0a0e20', border: '1px solid #60a5fa', borderRadius: 10, padding: '16px 18px' }}>
+                    <div style={{ ...val, fontSize: 22, color: '#60a5fa' }}>+0.7%</div>
+                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Full node APR bonus</div>
                   </div>
                 )}
               </div>
               {totalStaked > 0 && (
                 <div style={{ marginTop: 16 }}>
-                  <div style={{ fontSize: 11, color: '#5f7062', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.6px' }}>
+                  <div style={{ fontSize: 11, color: '#5a6480', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.6px' }}>
                     Node ownership — {ownershipLabel(totalStaked)} ({ownershipPct(totalStaked)}%)
-                    {fullNodeBonus && <span style={{ color: '#9bfd4e', marginLeft: 8 }}>★ Full control</span>}
+                    {fullNodeBonus && <span style={{ color: '#60a5fa', marginLeft: 8 }}>★ Full control</span>}
                   </div>
-                  <div style={{ background: '#1d2c1f', borderRadius: 6, height: 8 }}>
-                    <div style={{ width: `${ownershipPct(totalStaked)}%`, height: '100%', borderRadius: 6, background: 'linear-gradient(90deg,#9bfd4e,#4dff8f)' }} />
+                  <div style={{ background: '#1a2040', borderRadius: 6, height: 8 }}>
+                    <div style={{ width: `${ownershipPct(totalStaked)}%`, height: '100%', borderRadius: 6, background: 'linear-gradient(90deg,#60a5fa,#a78bfa)' }} />
                   </div>
                 </div>
               )}
@@ -308,20 +308,20 @@ export default function DashboardPage() {
             {/* ── Earnings chart ── */}
             {chart.length > 0 && active.length > 0 && (
               <div style={card}>
-                <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Earnings — 30 days</div>
+                <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Earnings — 30 days</div>
                 <div style={{ height: 160 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chart} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
                       <defs>
                         <linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#9bfd4e" stopOpacity={0.25} />
-                          <stop offset="95%" stopColor="#9bfd4e" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <XAxis dataKey="day" tick={{ fill: '#5f7062', fontSize: 10 }} tickLine={false} axisLine={false} interval={6} />
-                      <YAxis tick={{ fill: '#5f7062', fontSize: 10 }} tickLine={false} axisLine={false} />
-                      <Tooltip contentStyle={{ background: '#0d130e', border: '1px solid #1d2c1f', borderRadius: 8, fontSize: 12 }} labelStyle={{ color: '#8a9b8c' }} itemStyle={{ color: '#9bfd4e' }} />
-                      <Area type="monotone" dataKey="earned" stroke="#9bfd4e" strokeWidth={2} fill="url(#eg)" name="ETH earned" />
+                      <XAxis dataKey="day" tick={{ fill: '#5a6480', fontSize: 10 }} tickLine={false} axisLine={false} interval={6} />
+                      <YAxis tick={{ fill: '#5a6480', fontSize: 10 }} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ background: '#0d1121', border: '1px solid #1a2040', borderRadius: 8, fontSize: 12 }} labelStyle={{ color: '#8a93b8' }} itemStyle={{ color: '#60a5fa' }} />
+                      <Area type="monotone" dataKey="earned" stroke="#60a5fa" strokeWidth={2} fill="url(#eg)" name="ETH earned" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -330,10 +330,10 @@ export default function DashboardPage() {
 
             {/* ── Validator Nodes ── */}
             <div style={card}>
-              <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Your validator nodes</div>
+              <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Your validator nodes</div>
               {active.length === 0 ? (
-                <div style={{ color: '#5f7062', fontSize: 13, padding: '12px 0' }}>
-                  No active stakes. <Link href="/#stake" style={{ color: '#9bfd4e' }}>Start staking →</Link>
+                <div style={{ color: '#5a6480', fontSize: 13, padding: '12px 0' }}>
+                  No active stakes. <Link href="/#stake" style={{ color: '#60a5fa' }}>Start staking →</Link>
                 </div>
               ) : active.map(s => {
                 const vkey = validatorKey(s.id);
@@ -343,22 +343,22 @@ export default function DashboardPage() {
                 const isFullNode = s.amount_eth >= 32;
                 const effectiveApy = isFullNode ? s.apy + 0.7 : s.apy;
                 return (
-                  <div key={s.id} style={{ background: '#0a0f0b', border: isFullNode ? '1px solid #9bfd4e' : '1px solid #1d2c1f', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
+                  <div key={s.id} style={{ background: '#080b14', border: isFullNode ? '1px solid #60a5fa' : '1px solid #1d2c1f', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
                     {isFullNode && (
-                      <span style={{ position: 'absolute', top: -10, right: 16, background: '#9bfd4e', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 10px', borderRadius: 6 }}>
+                      <span style={{ position: 'absolute', top: -10, right: 16, background: '#60a5fa', color: '#040e24', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 10px', borderRadius: 6 }}>
                         FULL NODE · +0.7% APR
                       </span>
                     )}
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 14 }}>
                       <div>
-                        <div style={{ fontSize: 10, color: '#5f7062', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 4 }}>Validator public key</div>
-                        <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#8a9b8c', wordBreak: 'break-all' }}>
+                        <div style={{ fontSize: 10, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 4 }}>Validator public key</div>
+                        <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#8a93b8', wordBreak: 'break-all' }}>
                           {vkey.slice(0, 20)}…{vkey.slice(-8)}
                         </div>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ ...val, fontSize: 18, color: '#9bfd4e' }}>+{fmtEth(earned(s))} ETH</div>
-                        <div style={{ fontSize: 11, color: '#5f7062', marginTop: 2 }}>earned · {daysLeft(s.ends_at)}d left</div>
+                        <div style={{ ...val, fontSize: 18, color: '#60a5fa' }}>+{fmtEth(earned(s))} ETH</div>
+                        <div style={{ fontSize: 11, color: '#5a6480', marginTop: 2 }}>earned · {daysLeft(s.ends_at)}d left</div>
                       </div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 12, marginBottom: 14 }}>
@@ -370,15 +370,15 @@ export default function DashboardPage() {
                         { l: 'Txs processed (node)', v: fmtNum(tx) },
                         { l: 'Validator uptime', v: `${up}%` },
                       ].map(r => (
-                        <div key={r.l} style={{ background: '#0d130e', borderRadius: 8, padding: '10px 12px' }}>
-                          <div style={{ ...val, fontSize: 14, color: '#eaf3ea' }}>{r.v}</div>
-                          <div style={{ fontSize: 10, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 3 }}>{r.l}</div>
+                        <div key={r.l} style={{ background: '#0d1121', borderRadius: 8, padding: '10px 12px' }}>
+                          <div style={{ ...val, fontSize: 14, color: '#e8eaf8' }}>{r.v}</div>
+                          <div style={{ fontSize: 10, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 3 }}>{r.l}</div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontSize: 10, color: '#5f7062', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>Progress — {100 - Math.round(daysLeft(s.ends_at) / s.plan_days * 100)}% complete</div>
-                    <div style={{ background: '#1d2c1f', borderRadius: 6, height: 6 }}>
-                      <div style={{ width: `${100 - Math.round(daysLeft(s.ends_at) / s.plan_days * 100)}%`, height: '100%', borderRadius: 6, background: 'var(--acc, #9bfd4e)' }} />
+                    <div style={{ fontSize: 10, color: '#5a6480', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>Progress — {100 - Math.round(daysLeft(s.ends_at) / s.plan_days * 100)}% complete</div>
+                    <div style={{ background: '#1a2040', borderRadius: 6, height: 6 }}>
+                      <div style={{ width: `${100 - Math.round(daysLeft(s.ends_at) / s.plan_days * 100)}%`, height: '100%', borderRadius: 6, background: 'var(--acc, #60a5fa)' }} />
                     </div>
                   </div>
                 );
@@ -393,9 +393,9 @@ export default function DashboardPage() {
           {/* ETH Price */}
           <div style={card}>
             <div style={tag}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
               ETH / USD · Live
-              <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3d5040' }}>updates every 30s</span>
+              <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>updates every 30s</span>
             </div>
             {market ? (
               <>
@@ -403,7 +403,7 @@ export default function DashboardPage() {
                   <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 32, fontWeight: 700 }}>
                     {fmtUsd(market.price)}
                   </div>
-                  <div style={{ paddingBottom: 5, fontSize: 14, fontWeight: 700, color: market.change24h >= 0 ? '#9bfd4e' : '#ff5555' }}>
+                  <div style={{ paddingBottom: 5, fontSize: 14, fontWeight: 700, color: market.change24h >= 0 ? '#60a5fa' : '#ff5555' }}>
                     {market.change24h >= 0 ? '▲' : '▼'} {Math.abs(market.change24h).toFixed(2)}%
                   </div>
                 </div>
@@ -412,22 +412,22 @@ export default function DashboardPage() {
                     { l: 'Market cap', v: fmtBig(market.marketCap) },
                     { l: '24h volume', v: fmtBig(market.volume24h) },
                   ].map(r => (
-                    <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 12, color: '#8a9b8c', marginBottom: 3 }}>{r.l}</div>
+                    <div key={r.l} style={{ background: '#080b14', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12, color: '#8a93b8', marginBottom: 3 }}>{r.l}</div>
                       <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700 }}>{r.v}</div>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading market data…</div>
+              <div style={{ color: '#3a4566', fontSize: 13, padding: '20px 0' }}>Loading market data…</div>
             )}
           </div>
 
           {/* Network Stats */}
           <div style={card}>
             <div style={tag}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block', animation: 'pulse 2s infinite' }} />
               Ethereum Network · Real-time
             </div>
             {network ? (
@@ -440,14 +440,14 @@ export default function DashboardPage() {
                   { l: 'Gas · slow', v: `${network.lowGas}` },
                   { l: 'Consensus', v: 'Proof-of-Stake' },
                 ].map(r => (
-                  <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 12, color: '#5f7062', marginBottom: 3 }}>{r.l}</div>
-                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: (r as any).accent ? '#9bfd4e' : undefined }}>{r.v}</div>
+                  <div key={r.l} style={{ background: '#080b14', borderRadius: 8, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 12, color: '#5a6480', marginBottom: 3 }}>{r.l}</div>
+                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: (r as any).accent ? '#60a5fa' : undefined }}>{r.v}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading network data…</div>
+              <div style={{ color: '#3a4566', fontSize: 13, padding: '20px 0' }}>Loading network data…</div>
             )}
           </div>
         </div>
@@ -455,9 +455,9 @@ export default function DashboardPage() {
         {/* ── News ── */}
         <div style={card}>
           <div style={tag}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
             Crypto & Market News
-            <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3d5040' }}>via CryptoCompare</span>
+            <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>via CryptoCompare</span>
           </div>
 
           {/* Tabs */}
@@ -470,9 +470,9 @@ export default function DashboardPage() {
             ] as const).map(tab => (
               <button key={tab.key} onClick={() => setNewsTab(tab.key)}
                 style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, cursor: 'pointer', fontFamily: "'Chakra Petch',sans-serif", border: '1px solid', transition: 'all .15s',
-                  background: newsTab === tab.key ? 'var(--acc, #9bfd4e)' : 'transparent',
-                  color: newsTab === tab.key ? '#06210a' : '#5f7062',
-                  borderColor: newsTab === tab.key ? 'var(--acc, #9bfd4e)' : '#1d2c1f',
+                  background: newsTab === tab.key ? 'var(--acc, #60a5fa)' : 'transparent',
+                  color: newsTab === tab.key ? '#040e24' : '#5a6480',
+                  borderColor: newsTab === tab.key ? 'var(--acc, #60a5fa)' : '#1a2040',
                 }}
               >{tab.label}</button>
             ))}
@@ -489,39 +489,39 @@ export default function DashboardPage() {
             }).slice(0, 9);
 
             if (newsError) return (
-              <div style={{ color: '#5f7062', fontSize: 13, padding: '12px 0' }}>Не удалось загрузить новости. Попробуйте обновить страницу.</div>
+              <div style={{ color: '#5a6480', fontSize: 13, padding: '12px 0' }}>Не удалось загрузить новости. Попробуйте обновить страницу.</div>
             );
 
             return allNews.length === 0 ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#3d5040', fontSize: 13, padding: '10px 0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#3a4566', fontSize: 13, padding: '10px 0' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
                 Загрузка новостей…
               </div>
             ) : filtered.length === 0 ? (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>В этой категории пока нет свежих статей.</div>
+              <div style={{ color: '#3a4566', fontSize: 13, padding: '8px 0' }}>В этой категории пока нет свежих статей.</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
                 {filtered.map(item => (
                   <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', flexDirection: 'column', background: '#0a0f0b', borderRadius: 10, overflow: 'hidden', textDecoration: 'none', border: '1px solid #1d2c1f', transition: 'border-color .2s' }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#2d4a30')}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#1d2c1f')}
+                    style={{ display: 'flex', flexDirection: 'column', background: '#080b14', borderRadius: 10, overflow: 'hidden', textDecoration: 'none', border: '1px solid #1a2040', transition: 'border-color .2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#1e2d5a')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#1a2040')}
                   >
                     {item.imageurl && (
                       <img src={item.imageurl} alt="" style={{ width: '100%', height: 110, objectFit: 'cover', flexShrink: 0 }} onError={e => { e.currentTarget.style.display = 'none'; }} />
                     )}
                     <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf3ea', lineHeight: 1.4, marginBottom: 8, flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#e8eaf8', lineHeight: 1.4, marginBottom: 8, flex: 1 }}>
                         {item.title}
                       </div>
                       {item.body && (
-                        <div style={{ fontSize: 11.5, color: '#5f7062', lineHeight: 1.45, marginBottom: 8 }}>
+                        <div style={{ fontSize: 11.5, color: '#5a6480', lineHeight: 1.45, marginBottom: 8 }}>
                           {item.body.slice(0, 100)}{item.body.length > 100 ? '…' : ''}
                         </div>
                       )}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: 10.5, color: '#4a6b4e', fontWeight: 600, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.4px' }}>{item.source}</span>
-                        <span style={{ fontSize: 11, color: '#3d5040' }}>{timeAgo(item.published_on)}</span>
+                        <span style={{ fontSize: 11, color: '#3a4566' }}>{timeAgo(item.published_on)}</span>
                       </div>
                     </div>
                   </a>
@@ -534,7 +534,7 @@ export default function DashboardPage() {
         {/* ── Platform Stats (always visible) ── */}
         {platform && (
           <div style={card}>
-            <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Platform stats <span style={{ marginLeft: 'auto', fontSize: 10, color: '#5f7062' }}>updated {new Date(platform.updated_at).toLocaleTimeString()}</span></div>
+            <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Platform stats <span style={{ marginLeft: 'auto', fontSize: 10, color: '#5a6480' }}>updated {new Date(platform.updated_at).toLocaleTimeString()}</span></div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16 }}>
               {[
                 { l: 'Total value locked', v: `${fmtEth(platform.tvl_eth)} ETH` },
@@ -544,7 +544,7 @@ export default function DashboardPage() {
               ].map(s => (
                 <div key={s.l}>
                   <div style={{ ...val, fontSize: 18 }}>{s.v}</div>
-                  <div style={{ fontSize: 11, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{s.l}</div>
+                  <div style={{ fontSize: 11, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{s.l}</div>
                 </div>
               ))}
             </div>
