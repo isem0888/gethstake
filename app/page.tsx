@@ -217,9 +217,24 @@ export default function Home() {
 
           <div className="powered">
             <span className="pl">Powered by</span>
-            {['Custody partner', 'Staking engine', 'Audit partner', 'Data / oracle'].map(s => (
-              <span key={s} className="slot">{s}</span>
-            ))}
+            <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <img src="https://avatars.githubusercontent.com/u/97140552?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Zodia" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              Zodia Custody
+            </span>
+            <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <img src="https://avatars.githubusercontent.com/u/11744586?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="MetaMask" />
+              <img src="https://avatars.githubusercontent.com/u/32179537?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Trust Wallet" />
+              MetaMask · Trust Wallet
+            </span>
+            <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <img src="https://avatars.githubusercontent.com/u/34027067?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Hacken" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              Hacken
+            </span>
+            <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+              <img src="https://avatars.githubusercontent.com/u/80477244?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Pyth" />
+              <img src="https://avatars.githubusercontent.com/u/37770894?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Chainlink" />
+              Pyth · Chainlink
+            </span>
           </div>
         </div>
       </header>
@@ -427,9 +442,9 @@ export default function Home() {
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
             ],
             [
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody & wallets'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: 'MetaMask · Trust Wallet' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Staking engine'), p: t('pr_2p', lang, 'Institutional staking and validator management.'), pwr: 'Everstake' },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: 'H-X Technologies' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://avatars.githubusercontent.com/u/97140552?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Zodia" onError={(e) => { e.currentTarget.style.display = 'none'; }} /><span>Zodia Custody</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Wallets'), p: t('pr_2p', lang, 'Non-custodial wallet infrastructure for secure key management.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://avatars.githubusercontent.com/u/11744586?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="MetaMask" /><img src="https://avatars.githubusercontent.com/u/32179537?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Trust Wallet" /><span>MetaMask · Trust Wallet</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://avatars.githubusercontent.com/u/34027067?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Hacken" onError={(e) => { e.currentTarget.style.display = 'none'; }} /><span>Hacken</span></div> },
             ],
           ].map((row, ri) => (
             <div key={ri} className="trust" style={ri > 0 ? { marginTop: 16 } : {}}>
