@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
+import { DeadlineBanner } from '@/components/DeadlineBanner';
 
 export const metadata: Metadata = {
   title: 'GethStake — Stake. Earn. Own a validator.',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <DeadlineBanner />
         <Providers>{children}</Providers>
       </body>
     </html>

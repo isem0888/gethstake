@@ -285,9 +285,6 @@ export default function DashboardPage() {
     return () => clearInterval(t);
   }, [isConnected, address]);
 
-  const PLATFORM_CLOSE = new Date('2027-01-01T00:00:00Z');
-  const daysToClose = Math.max(0, Math.ceil((PLATFORM_CLOSE.getTime() - Date.now()) / 86_400_000));
-
   const active = stakes.filter(s => s.status === 'active');
   const totalStaked = active.reduce((a, s) => a + s.amount_eth, 0);
   const totalEarned = active.reduce((a, s) => a + earned(s), 0);
@@ -322,19 +319,7 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      {/* ── Deadline banner ── */}
-      <div style={{ background: daysToClose < 60 ? 'rgba(248,113,113,.1)' : 'rgba(96,165,250,.07)', borderBottom: `1px solid ${daysToClose < 60 ? '#f87171' : '#60a5fa33'}` }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '8px 24px', display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
-          <span style={{ color: daysToClose < 60 ? '#f87171' : '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, letterSpacing: '.5px' }}>
-            🔒 ПЛАТФОРМА ЗАКРЫВАЕТСЯ 01.01.2027
-          </span>
-          <span style={{ color: '#5a6480' }}>·</span>
-          <span style={{ color: '#8a93b8' }}>Осталось <b style={{ color: daysToClose < 60 ? '#f87171' : '#e8eaf8' }}>{daysToClose} дней</b> для открытия новых стейков</span>
-          <span style={{ marginLeft: 'auto', color: '#3a4566', fontSize: 11 }}>Все активные позиции будут выплачены по истечении срока</span>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+<div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* ── Portfolio (top) ── */}
         {!isConnected ? (
