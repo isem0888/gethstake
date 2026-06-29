@@ -1,11 +1,15 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { mainnet, sepolia } from 'wagmi/chains';
+import { mainnet } from 'wagmi/chains';
+import { http } from 'wagmi';
 
 export const wagmiConfig = getDefaultConfig({
   appName: 'GethStake',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-  chains: [mainnet, sepolia],
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http('https://ethereum.publicnode.com'),
+  },
   ssr: true,
 });
 
-export const SUPPORTED_CHAINS = [mainnet, sepolia];
+export const SUPPORTED_CHAINS = [mainnet];

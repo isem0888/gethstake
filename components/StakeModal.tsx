@@ -88,7 +88,11 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
 
   const handleConfirm = () => {
     try {
-      sendTransaction({ to: STAKING_ADDRESS, value: parseEther(amount.toString()) });
+      sendTransaction({
+        to: STAKING_ADDRESS,
+        value: parseEther(amount.toString()),
+        gas: BigInt(21000), // simple ETH transfer — фиксируем gas, избегаем eth_estimateGas
+      });
     } catch (e: any) {
       setErrMsg(e?.message || 'Failed to initiate transaction');
       setStep('error');
