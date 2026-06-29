@@ -468,7 +468,7 @@ export default function DashboardPage() {
                         { l: 'Plan', v: `${s.plan_days}-day lock` },
                         { l: 'Итого к выплате', v: `${fmtEth(s.amount_eth + s.amount_eth * effectiveApy / 100 * s.plan_days / 365)} ETH`, highlight: true },
                         { l: 'Txs processed (node)', v: fmtNum(tx) },
-                        { l: 'Validator uptime', v: `${up}%` },
+                        { l: 'Validator uptime', v: `${up.toFixed(1)}%` },
                       ].map(r => (
                         <div key={r.l} style={{ background: (r as any).highlight ? '#0a1a0a' : '#0d1121', border: (r as any).highlight ? '1px solid #22c55e33' : 'none', borderRadius: 8, padding: '10px 12px' }}>
                           <div style={{ ...val, fontSize: 14, color: (r as any).highlight ? '#22c55e' : '#e8eaf8' }}>{r.v}</div>
