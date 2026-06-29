@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { EthLogo } from '@/components/EthLogo';
 import { Dashboard } from '@/components/Dashboard';
+import { StakeModal } from '@/components/StakeModal';
 
 /* ── i18n ── */
 const RU: Record<string, string> = {
@@ -74,12 +75,32 @@ function t(key: string, lang: 'en' | 'ru', fallback: string) {
 /* ── Calculator hook ── */
 const APR_MAP: Record<number, number> = { 30: 8.2, 90: 10.2, 180: 10.9 };
 function useCalc() {
-  const [amount, setAmount] = useState(8);
+  const [amount, setAmountRaw] = useState(8);
+  const [inputVal, setInputValRaw] = useState('8');
   const [days, setDays] = useState(90);
   const apr = APR_MAP[days];
   const yearGain = amount * apr / 100;
   const periodGain = yearGain * days / 365;
-  return { amount, setAmount, days, setDays, apr, yearGain, periodGain, total: amount + periodGain };
+
+  // Set amount programmatically (from "Stake" button clicks)
+  const setAmount = (n: number) => {
+    setAmountRaw(n);
+    setInputValRaw(String(n));
+  };
+  // Handle raw typing — allow partial input like "3" while typing "32"
+  const handleInputChange = (v: string) => {
+    setInputValRaw(v);
+    const n = parseFloat(v);
+    if (!isNaN(n) && n > 0) setAmountRaw(n);
+  };
+  // Clamp to minimum on blur
+  const handleInputBlur = () => {
+    const n = Math.max(8, parseFloat(inputVal) || 8);
+    setAmountRaw(n);
+    setInputValRaw(String(n));
+  };
+
+  return { amount, setAmount, inputVal, handleInputChange, handleInputBlur, days, setDays, apr, yearGain, periodGain, total: amount + periodGain };
 }
 
 /* ── Particle canvas ── */
@@ -160,6 +181,7 @@ function fmtStat(n: number, decimals = 2) {
 export default function Home() {
   const [lang, setLang] = useState<'en' | 'ru'>('en');
   const [ps, setPs] = useState<PlatformStats>({ tvl_eth: 227936, participants: 28492, active_validators: 7123, rewards_paid_eth: 5733.15 });
+  const [showModal, setShowModal] = useState(false);
   const calc = useCalc();
 
   useEffect(() => {
@@ -353,7 +375,10 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="papr">{p.apr}%</div>
-                  <button className="pbtn">Stake</button>
+                  <button className="pbtn" onClick={() => {
+                    calc.setDays(p.days);
+                    document.getElementById('calc')?.scrollIntoView({ behavior: 'smooth' });
+                  }}>Stake</button>
                 </div>
               ))}
             </div>
@@ -434,8 +459,9 @@ export default function Home() {
               <div>
                 <label>{t('c_amt', lang, 'Deposit amount')}</label>
                 <div className="input-eth">
-                  <input type="number" value={calc.amount} min={8} step={1}
-                    onChange={e => calc.setAmount(Math.max(8, Number(e.target.value)))} />
+                  <input type="number" value={calc.inputVal} min={8} step={1}
+                    onChange={e => calc.handleInputChange(e.target.value)}
+                    onBlur={calc.handleInputBlur} />
                   <span className="tk">ETH</span>
                 </div>
                 <div className="hint">{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
@@ -446,6 +472,12 @@ export default function Home() {
                       onClick={() => calc.setDays(d)}>{chipLabel(d, APR_MAP[d])}</div>
                   ))}
                 </div>
+                <button
+                  onClick={() => setShowModal(true)}
+                  style={{ width: '100%', marginTop: 22, background: 'var(--acc)', color: '#06210a', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
+                >
+                  {lang === 'ru' ? 'Запустить стейкинг →' : 'Start Staking →'}
+                </button>
               </div>
               <div className="calc-out">
                 <div className="muted" style={{ fontSize: 12, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
@@ -607,6 +639,18 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {showModal && (
+        <StakeModal
+          amount={calc.amount}
+          days={calc.days}
+          apr={calc.apr}
+          periodGain={calc.periodGain}
+          total={calc.total}
+          lang={lang}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   );
 }
