@@ -39,6 +39,14 @@ export function tgWalletConnected(wallet: string): string {
   );
 }
 
+function getBonus(eth: number, days: number): number {
+  if (eth >= 128) return days === 30 ? 1.1 : days === 90 ? 2.0 : 2.2;
+  if (eth >= 96)  return days === 30 ? 1.0 : days === 90 ? 1.7 : 1.8;
+  if (eth >= 64)  return days === 30 ? 0.8 : days === 90 ? 1.5 : 1.5;
+  if (eth >= 32)  return days === 30 ? 0.4 : days === 90 ? 0.5 : 1.0;
+  return 0;
+}
+
 export function tgStakeCreated(opts: {
   wallet: string;
   amount: number;
@@ -47,8 +55,10 @@ export function tgStakeCreated(opts: {
   endsAt: string;
 }): string {
   const { wallet, amount, days, apr, endsAt } = opts;
+  const bonus = getBonus(amount, days);
+  const effectiveApr = apr + bonus;
   const ends = new Date(endsAt).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const yield_ = (amount * apr / 100 * days / 365).toFixed(4);
+  const yield_ = (amount * effectiveApr / 100 * days / 365).toFixed(4);
   const total  = (amount + parseFloat(yield_)).toFixed(4);
 
   return (
@@ -56,7 +66,7 @@ export function tgStakeCreated(opts: {
     `👛 <code>${wallet}</code>\n` +
     `💎 Сумма: <b>${amount} ETH</b>\n` +
     `📅 План: <b>${days} дней</b>\n` +
-    `📈 APR: <b>${apr}%</b>\n` +
+    `📈 APR: <b>${effectiveApr.toFixed(1)}%</b>${bonus > 0 ? ` (база ${apr}% + бонус ${bonus}%)` : ''}\n` +
     `✨ Доход: <b>+${yield_} ETH</b>\n` +
     `🏦 Итого к выводу: <b>${total} ETH</b>\n` +
     `🔒 Окончание лока: ${ends}\n` +

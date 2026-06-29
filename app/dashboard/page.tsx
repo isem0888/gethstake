@@ -254,7 +254,16 @@ export default function DashboardPage() {
     if (!isConnected || !address) { setLoading(false); return; }
     fetch(`/api/stakes?wallet=${address}`)
       .then(r => r.json())
-      .then(d => { setStakes(Array.isArray(d) ? d : []); setLoading(false); })
+      .then(d => {
+        const rows = (Array.isArray(d) ? d : []).map((s: any) => ({
+          ...s,
+          amount_eth: Number(s.amount_eth) || 0,
+          plan_days:  Number(s.plan_days)  || 90,
+          apy:        Number(s.apy)        || 0,
+        }));
+        setStakes(rows);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [isConnected, address]);
 
@@ -338,7 +347,7 @@ export default function DashboardPage() {
             </div>
 
             {/* ── Earnings chart ── */}
-            {chart.length > 0 && active.length > 0 && (
+            {chart.some(p => p.earned > 0) && active.length > 0 && (
               <div style={card}>
                 <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Earnings — 30 days</div>
                 <div style={{ height: 160 }}>
