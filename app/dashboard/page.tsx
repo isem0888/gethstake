@@ -1,11 +1,97 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { EthLogo } from '@/components/EthLogo';
 import { WalletButton } from '@/components/WalletButton';
 import Link from 'next/link';
+
+/* ── Market + Network data ── */
+interface EthMarket {
+  price: number;
+  change24h: number;
+  marketCap: number;
+  volume24h: number;
+}
+interface EthNetwork {
+  pendingTx: number;
+  highGas: number;
+  medGas: number;
+  lowGas: number;
+  blockHeight: number;
+}
+interface NewsItem {
+  id: string;
+  title: string;
+  url: string;
+  source: string;
+  published: number;
+  imageurl: string;
+  body: string;
+}
+
+function useEthMarket() {
+  const [data, setData] = useState<EthMarket | null>(null);
+  const fetch_ = useCallback(() => {
+    fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true')
+      .then(r => r.json())
+      .then(d => setData({
+        price: d.ethereum.usd,
+        change24h: d.ethereum.usd_24h_change,
+        marketCap: d.ethereum.usd_market_cap,
+        volume24h: d.ethereum.usd_24h_vol,
+      }))
+      .catch(() => {});
+  }, []);
+  useEffect(() => { fetch_(); const t = setInterval(fetch_, 30_000); return () => clearInterval(t); }, [fetch_]);
+  return data;
+}
+
+function useEthNetwork() {
+  const [data, setData] = useState<EthNetwork | null>(null);
+  const fetch_ = useCallback(() => {
+    fetch('https://api.blockcypher.com/v1/eth/main')
+      .then(r => r.json())
+      .then(d => setData({
+        pendingTx: d.unconfirmed_count || 0,
+        highGas: Math.round((d.high_gas_price || 0) / 1e9),
+        medGas: Math.round((d.medium_gas_price || 0) / 1e9),
+        lowGas: Math.round((d.low_gas_price || 0) / 1e9),
+        blockHeight: d.height || 0,
+      }))
+      .catch(() => {});
+  }, []);
+  useEffect(() => { fetch_(); const t = setInterval(fetch_, 30_000); return () => clearInterval(t); }, [fetch_]);
+  return data;
+}
+
+function useEthNews() {
+  const [news, setNews] = useState<NewsItem[]>([]);
+  useEffect(() => {
+    fetch('https://min-api.cryptocompare.com/data/v2/news/?categories=ETH,Ethereum&lang=EN&sortOrder=latest&extraParams=gethstake')
+      .then(r => r.json())
+      .then(d => setNews((d.Data || []).slice(0, 4)))
+      .catch(() => {});
+  }, []);
+  return news;
+}
+
+function fmtUsd(n: number) {
+  return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function fmtBig(n: number) {
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  return fmtUsd(n);
+}
+function timeAgo(ts: number) {
+  const diff = Math.floor((Date.now() / 1000) - ts);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
 
 /* ── Helpers ── */
 function djb2(str: string): number {
@@ -119,6 +205,10 @@ export default function DashboardPage() {
   const [platform, setPlatform] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const market = useEthMarket();
+  const network = useEthNetwork();
+  const news = useEthNews();
+
   useEffect(() => {
     fetch('/api/platform').then(r => r.json()).then(setPlatform).catch(() => {});
   }, []);
@@ -157,6 +247,104 @@ export default function DashboardPage() {
       </nav>
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* ── ETH Market + Network Stats ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+
+          {/* ETH Price */}
+          <div style={card}>
+            <div style={tag}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
+              ETH / USD · Live
+              <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3d5040' }}>updates every 30s</span>
+            </div>
+            {market ? (
+              <>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 16 }}>
+                  <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 32, fontWeight: 700 }}>
+                    {fmtUsd(market.price)}
+                  </div>
+                  <div style={{ paddingBottom: 5, fontSize: 14, fontWeight: 700, color: market.change24h >= 0 ? '#9bfd4e' : '#ff5555' }}>
+                    {market.change24h >= 0 ? '▲' : '▼'} {Math.abs(market.change24h).toFixed(2)}%
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {[
+                    { l: 'Market cap', v: fmtBig(market.marketCap) },
+                    { l: '24h volume', v: fmtBig(market.volume24h) },
+                  ].map(r => (
+                    <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12, color: '#8a9b8c', marginBottom: 3 }}>{r.l}</div>
+                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700 }}>{r.v}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading market data…</div>
+            )}
+          </div>
+
+          {/* Network Stats */}
+          <div style={card}>
+            <div style={tag}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              Ethereum Network · Real-time
+            </div>
+            {network ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {[
+                  { l: 'Pending transactions', v: fmtNum(network.pendingTx), accent: true },
+                  { l: 'Block height', v: `#${fmtNum(network.blockHeight)}` },
+                  { l: 'Gas · fast (Gwei)', v: `${network.highGas}` },
+                  { l: 'Gas · standard', v: `${network.medGas}` },
+                  { l: 'Gas · slow', v: `${network.lowGas}` },
+                  { l: 'Consensus', v: 'Proof-of-Stake' },
+                ].map(r => (
+                  <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 12, color: '#5f7062', marginBottom: 3 }}>{r.l}</div>
+                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: (r as any).accent ? '#9bfd4e' : undefined }}>{r.v}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading network data…</div>
+            )}
+          </div>
+        </div>
+
+        {/* ── News ── */}
+        <div style={card}>
+          <div style={tag}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
+            Ethereum News
+          </div>
+          {news.length === 0 ? (
+            <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>Loading news…</div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
+              {news.map(item => (
+                <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer"
+                  style={{ display: 'flex', flexDirection: 'column', gap: 8, background: '#0a0f0b', borderRadius: 10, overflow: 'hidden', textDecoration: 'none', border: '1px solid #1d2c1f', transition: 'border-color .2s' }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = '#2d4a30')}
+                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#1d2c1f')}
+                >
+                  {item.imageurl && (
+                    <img src={item.imageurl} alt="" style={{ width: '100%', height: 120, objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+                  )}
+                  <div style={{ padding: '0 12px 12px' }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf3ea', lineHeight: 1.4, marginBottom: 6 }}>
+                      {item.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#5f7062' }}>
+                      {item.source} · {timeAgo(item.published)}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
 
         {!isConnected ? (
           <div style={{ ...card, textAlign: 'center', padding: '60px 24px' }}>
