@@ -43,8 +43,8 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   const [step, setStep] = useState<'confirm' | 'pending' | 'success' | 'error'>('confirm');
   const [errMsg, setErrMsg] = useState('');
 
-  const bonus = getBonus(amount);
-  const effectiveApr = apr + bonus;
+  const bonus = getBonus(amount);         // только для отображения строки "APR bonus"
+  const effectiveApr = apr;              // apr уже включает бонус (baseApr + bonus из page.tsx)
   const effectivePeriodGain = amount * effectiveApr / 100 * days / 365;
   const effectiveTotal = amount + effectivePeriodGain;
 
