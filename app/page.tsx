@@ -167,6 +167,30 @@ function ParticleBg() {
   return <canvas ref={canvasRef} id="bg-canvas" />;
 }
 
+/* ── Bonus tooltip ── */
+function BonusTooltip({ lang }: { lang: 'en' | 'ru' }) {
+  const [open, setOpen] = useState(false);
+  const text = lang === 'ru'
+    ? 'Каждые 32 ETH формируют полноценный валидатор Ethereum. Полный узел активнее участвует в предложении блоков и получает приоритетные комиссии (MEV + tips). Чем больше валидаторов вы контролируете — тем выше доля в общем пуле наград. Платформа распределяет этот дополнительный доход как бонус к базовому APR.'
+    : 'Every 32 ETH forms a complete Ethereum validator. A full node participates more actively in block proposals and earns priority fees (MEV + tips). The more validators you control, the larger your share of the reward pool. The platform distributes this extra income as a bonus on top of the base APR.';
+  return (
+    <span style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+      <span
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen(v => !v)}
+        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 16, height: 16, borderRadius: '50%', border: '1px solid #5f7062', color: '#5f7062', fontSize: 10, fontWeight: 700, cursor: 'pointer', userSelect: 'none', flexShrink: 0 }}
+      >?</span>
+      {open && (
+        <span style={{ position: 'absolute', bottom: 22, left: '50%', transform: 'translateX(-50%)', width: 240, background: '#0d1f0f', border: '1px solid #2a3f2c', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: '#b8ccba', lineHeight: 1.55, zIndex: 50, pointerEvents: 'none', boxShadow: '0 4px 24px rgba(0,0,0,.5)' }}>
+          {text}
+          <span style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%)', width: 8, height: 8, background: '#0d1f0f', border: '1px solid #2a3f2c', borderRight: 'none', borderTop: 'none', transform: 'translateX(-50%) rotate(-45deg)' }} />
+        </span>
+      )}
+    </span>
+  );
+}
+
 /* ── SVG helpers ── */
 const EthSvg = ({ w = 22 }: { w?: number }) => (
   <svg viewBox="0 0 28 44" fill="none" width={w}>
@@ -508,6 +532,7 @@ export default function Home() {
                   <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 6, padding: '3px 10px' }}>
                     <span style={{ color: '#9bfd4e', fontSize: 12, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
                     <span style={{ color: '#5f7062', fontSize: 11 }}>{lang === 'ru' ? 'за объём' : 'volume APR'}</span>
+                    <BonusTooltip lang={lang} />
                   </div>
                 )}
                 <div style={{ marginTop: 18 }}>
