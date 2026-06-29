@@ -518,11 +518,11 @@ export default function Home() {
 
           <div className="panel">
             {/* ── Plan selector ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 28 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 16 }}>
               {([
                 { days: 30,  apr: 5.5,  label: t('s_30',  lang, '30-day lock'),  hot: false },
                 { days: 90,  apr: 8.3,  label: t('s_90',  lang, '90-day lock'),  hot: true  },
-                { days: 180, apr: 9.7, label: t('s_180', lang, '180-day lock'), hot: false },
+                { days: 180, apr: 9.7,  label: t('s_180', lang, '180-day lock'), hot: false },
               ] as const).map(p => {
                 const active = calc.days === p.days;
                 return (
@@ -532,30 +532,29 @@ export default function Home() {
                     style={{
                       background: active ? 'rgba(96,165,250,.12)' : 'var(--card2)',
                       border: `1px solid ${active ? 'var(--acc)' : p.hot ? 'rgba(96,165,250,.35)' : 'var(--line)'}`,
-                      borderRadius: 14,
-                      padding: '18px 16px',
+                      borderRadius: 12,
+                      padding: '12px 10px',
                       cursor: 'pointer',
                       transition: '.18s',
                       textAlign: 'center',
                       position: 'relative',
-                      boxShadow: active ? '0 0 20px rgba(96,165,250,.15)' : p.hot ? '0 0 16px rgba(96,165,250,.08)' : 'none',
+                      boxShadow: active ? '0 0 16px rgba(96,165,250,.15)' : 'none',
                     }}
                   >
                     {p.hot && !active && (
-                      <span style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'var(--acc)', color: '#040e24', fontSize: 9, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 10px', borderRadius: 5, whiteSpace: 'nowrap', letterSpacing: '.5px' }}>
+                      <span style={{ position: 'absolute', top: -9, left: '50%', transform: 'translateX(-50%)', background: 'var(--acc)', color: '#040e24', fontSize: 8, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 4, whiteSpace: 'nowrap', letterSpacing: '.5px' }}>
                         {lang === 'ru' ? 'ПОПУЛЯРНЫЙ' : 'POPULAR'}
                       </span>
                     )}
-                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 28, fontWeight: 700, color: active ? 'var(--acc)' : 'var(--txt)', marginBottom: 4 }}>
+                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 22, fontWeight: 700, color: active ? 'var(--acc)' : 'var(--txt)', lineHeight: 1.1 }}>
                       {p.apr}%
                     </div>
-                    <div style={{ fontSize: 12, color: active ? 'var(--acc)' : 'var(--mut)', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 6 }}>
+                    <div style={{ fontSize: 10, color: active ? 'var(--acc)' : 'var(--mut)', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 4 }}>
                       APR
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--txt)', marginBottom: 2 }}>{p.label}</div>
-                    <div style={{ fontSize: 11, color: 'var(--mut2)' }}>{t('s_min', lang, 'min 8 ETH · paid in ETH')}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: active ? 'var(--txt)' : 'var(--mut)', marginBottom: 1 }}>{p.label}</div>
                     {active && (
-                      <div style={{ marginTop: 10, fontSize: 10, color: 'var(--acc)', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px' }}>
+                      <div style={{ fontSize: 9, color: 'var(--acc)', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px', marginTop: 4 }}>
                         ✓ {lang === 'ru' ? 'ВЫБРАН' : 'SELECTED'}
                       </div>
                     )}
@@ -567,17 +566,17 @@ export default function Home() {
             {/* ── Deposit + Calculator ── */}
             <div className="calc">
               <div>
-                <label>{t('c_amt', lang, 'Deposit amount')}</label>
+                <label style={{ fontSize: 11 }}>{t('c_amt', lang, 'Deposit amount')}</label>
                 <div className="input-eth">
                   <input type="number" value={calc.inputVal} min={8} step={1}
                     onChange={e => calc.handleInputChange(e.target.value)}
                     onBlur={calc.handleInputBlur} />
                   <span className="tk">ETH</span>
                 </div>
-                <div className="hint">{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
+                <div className="hint" style={{ fontSize: 11, marginTop: 6 }}>{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
                 <button
                   onClick={handleStartStaking}
-                  style={{ width: '100%', marginTop: 22, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
+                  style={{ width: '100%', marginTop: 14, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
                 >
                   {lang === 'ru'
                     ? (isConnected ? 'Запустить стейкинг →' : 'Подключить кошелёк →')
@@ -586,35 +585,34 @@ export default function Home() {
               </div>
 
               <div className="calc-out">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 4 }}>
-                  <div className="muted" style={{ fontSize: 12, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6, marginBottom: 2 }}>
+                  <div className="muted" style={{ fontSize: 11, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
                     {lang === 'ru' ? `Доход за ${calc.days} дней` : `Yield for ${calc.days} days`}
                   </div>
                   {calc.bonus > 0 && (
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(96,165,250,.12)', border: '1px solid rgba(96,165,250,.3)', borderRadius: 6, padding: '3px 10px' }}>
-                      <span style={{ color: '#60a5fa', fontSize: 11, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(96,165,250,.12)', border: '1px solid rgba(96,165,250,.3)', borderRadius: 5, padding: '2px 8px' }}>
+                      <span style={{ color: '#60a5fa', fontSize: 10, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
                       <BonusTooltip lang={lang} />
                     </div>
                   )}
                 </div>
-                <div className="big" style={{ marginBottom: 4 }}>{fmt(calc.periodGain)} ETH</div>
-                <div className="row" style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #1d2c1f' }}>
-                  <span style={{ color: '#5a6480', fontSize: 13 }}>APR</span>
-                  <b style={{ color: calc.bonus > 0 ? '#60a5fa' : undefined }}>
+                <div className="big" style={{ marginBottom: 2, fontSize: 32 }}>{fmt(calc.periodGain)} ETH</div>
+                <div className="row" style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid #1d2c1f' }}>
+                  <span style={{ color: '#5a6480', fontSize: 12 }}>APR</span>
+                  <b style={{ color: calc.bonus > 0 ? '#60a5fa' : undefined, fontSize: 13 }}>
                     {calc.bonus > 0 ? `${calc.baseApr}% + ${calc.bonus}% = ${calc.apr.toFixed(1)}%` : `${calc.apr}%`}
                   </b>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', marginBottom: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px', marginBottom: 10 }}>
                   {[
                     { l: lang === 'ru' ? 'В день' : 'Per day',        v: fmt(calc.dailyGain, 6) },
                     { l: lang === 'ru' ? 'В месяц' : 'Per month',     v: fmt(calc.monthlyGain, 4) },
                     { l: lang === 'ru' ? 'За квартал' : 'Per quarter', v: fmt(calc.quarterGain, 4) },
                     { l: lang === 'ru' ? 'В год' : 'Per year',        v: fmt(calc.yearGain, 4) },
                   ].map(r => (
-                    <div key={r.l} style={{ background: 'rgba(96,165,250,.04)', border: '1px solid #1d2c1f', borderRadius: 8, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 11, color: '#5a6480', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>{r.l}</div>
-                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 14, fontWeight: 700, color: '#60a5fa' }}>{r.v}</div>
-                      <div style={{ fontSize: 10, color: '#3d5040', marginTop: 2 }}>ETH</div>
+                    <div key={r.l} style={{ background: 'rgba(96,165,250,.04)', border: '1px solid #1d2c1f', borderRadius: 7, padding: '7px 10px' }}>
+                      <div style={{ fontSize: 10, color: '#5a6480', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '.5px' }}>{r.l}</div>
+                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: '#60a5fa' }}>{r.v} <span style={{ fontSize: 9, color: '#3d5040', fontWeight: 400 }}>ETH</span></div>
                     </div>
                   ))}
                 </div>
@@ -623,9 +621,9 @@ export default function Home() {
                   { l: lang === 'ru' ? `Доход за ${calc.days} дней` : `Yield (${calc.days}d)`, v: `+${fmt(calc.periodGain)} ETH`, accent: true },
                   { l: lang === 'ru' ? 'Итого к выводу' : 'Total payout', v: `${fmt(calc.total)} ETH`, accent: false, bold: true },
                 ].map(r => (
-                  <div key={r.l} className="row" style={{ borderColor: r.bold ? 'transparent' : undefined, paddingTop: r.bold ? 10 : undefined }}>
-                    <span style={{ color: r.bold ? '#e8eaf8' : '#5a6480', fontWeight: r.bold ? 600 : undefined }}>{r.l}</span>
-                    <b style={{ color: r.accent ? '#60a5fa' : r.bold ? '#fff' : undefined, fontSize: r.bold ? 15 : undefined }}>{r.v}</b>
+                  <div key={r.l} className="row" style={{ borderColor: r.bold ? 'transparent' : undefined, paddingTop: r.bold ? 8 : undefined }}>
+                    <span style={{ color: r.bold ? '#e8eaf8' : '#5a6480', fontWeight: r.bold ? 600 : undefined, fontSize: r.bold ? 13 : 12 }}>{r.l}</span>
+                    <b style={{ color: r.accent ? '#60a5fa' : r.bold ? '#fff' : undefined, fontSize: r.bold ? 14 : 13 }}>{r.v}</b>
                   </div>
                 ))}
               </div>
