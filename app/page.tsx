@@ -222,9 +222,8 @@ export default function Home() {
   const [lang, setLang] = useState<'en' | 'ru'>('en');
   const [ps, setPs] = useState<PlatformStats>({ tvl_eth: 227936, participants: 28492, active_validators: 7123, rewards_paid_eth: 5733.15 });
   const [showModal, setShowModal] = useState(false);
-  const [testState, setTestState] = useState<'idle' | 'loading' | 'ok' | 'err'>('idle');
   const calc = useCalc();
-  const { isConnected, address } = useAccount();
+  const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
 
   const handleStartStaking = () => {
@@ -232,30 +231,6 @@ export default function Home() {
       openConnectModal?.();
     } else {
       setShowModal(true);
-    }
-  };
-
-  const handleTestPay = async () => {
-    if (!isConnected || !address) { openConnectModal?.(); return; }
-    setTestState('loading');
-    try {
-      const res = await fetch('/api/stakes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet_address: address, amount_eth: calc.amount, plan_days: calc.days }),
-      });
-      if (res.ok) {
-        setTestState('ok');
-        setTimeout(() => { window.location.href = '/dashboard'; }, 1200);
-      } else {
-        const d = await res.json();
-        alert('Ошибка: ' + (d.error || res.status));
-        setTestState('err');
-        setTimeout(() => setTestState('idle'), 3000);
-      }
-    } catch {
-      setTestState('err');
-      setTimeout(() => setTestState('idle'), 3000);
     }
   };
 
@@ -619,29 +594,6 @@ export default function Home() {
                     : (isConnected ? 'Start Staking →' : 'Connect Wallet →')}
                 </button>
 
-                {/* ── TEST BUTTON ── */}
-                <button
-                  onClick={handleTestPay}
-                  disabled={testState === 'loading' || testState === 'ok'}
-                  style={{
-                    width: '100%', marginTop: 8,
-                    background: testState === 'ok' ? 'rgba(34,197,94,.15)' : testState === 'err' ? 'rgba(248,113,113,.1)' : 'rgba(96,165,250,.06)',
-                    color: testState === 'ok' ? '#22c55e' : testState === 'err' ? '#f87171' : '#60a5fa',
-                    border: `1px dashed ${testState === 'ok' ? '#22c55e' : testState === 'err' ? '#f87171' : 'rgba(96,165,250,.4)'}`,
-                    borderRadius: 10, padding: '11px 0',
-                    fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 12,
-                    letterSpacing: '.5px', cursor: testState === 'loading' || testState === 'ok' ? 'default' : 'pointer',
-                    textTransform: 'uppercase', transition: 'all .2s',
-                  }}
-                >
-                  {testState === 'loading' && '⏳ Отправка...'}
-                  {testState === 'ok' && '✓ Готово — переход в дашборд'}
-                  {testState === 'err' && '✗ Ошибка — попробуй снова'}
-                  {testState === 'idle' && `⚡ Я оплатил — тест (${calc.amount} ETH · ${calc.days}д)`}
-                </button>
-                <div style={{ fontSize: 10, color: '#3a4566', textAlign: 'center', marginTop: 5, fontFamily: "'Chakra Petch',sans-serif" }}>
-                  Тест: записывает стейк без транзакции → ТГ уведомление → дашборд
-                </div>
               </div>
               <div className="calc-out">
                 {/* Header */}

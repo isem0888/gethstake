@@ -76,7 +76,13 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   // Watch for error
   useEffect(() => {
     if (!txError) return;
-    setErrMsg(txError.message?.split('\n')[0] || 'Transaction failed');
+    const raw = txError.message || '';
+    let msg = raw.split('\n')[0] || 'Transaction failed';
+    if (/insufficient funds/i.test(raw))             msg = 'Insufficient ETH balance. Check you have enough ETH + gas.';
+    else if (/user rejected|rejected the request/i.test(raw)) msg = 'Transaction rejected in wallet.';
+    else if (/unknown rpc|rpc error/i.test(raw))     msg = 'Wallet RPC error. Try switching RPC in wallet settings, or retry.';
+    else if (/network/i.test(raw))                   msg = 'Network error. Check your connection and retry.';
+    setErrMsg(msg);
     setStep('error');
   }, [txError]);
 
