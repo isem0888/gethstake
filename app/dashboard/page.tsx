@@ -26,9 +26,10 @@ interface NewsItem {
   title: string;
   url: string;
   source: string;
-  published: number;
+  published_on: number;
   imageurl: string;
   body: string;
+  categories: string;
 }
 
 function useEthMarket() {
@@ -66,25 +67,23 @@ function useEthNetwork() {
   return data;
 }
 
-// Fetch broad news — all categories, filter client-side
+// Fetch news from our own API route (which parses RSS feeds server-side)
 function useNews() {
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [error, setError] = useState(false);
   useEffect(() => {
-    // Two requests in parallel: latest general + ETH-specific
-    Promise.all([
-      fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&sortOrder=latest&extraParams=gethstake').then(r => r.json()),
-      fetch('https://min-api.cryptocompare.com/data/v2/news/?categories=Regulation,Business,Trading,Market,Blockchain&lang=EN&sortOrder=latest&extraParams=gethstake').then(r => r.json()),
-    ]).then(([all, market]) => {
-      const combined: NewsItem[] = [...(all.Data || []), ...(market.Data || [])];
-      // Deduplicate by id
-      const seen = new Set<string>();
-      const unique = combined.filter(n => { if (seen.has(n.id)) return false; seen.add(n.id); return true; });
-      // Sort by published desc
-      unique.sort((a, b) => b.published - a.published);
-      setNews(unique.slice(0, 24));
-    }).catch(() => {});
+    fetch('/api/news')
+      .then(r => r.json())
+      .then(d => {
+        if (d.articles && d.articles.length > 0) {
+          setNews(d.articles);
+        } else {
+          setError(true);
+        }
+      })
+      .catch(() => setError(true));
   }, []);
-  return news;
+  return { news, error };
 }
 
 function fmtUsd(n: number) {
@@ -217,7 +216,7 @@ export default function DashboardPage() {
 
   const market = useEthMarket();
   const network = useEthNetwork();
-  const allNews = useNews();
+  const { news: allNews, error: newsError } = useNews();
   const [newsTab, setNewsTab] = useState<'all' | 'eth' | 'market' | 'regulation'>('all');
 
   useEffect(() => {
@@ -481,18 +480,25 @@ export default function DashboardPage() {
 
           {(() => {
             const filtered = allNews.filter(item => {
-              const cats = (item as any).categories?.toLowerCase() || '';
+              const cats = (item.categories || '').toLowerCase();
               const title = item.title.toLowerCase();
-              if (newsTab === 'eth') return cats.includes('eth') || cats.includes('ethereum') || title.includes('ethereum') || title.includes(' eth');
-              if (newsTab === 'market') return cats.includes('market') || cats.includes('trading') || cats.includes('business') || cats.includes('price');
-              if (newsTab === 'regulation') return cats.includes('regulation') || cats.includes('legal') || cats.includes('sec') || title.includes('sec ') || title.includes('regulation') || title.includes('law') || title.includes('ban');
+              if (newsTab === 'eth')        return cats.includes('eth') || cats.includes('staking') || title.includes('ethereum') || title.includes(' eth ') || title.includes('ether');
+              if (newsTab === 'market')     return cats.includes('market') || cats.includes('crypto') || title.includes('price') || title.includes('market') || title.includes('bitcoin');
+              if (newsTab === 'regulation') return cats.includes('regulation') || title.includes('sec') || title.includes('regulat') || title.includes('law') || title.includes('ban') || title.includes('govern');
               return true;
-            }).slice(0, 8);
+            }).slice(0, 9);
+
+            if (newsError) return (
+              <div style={{ color: '#5f7062', fontSize: 13, padding: '12px 0' }}>Не удалось загрузить новости. Попробуйте обновить страницу.</div>
+            );
 
             return allNews.length === 0 ? (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>Loading news…</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#3d5040', fontSize: 13, padding: '10px 0' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                Загрузка новостей…
+              </div>
             ) : filtered.length === 0 ? (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>No recent articles in this category.</div>
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>В этой категории пока нет свежих статей.</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
                 {filtered.map(item => (
@@ -508,9 +514,14 @@ export default function DashboardPage() {
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf3ea', lineHeight: 1.4, marginBottom: 8, flex: 1 }}>
                         {item.title}
                       </div>
+                      {item.body && (
+                        <div style={{ fontSize: 11.5, color: '#5f7062', lineHeight: 1.45, marginBottom: 8 }}>
+                          {item.body.slice(0, 100)}{item.body.length > 100 ? '…' : ''}
+                        </div>
+                      )}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 11, color: '#5f7062', fontWeight: 600 }}>{item.source}</span>
-                        <span style={{ fontSize: 11, color: '#3d5040' }}>{timeAgo(item.published)}</span>
+                        <span style={{ fontSize: 10.5, color: '#4a6b4e', fontWeight: 600, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.4px' }}>{item.source}</span>
+                        <span style={{ fontSize: 11, color: '#3d5040' }}>{timeAgo(item.published_on)}</span>
                       </div>
                     </div>
                   </a>
