@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { EthLogo } from './EthLogo';
 import { WalletButton } from './WalletButton';
 
@@ -11,6 +12,7 @@ interface NavbarProps {
 
 export function Navbar({ lang, onLangChange }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isConnected } = useAccount();
 
   const links = [
     { href: '#stake',  en: 'Stake',      ru: 'Стейкинг' },
@@ -35,6 +37,11 @@ export function Navbar({ lang, onLangChange }: NavbarProps) {
         </div>
 
         <div className="nav-right">
+          {isConnected && (
+            <a href="/dashboard" className="btn btn-wallet" style={{ fontSize: 12, padding: '9px 16px', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px', textTransform: 'uppercase' }}>
+              {lang === 'ru' ? 'Кабинет' : 'Dashboard'}
+            </a>
+          )}
           <div className="lang">
             <button className={lang === 'en' ? 'on' : ''} onClick={() => onLangChange('en')}>EN</button>
             <button className={lang === 'ru' ? 'on' : ''} onClick={() => onLangChange('ru')}>RU</button>

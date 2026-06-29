@@ -227,7 +227,7 @@ export default function Home() {
           <div className="powered">
             <span className="pl">Powered by</span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <img src="https://github.com/Zodia-Finance.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Zodia" onError={(e) => { e.currentTarget.src = 'https://avatars.githubusercontent.com/u/97140552?s=22'; }} />
+              <svg viewBox="0 0 22 22" width={22} height={22} style={{ borderRadius: '50%', flexShrink: 0 }}><rect width="22" height="22" rx="11" fill="#0d2580"/><text x="11" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial,sans-serif">Z</text></svg>
               Zodia Custody
             </span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -365,8 +365,51 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── NODE OWNERSHIP ── */}
+      <section id="nodes" style={{ background: 'var(--bg2)' }}>
+        <div className="wrap">
+          <div className="sec-head center">
+            <div className="tag">{lang === 'ru' ? 'Владение узлом' : 'Node ownership'}</div>
+            <h2>{lang === 'ru' ? 'Ваша доля — ваша часть сети' : 'Your stake — your share of the network'}</h2>
+            <p>{lang === 'ru'
+              ? 'Четыре участника по 8 ETH формируют один валидатор на 32 ETH. Чем больше ваш депозит — тем больше доля. При депозите 32 ETH вы получаете полный контроль над узлом и бонус +0.7% к APR.'
+              : 'Four 8 ETH participants form one 32 ETH validator. The more you stake, the larger your share. At 32 ETH you gain full node control and an APR bonus of +0.7%.'
+            }</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 8 }}>
+            {[
+              { eth: 8,  share: '¼', pct: 25,  label: lang === 'ru' ? 'Четверть узла' : 'Quarter node',      bonus: null },
+              { eth: 16, share: '½', pct: 50,  label: lang === 'ru' ? 'Половина узла' : 'Half node',         bonus: null },
+              { eth: 24, share: '¾', pct: 75,  label: lang === 'ru' ? 'Три четверти'  : 'Three-quarter node', bonus: null },
+              { eth: 32, share: '1', pct: 100, label: lang === 'ru' ? 'Полный узел'   : 'Full node control',  bonus: '+0.7% APR' },
+            ].map(tier => (
+              <div key={tier.eth} className="fcard" style={{ position: 'relative', border: tier.bonus ? '1px solid var(--acc)' : undefined }}>
+                {tier.bonus && (
+                  <span style={{ position: 'absolute', top: -10, right: 12, background: 'var(--acc)', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 6 }}>
+                    {tier.bonus}
+                  </span>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 26, fontWeight: 700, color: 'var(--acc)' }}>{tier.share}</span>
+                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700 }}>{tier.eth} ETH</span>
+                </div>
+                <div style={{ background: 'var(--bg)', borderRadius: 6, height: 6, marginBottom: 10 }}>
+                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'var(--acc)', opacity: 0.7 + tier.pct / 400 }} />
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--mut)' }}>{tier.label}</div>
+                {tier.bonus && (
+                  <div style={{ fontSize: 12, color: 'var(--acc)', marginTop: 6, fontWeight: 600 }}>
+                    {lang === 'ru' ? 'Полный контроль + бонус к APR' : 'Full control + APR bonus'}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── CALCULATOR ── */}
-      <section id="calc" style={{ background: 'var(--bg2)' }}>
+      <section id="calc">
         <div className="wrap">
           <div className="sec-head center">
             <div className="tag">{t('c_tag', lang, 'Calculator')}</div>
@@ -450,7 +493,7 @@ export default function Home() {
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
             ],
             [
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/Zodia-Finance.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Zodia" onError={(e) => { e.currentTarget.src='https://avatars.githubusercontent.com/u/97140552?s=22'; }} /><span>Zodia Custody</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><svg viewBox="0 0 22 22" width={22} height={22} style={{ borderRadius: '50%', flexShrink: 0 }}><rect width="22" height="22" rx="11" fill="#0d2580"/><text x="11" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial,sans-serif">Z</text></svg><span>Zodia Custody</span></div> },
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Wallets'), p: t('pr_2p', lang, 'Non-custodial wallet infrastructure for secure key management.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/MetaMask.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="MetaMask" /><img src="https://github.com/trustwallet.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Trust Wallet" /><span>MetaMask · Trust Wallet</span></div> },
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/hknio.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Hacken" onError={(e) => { e.currentTarget.src='https://avatars.githubusercontent.com/u/34027067?s=22'; }} /><span>Hacken</span></div> },
             ],
