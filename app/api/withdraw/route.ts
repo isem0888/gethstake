@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   // Сохраняем запрос на вывод
   const { data, error } = await supabase
-    .from('withdrawals')
+    .from('withdrawals' as any)
     .insert({
       wallet_address: wallet_address.toLowerCase(),
       stake_id,
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       early: Boolean(early),
       status: 'pending',
       requested_at: new Date().toISOString(),
-    })
+    } as any)
     .select()
     .single();
 
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
 
   const supabase = createServerClient();
   const { data, error } = await supabase
-    .from('withdrawals')
+    .from('withdrawals' as any)
     .select('*')
     .eq('wallet_address', wallet)
     .order('requested_at', { ascending: false });
