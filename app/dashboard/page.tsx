@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { EthLogo } from '@/components/EthLogo';
 import { WalletButton } from '@/components/WalletButton';
+import { WithdrawModal } from '@/components/WithdrawModal';
 import Link from 'next/link';
 
 /* ── Market + Network data ── */
@@ -260,6 +261,8 @@ export default function DashboardPage() {
   const [stakes, setStakes] = useState<Stake[]>([]);
   const [platform, setPlatform] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [withdrawStake, setWithdrawStake] = useState<Stake | null>(null);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
 
   const market = useEthMarket();
   const network = useEthNetwork();
@@ -288,9 +291,18 @@ export default function DashboardPage() {
         .catch(() => setLoading(false));
 
     fetchStakes();
-    const t = setInterval(fetchStakes, 4 * 60 * 60 * 1000); // авто-обновление каждые 4 часа
+    const t = setInterval(fetchStakes, 4 * 60 * 60 * 1000);
     return () => clearInterval(t);
   }, [isConnected, address]);
+
+  // Load withdrawals
+  useEffect(() => {
+    if (!address) return;
+    fetch(`/api/withdraw?wallet=${address}`)
+      .then(r => r.json())
+      .then(d => Array.isArray(d) && setWithdrawals(d))
+      .catch(() => {});
+  }, [address]);
 
   const now = Date.now();
   const active = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() > now);
@@ -311,6 +323,25 @@ export default function DashboardPage() {
 
   return (
     <div style={S}>
+      {/* Withdraw Modal */}
+      {withdrawStake && (
+        <WithdrawModal
+          stakeId={withdrawStake.id}
+          walletAddress={address || ''}
+          amountEth={withdrawStake.amount_eth}
+          planDays={withdrawStake.plan_days}
+          endsAt={withdrawStake.ends_at}
+          earnedEth={earned(withdrawStake)}
+          lang="en"
+          onClose={() => setWithdrawStake(null)}
+          onSuccess={() => {
+            setWithdrawStake(null);
+            // Reload withdrawals
+            if (address) fetch(`/api/withdraw?wallet=${address}`).then(r => r.json()).then(d => Array.isArray(d) && setWithdrawals(d)).catch(() => {});
+          }}
+        />
+      )}
+
       {/* Nav */}
       <nav style={{ borderBottom: '1px solid #1d2c1f', background: 'rgba(6,7,15,.9)', backdropFilter: 'blur(14px)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div className="dash-nav-inner">
@@ -479,9 +510,15 @@ export default function DashboardPage() {
                       ))}
                     </div>
                     <div style={{ fontSize: 10, color: '#5a6480', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>Progress — {100 - Math.round(daysLeft(s.ends_at) / s.plan_days * 100)}% complete</div>
-                    <div style={{ background: '#1a2040', borderRadius: 6, height: 6 }}>
+                    <div style={{ background: '#1a2040', borderRadius: 6, height: 6, marginBottom: 16 }}>
                       <div style={{ width: `${100 - Math.round(daysLeft(s.ends_at) / s.plan_days * 100)}%`, height: '100%', borderRadius: 6, background: 'var(--acc, #60a5fa)' }} />
                     </div>
+                    <button
+                      onClick={() => setWithdrawStake(s)}
+                      style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.35)', color: '#f87171', borderRadius: 8, padding: '8px 18px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 11, cursor: 'pointer', letterSpacing: '.5px', textTransform: 'uppercase' }}
+                    >
+                      ↑ Withdraw funds
+                    </button>
                   </div>
                 );
               })}
@@ -536,6 +573,71 @@ export default function DashboardPage() {
                     );
                   })}
                 </div>
+              )}
+            </div>
+
+            {/* ── Transactions ── */}
+            <div style={card}>
+              <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} /> Transaction history</div>
+              {[
+                // Deposits from stakes
+                ...stakes.map(s => ({
+                  type: 'deposit' as const,
+                  date: s.started_at,
+                  amount: s.amount_eth,
+                  label: `Deposit · ${s.plan_days}-day plan`,
+                  status: 'confirmed',
+                })),
+                // Yield accruals (one entry per active stake)
+                ...active.map(s => ({
+                  type: 'yield' as const,
+                  date: new Date().toISOString(),
+                  amount: earned(s),
+                  label: `Yield accrued · ${s.plan_days}d plan`,
+                  status: 'accruing',
+                })),
+                // Withdrawals
+                ...withdrawals.map((w: any) => ({
+                  type: 'withdraw' as const,
+                  date: w.requested_at,
+                  amount: w.amount_eth,
+                  label: `Withdrawal${w.early ? ' (early)' : ''}`,
+                  status: w.status === 'pending' ? 'processing' : 'completed',
+                })),
+              ]
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .map((tx, i) => {
+                  const typeIcon = tx.type === 'deposit' ? '↓' : tx.type === 'yield' ? '✦' : '↑';
+                  const typeColor = tx.type === 'deposit' ? '#60a5fa' : tx.type === 'yield' ? '#a78bfa' : '#f87171';
+                  const amountSign = tx.type === 'withdraw' ? '-' : '+';
+                  const statusColor = tx.status === 'processing' ? '#fbbf24' : tx.status === 'accruing' ? '#a78bfa' : '#22c55e';
+                  return (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #0f1628', gap: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 30, height: 30, borderRadius: 8, background: `${typeColor}18`, border: `1px solid ${typeColor}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: typeColor, flexShrink: 0 }}>
+                          {typeIcon}
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12, color: '#e8eaf8', fontWeight: 600 }}>{tx.label}</div>
+                          <div style={{ fontSize: 10, color: '#5a6480', marginTop: 1 }}>
+                            {new Date(tx.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: typeColor }}>
+                          {amountSign}{tx.amount.toFixed(4)} ETH
+                        </div>
+                        <div style={{ fontSize: 9, color: statusColor, textTransform: 'uppercase', letterSpacing: '.4px', marginTop: 1 }}>
+                          {tx.status}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              }
+              {stakes.length === 0 && withdrawals.length === 0 && (
+                <div style={{ color: '#5a6480', fontSize: 13, padding: '12px 0' }}>No transactions yet.</div>
               )}
             </div>
           </>
