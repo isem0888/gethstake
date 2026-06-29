@@ -519,71 +519,73 @@ export default function Home() {
           </div>
 
           <div className="panel">
-            {/* ── Plan selector ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8, marginBottom: 16 }}>
-              {([
-                { days: 30,  apr: 5.5,  label: t('s_30',  lang, '30-day lock'),  hot: false },
-                { days: 90,  apr: 8.3,  label: t('s_90',  lang, '90-day lock'),  hot: true  },
-                { days: 180, apr: 9.7,  label: t('s_180', lang, '180-day lock'), hot: false },
-              ] as const).map(p => {
-                const active = calc.days === p.days;
-                return (
-                  <div
-                    key={p.days}
-                    onClick={() => calc.setDays(p.days)}
-                    style={{
-                      background: active ? 'rgba(96,165,250,.12)' : 'var(--card2)',
-                      border: `1px solid ${active ? 'var(--acc)' : p.hot ? 'rgba(96,165,250,.35)' : 'var(--line)'}`,
-                      borderRadius: 12,
-                      padding: '12px 10px',
-                      cursor: 'pointer',
-                      transition: '.18s',
-                      textAlign: 'center',
-                      position: 'relative',
-                      boxShadow: active ? '0 0 16px rgba(96,165,250,.15)' : 'none',
-                    }}
-                  >
-                    {p.hot && !active && (
-                      <span style={{ position: 'absolute', top: -9, left: '50%', transform: 'translateX(-50%)', background: 'var(--acc)', color: '#040e24', fontSize: 8, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 4, whiteSpace: 'nowrap', letterSpacing: '.5px' }}>
-                        {lang === 'ru' ? 'ПОПУЛЯРНЫЙ' : 'POPULAR'}
-                      </span>
-                    )}
-                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 22, fontWeight: 700, color: active ? 'var(--acc)' : 'var(--txt)', lineHeight: 1.1 }}>
-                      {p.apr}%
-                    </div>
-                    <div style={{ fontSize: 10, color: active ? 'var(--acc)' : 'var(--mut)', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: 4 }}>
-                      APR
-                    </div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: active ? 'var(--txt)' : 'var(--mut)', marginBottom: 1 }}>{p.label}</div>
-                    {active && (
-                      <div style={{ fontSize: 9, color: 'var(--acc)', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px', marginTop: 4 }}>
-                        ✓ {lang === 'ru' ? 'ВЫБРАН' : 'SELECTED'}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
             {/* ── Deposit + Calculator ── */}
             <div className="calc">
-              <div>
-                <label style={{ fontSize: 11 }}>{t('c_amt', lang, 'Deposit amount')}</label>
-                <div className="input-eth">
-                  <input type="number" value={calc.inputVal} min={8} step={1}
-                    onChange={e => calc.handleInputChange(e.target.value)}
-                    onBlur={calc.handleInputBlur} />
-                  <span className="tk">ETH</span>
+              {/* LEFT: plan cards + deposit input + button */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {([
+                  { days: 30,  apr: 5.5,  label: t('s_30',  lang, '30-day lock'),  hot: false },
+                  { days: 90,  apr: 8.3,  label: t('s_90',  lang, '90-day lock'),  hot: true  },
+                  { days: 180, apr: 9.7,  label: t('s_180', lang, '180-day lock'), hot: false },
+                ] as const).map(p => {
+                  const active = calc.days === p.days;
+                  return (
+                    <div
+                      key={p.days}
+                      onClick={() => calc.setDays(p.days)}
+                      style={{
+                        background: active ? 'rgba(96,165,250,.12)' : 'var(--card2)',
+                        border: `1px solid ${active ? 'var(--acc)' : p.hot ? 'rgba(96,165,250,.35)' : 'var(--line)'}`,
+                        borderRadius: 12,
+                        padding: '12px 16px',
+                        cursor: 'pointer',
+                        transition: '.18s',
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        boxShadow: active ? '0 0 16px rgba(96,165,250,.12)' : 'none',
+                      }}
+                    >
+                      {p.hot && (
+                        <span style={{ position: 'absolute', top: -8, left: 14, background: 'var(--acc)', color: '#040e24', fontSize: 8, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 4, letterSpacing: '.5px' }}>
+                          {lang === 'ru' ? 'ПОПУЛЯРНЫЙ' : 'POPULAR'}
+                        </span>
+                      )}
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: active ? 'var(--txt)' : 'var(--mut)' }}>{p.label}</div>
+                        <div style={{ fontSize: 10, color: 'var(--mut2)', marginTop: 1 }}>min 8 ETH · paid in ETH</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700, color: active ? 'var(--acc)' : 'var(--txt)', lineHeight: 1 }}>
+                          {p.apr}%
+                        </div>
+                        <div style={{ fontSize: 10, color: active ? 'var(--acc)' : 'var(--mut)', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.6px' }}>
+                          APR{active ? ' ✓' : ''}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <div style={{ marginTop: 4 }}>
+                  <label style={{ fontSize: 11 }}>{t('c_amt', lang, 'Deposit amount')}</label>
+                  <div className="input-eth">
+                    <input type="number" value={calc.inputVal} min={8} step={1}
+                      onChange={e => calc.handleInputChange(e.target.value)}
+                      onBlur={calc.handleInputBlur} />
+                    <span className="tk">ETH</span>
+                  </div>
+                  <div className="hint" style={{ fontSize: 11, marginTop: 6 }}>{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
+                  <button
+                    onClick={handleStartStaking}
+                    style={{ width: '100%', marginTop: 12, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
+                  >
+                    {lang === 'ru'
+                      ? (isConnected ? 'Запустить стейкинг →' : 'Подключить кошелёк →')
+                      : (isConnected ? 'Start Staking →' : 'Connect Wallet →')}
+                  </button>
                 </div>
-                <div className="hint" style={{ fontSize: 11, marginTop: 6 }}>{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
-                <button
-                  onClick={handleStartStaking}
-                  style={{ width: '100%', marginTop: 14, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
-                >
-                  {lang === 'ru'
-                    ? (isConnected ? 'Запустить стейкинг →' : 'Подключить кошелёк →')
-                    : (isConnected ? 'Start Staking →' : 'Connect Wallet →')}
-                </button>
               </div>
 
               <div className="calc-out">
