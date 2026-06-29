@@ -320,8 +320,10 @@ export default function Home() {
             </span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
               <img src="https://github.com/pyth-network.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Pyth" />
-              <img src="https://github.com/smartcontractkit.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Chainlink" />
-              Pyth · Chainlink
+              <a href="https://arkm.com/explorer/address/0xA1d76A7cA72128541E9FCAcafBdA3a92EF94fDc5" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'inherit', textDecoration: 'none' }}>
+                <img src="https://github.com/smartcontractkit.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Chainlink" />
+                Pyth · Chainlink
+              </a>
             </span>
           </div>
         </div>
@@ -672,7 +674,7 @@ export default function Home() {
                 addr: '0xde0B295669a9FD93d5F28D9Ec85E40f4cb697BAe',
               },
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>, h: t('t_2h', lang, 'Transparent accounting'), p: t('t_2p', lang, 'Reporting on how deposits combine into validators and on actual yield.') },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#60a5fa" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#60a5fa" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.'), addr: '0x531a8f99c70D6A56A7CEe02d6B4281650d7919a0', addrLabel: 'ActivePool' },
             ],
             [
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><svg viewBox="0 0 22 22" width={22} height={22} style={{ borderRadius: '50%', flexShrink: 0 }}><rect width="22" height="22" rx="11" fill="#0d2580"/><text x="11" y="16" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold" fontFamily="Arial,sans-serif">Z</text></svg><span>Zodia Custody</span></div> },
@@ -694,6 +696,7 @@ export default function Home() {
                       title={c.addr}
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: .7 }}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      {c.addrLabel ? <span style={{ marginRight: 4, opacity: .7 }}>{c.addrLabel}:</span> : null}
                       {c.addr.slice(0, 8)}…{c.addr.slice(-6)}
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: .55 }}><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                     </a>
