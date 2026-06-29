@@ -42,7 +42,7 @@ export function Navbar({ lang, onLangChange }: NavbarProps) {
               {lang === 'ru' ? 'Кабинет' : 'Dashboard'}
             </a>
           )}
-          <div className="lang">
+          <div className="lang nav-lang">
             <button className={lang === 'en' ? 'on' : ''} onClick={() => onLangChange('en')}>EN</button>
             <button className={lang === 'ru' ? 'on' : ''} onClick={() => onLangChange('ru')}>RU</button>
           </div>

@@ -42,18 +42,18 @@ export function WalletButton() {
               </button>
             ) : (
               <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn btn-wallet" onClick={openChainModal} style={{ padding: '9px 12px', fontSize: 12 }}>
+                <button className="btn btn-wallet wallet-chain-btn" onClick={openChainModal} style={{ padding: '9px 12px', fontSize: 12 }}>
                   {chain.hasIcon && chain.iconUrl && (
                     <img src={chain.iconUrl} alt={chain.name} style={{ width: 14, height: 14, borderRadius: '50%' }} />
                   )}
                   {chain.name}
                 </button>
-                <button className="btn btn-wallet" onClick={openAccountModal}>
+                <button className="btn btn-wallet wallet-account-btn" onClick={openAccountModal}>
                   {account.displayName}
-                  {account.displayBalance ? ` · ${account.displayBalance}` : ''}
+                  <span className="wallet-balance">{account.displayBalance ? ` · ${account.displayBalance}` : ''}</span>
                 </button>
                 <button
-                  className="btn btn-wallet"
+                  className="btn btn-wallet wallet-disconnect-btn"
                   onClick={() => disconnect()}
                   style={{ padding: '9px 12px', fontSize: 12, borderColor: '#ff4d4d', color: '#ff4d4d' }}
                 >

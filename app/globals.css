@@ -258,7 +258,7 @@ footer { border-top: 1px solid var(--line); padding: 34px 0; margin-top: 30px; c
 .stake-bar { height: 100%; background: var(--acc); border-radius: 2px; box-shadow: 0 0 8px rgba(96,165,250,.5); transition: width .3s; }
 
 /* ── RESPONSIVE ── */
-@media(max-width:980px) { .nav-links { display: none; } .burger { display: flex; } }
+@media(max-width:980px) { .nav-links { display: none; } .burger { display: flex; flex-shrink: 0; } }
 @media(max-width:880px) {
   .hero-grid { grid-template-columns: 1fr; }
   h1.hero-h1 { font-size: 44px; }
@@ -342,8 +342,16 @@ footer { border-top: 1px solid var(--line); padding: 34px 0; margin-top: 30px; c
 
 /* ── NAV-RIGHT MOBILE ── */
 @media(max-width:640px) {
-  .nav-right { gap: 8px; }
-  .nav-dashboard-btn { display: none; }
+  .nav-right { gap: 6px; }
+  /* Показываем дашборд компактно */
+  .nav-dashboard-btn { display: inline-flex !important; font-size: 10px !important; padding: 7px 10px !important; letter-spacing: .3px !important; }
+  /* Скрываем lang из шапки — он в бургер-меню */
+  .nav-lang { display: none !important; }
+  /* Wallet: скрываем chain и disconnect, оставляем только адрес */
+  .wallet-chain-btn { display: none !important; }
+  .wallet-disconnect-btn { display: none !important; }
+  .wallet-balance { display: none; }
+  .wallet-account-btn { font-size: 11px !important; padding: 7px 10px !important; }
   .lang { font-size: 11px; }
   .lang button { padding: 6px 8px; }
 }
