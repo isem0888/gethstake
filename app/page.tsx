@@ -73,7 +73,7 @@ function t(key: string, lang: 'en' | 'ru', fallback: string) {
 }
 
 /* ── Bonus APR by deposit size ── */
-export function getBonus(eth: number): number {
+function getBonus(eth: number): number {
   if (eth >= 128) return 3.1;
   if (eth >= 96)  return 2.2;
   if (eth >= 64)  return 1.5;
