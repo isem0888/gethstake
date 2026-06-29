@@ -89,9 +89,13 @@ function useCalc() {
   const [days, setDays] = useState(90);
   const baseApr = APR_MAP[days];
   const bonus = getBonus(amount);
-  const apr = baseApr + bonus;           // effective APR shown everywhere
-  const yearGain = amount * apr / 100;
-  const periodGain = yearGain * days / 365;
+  const apr = baseApr + bonus;
+
+  const dailyGain    = amount * apr / 100 / 365;
+  const monthlyGain  = dailyGain * 30;
+  const quarterGain  = dailyGain * 90;
+  const yearGain     = dailyGain * 365;
+  const periodGain   = dailyGain * days;
 
   const setAmount = (n: number) => {
     setAmountRaw(n);
@@ -108,7 +112,7 @@ function useCalc() {
     setInputValRaw(String(n));
   };
 
-  return { amount, setAmount, inputVal, handleInputChange, handleInputBlur, days, setDays, baseApr, bonus, apr, yearGain, periodGain, total: amount + periodGain };
+  return { amount, setAmount, inputVal, handleInputChange, handleInputBlur, days, setDays, baseApr, bonus, apr, dailyGain, monthlyGain, quarterGain, yearGain, periodGain, total: amount + periodGain };
 }
 
 /* ── Particle canvas ── */
@@ -524,27 +528,57 @@ export default function Home() {
                 </button>
               </div>
               <div className="calc-out">
-                <div className="muted" style={{ fontSize: 12, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
-                  {t('c_outpre', lang, 'Yield for the term')} ({calc.days}{lang === 'ru' ? ' дней' : ' days'})
-                </div>
-                <div className="big">{fmt(calc.periodGain)} ETH</div>
-                {calc.bonus > 0 && (
-                  <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 6, padding: '3px 10px' }}>
-                    <span style={{ color: '#9bfd4e', fontSize: 12, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
-                    <span style={{ color: '#5f7062', fontSize: 11 }}>{lang === 'ru' ? 'за объём' : 'volume APR'}</span>
-                    <BonusTooltip lang={lang} />
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 4 }}>
+                  <div className="muted" style={{ fontSize: 12, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
+                    {lang === 'ru' ? `Доход за ${calc.days} дней` : `Yield for ${calc.days} days`}
                   </div>
-                )}
-                <div style={{ marginTop: 18 }}>
+                  {calc.bonus > 0 && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 6, padding: '3px 10px' }}>
+                      <span style={{ color: '#9bfd4e', fontSize: 11, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
+                      <BonusTooltip lang={lang} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Big period number */}
+                <div className="big" style={{ marginBottom: 4 }}>{fmt(calc.periodGain)} ETH</div>
+
+                {/* APR line */}
+                <div className="row" style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #1d2c1f' }}>
+                  <span style={{ color: '#5f7062', fontSize: 13 }}>APR</span>
+                  <b style={{ color: calc.bonus > 0 ? '#9bfd4e' : undefined }}>
+                    {calc.bonus > 0 ? `${calc.baseApr}% + ${calc.bonus}% = ${calc.apr.toFixed(1)}%` : `${calc.apr}%`}
+                  </b>
+                </div>
+
+                {/* Breakdown grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px 20px', marginBottom: 16 }}>
                   {[
-                    { l: t('c_dep', lang, 'Deposit'), v: `${fmt(calc.amount, calc.amount % 1 === 0 ? 0 : 2)} ETH` },
-                    { l: t('c_apr', lang, 'APR'), v: calc.bonus > 0 ? `${calc.baseApr}% + ${calc.bonus}% = ${calc.apr.toFixed(1)}%` : `${calc.apr}%` },
-                    { l: t('c_year', lang, 'Yield per year'), v: `${fmt(calc.yearGain, 2)} ETH` },
-                    { l: t('c_total', lang, 'Total payout'), v: `${fmt(calc.total)} ETH` },
+                    { l: lang === 'ru' ? 'В день' : 'Per day',       v: fmt(calc.dailyGain, 6) },
+                    { l: lang === 'ru' ? 'В месяц' : 'Per month',    v: fmt(calc.monthlyGain, 4) },
+                    { l: lang === 'ru' ? 'За квартал' : 'Per quarter', v: fmt(calc.quarterGain, 4) },
+                    { l: lang === 'ru' ? 'В год' : 'Per year',       v: fmt(calc.yearGain, 4) },
                   ].map(r => (
-                    <div key={r.l} className="row"><span>{r.l}</span><b style={{ color: r.l === t('c_apr', lang, 'APR') && calc.bonus > 0 ? '#9bfd4e' : undefined }}>{r.v}</b></div>
+                    <div key={r.l} style={{ background: 'rgba(155,253,78,.04)', border: '1px solid #1d2c1f', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 11, color: '#5f7062', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>{r.l}</div>
+                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 14, fontWeight: 700, color: '#9bfd4e' }}>{r.v}</div>
+                      <div style={{ fontSize: 10, color: '#3d5040', marginTop: 2 }}>ETH</div>
+                    </div>
                   ))}
                 </div>
+
+                {/* Summary rows */}
+                {[
+                  { l: lang === 'ru' ? 'Депозит' : 'Deposit', v: `${fmt(calc.amount, calc.amount % 1 === 0 ? 0 : 4)} ETH`, accent: false },
+                  { l: lang === 'ru' ? `Доход за ${calc.days} дней` : `Yield (${calc.days}d)`, v: `+${fmt(calc.periodGain)} ETH`, accent: true },
+                  { l: lang === 'ru' ? 'Итого к выводу' : 'Total payout', v: `${fmt(calc.total)} ETH`, accent: false, bold: true },
+                ].map(r => (
+                  <div key={r.l} className="row" style={{ borderColor: r.bold ? 'transparent' : undefined, paddingTop: r.bold ? 10 : undefined }}>
+                    <span style={{ color: r.bold ? '#eaf3ea' : '#5f7062', fontWeight: r.bold ? 600 : undefined }}>{r.l}</span>
+                    <b style={{ color: r.accent ? '#9bfd4e' : r.bold ? '#fff' : undefined, fontSize: r.bold ? 15 : undefined }}>{r.v}</b>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
