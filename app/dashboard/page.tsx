@@ -292,7 +292,9 @@ export default function DashboardPage() {
     return () => clearInterval(t);
   }, [isConnected, address]);
 
-  const active = stakes.filter(s => s.status === 'active');
+  const now = Date.now();
+  const active = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() > now);
+  const expired = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() <= now);
   const totalStaked = active.reduce((a, s) => a + s.amount_eth, 0);
   const totalEarned = active.reduce((a, s) => a + earned(s), 0);
   const totalDailyYield = active.reduce((a, s) => {
@@ -483,6 +485,58 @@ export default function DashboardPage() {
                   </div>
                 );
               })}
+
+              {/* ── Expired stakes ── */}
+              {expired.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontSize: 10, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 10 }}>
+                    Completed plans
+                  </div>
+                  {expired.map(s => {
+                    const stakeBonus = getBonus(s.amount_eth, s.plan_days);
+                    const effectiveApy = getBaseApr(s.plan_days) + stakeBonus;
+                    const totalPayout = s.amount_eth + s.amount_eth * effectiveApy / 100 * s.plan_days / 365;
+                    const endDate = new Date(s.ends_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    return (
+                      <div key={s.id} style={{ background: '#080b14', border: '1px solid #2a2a3a', borderRadius: 12, padding: '16px 20px', marginBottom: 10, opacity: 0.75 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <span style={{ background: '#1a1a2a', border: '1px solid #3a3a5a', borderRadius: 6, padding: '3px 10px', fontSize: 10, color: '#8a8ab8', fontFamily: "'Chakra Petch',sans-serif", letterSpacing: '.5px' }}>
+                              ✓ CLOSED · {s.plan_days}-DAY PLAN
+                            </span>
+                            <span style={{ fontSize: 11, color: '#5a6480' }}>ended {endDate}</span>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 16, fontWeight: 700, color: '#22c55e' }}>
+                              +{fmtEth(s.amount_eth * effectiveApy / 100 * s.plan_days / 365)} ETH
+                            </div>
+                            <div style={{ fontSize: 10, color: '#5a6480', marginTop: 2 }}>earned over {s.plan_days} days</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, marginBottom: 14 }}>
+                          {[
+                            { l: 'Deposit', v: `${s.amount_eth} ETH` },
+                            { l: 'APR', v: `${effectiveApy.toFixed(1)}%` },
+                            { l: 'Total payout', v: `${fmtEth(totalPayout)} ETH` },
+                          ].map(r => (
+                            <div key={r.l} style={{ background: '#0d1121', borderRadius: 8, padding: '8px 12px' }}>
+                              <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: '#e8eaf8' }}>{r.v}</div>
+                              <div style={{ fontSize: 10, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 2 }}>{r.l}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ background: 'rgba(96,165,250,.06)', border: '1px solid rgba(96,165,250,.15)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ fontSize: 16 }}>🔒</span>
+                          <span style={{ fontSize: 12, color: '#8a93b8', lineHeight: 1.5 }}>
+                            This plan is closed. New staking available until <b style={{ color: '#60a5fa' }}>01.01.2027</b>.{' '}
+                            <Link href="/#stake" style={{ color: '#60a5fa', textDecoration: 'underline' }}>Start a new plan →</Link>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </>
         )}
