@@ -394,8 +394,8 @@ export default function DashboardPage() {
               <div style={card}>
                 <div style={tag}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
-                  Начисление ETH · 4-часовые столбцы · 30 дней
-                  <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>каждый столбец = 4ч</span>
+                  ETH Yield · 30-Day History
+                  <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3a4566' }}>live · rolling window</span>
                 </div>
                 <div style={{ height: 180 }}>
                   <ResponsiveContainer width="100%" height="100%">
