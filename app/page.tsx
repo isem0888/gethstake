@@ -1,0 +1,507 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { Navbar } from '@/components/Navbar';
+import { EthLogo } from '@/components/EthLogo';
+import { Dashboard } from '@/components/Dashboard';
+
+/* ── i18n ── */
+const RU: Record<string, string> = {
+  hero_eyebrow: 'Стейкинг ETH нового поколения',
+  hero_sub: 'gethstake.com объединяет ритейл-участников в валидаторы Ethereum. Узел требует 32 ETH, оборудования и аптайма 24/7 — ваши 8 ETH это четверть валидатора, а доход вы получаете в ETH.',
+  hero_cta1: 'Начать стейкинг →', hero_cta2: 'Подробнее →',
+  hero_trusted: 'Нам доверяет сообщество',
+  sc_tvl: 'Всего застейкано', sc_part: 'Активных участников', sc_apr: 'APR лучшего плана · 90 дней', sc_aprsub: 'в ETH',
+  bf_tag: 'Создано для результата', bf_h2: 'Почему выбирают gethstake',
+  bf_1h: 'Реальный доход в ETH', bf_1p: 'Конкурентная доходность на базе стейкинга, номинированная и выплачиваемая в ETH — не в баллах.',
+  bf_2h: 'Безопасно', bf_2p: 'Проверенные аудитом контракты и институциональная инфраструктура со встроенными лимитами риска.',
+  bf_3h: 'Гибкий выход', bf_3p: 'Досрочный вывод возможен — вы получаете депозит обратно, теряя начисленную доходность.',
+  bf_4h: 'Пул валидаторов', bf_4p: 'Четыре депозита по 8 ETH формируют один валидатор на 32 ETH — ритейл-доступ к стейкингу Ethereum.',
+  w_tag: 'Экономика валидатора', w_h2: 'Почему минимальный депозит — 8 ETH',
+  w_p: 'Это не барьер, а математика сети. Стать валидатором в одиночку дорого и сложно.',
+  w_h3: 'Один валидатор = 32 ETH',
+  w_p1: 'Чтобы запустить собственный узел Ethereum, нужно внести ровно 32 ETH и обеспечить:',
+  w_li1: 'надёжное оборудование, работающее 24/7', w_li2: 'стабильное соединение и аптайм',
+  w_li3: 'принятие риска слэшинга за простой или ошибки', w_li4: 'техническое сопровождение узла',
+  w_p2: 'Для большинства частных инвесторов это недостижимо. gethstake.com снимает барьер: четыре депозита по 8 ETH объединяются в один валидатор на 32 ETH.',
+  w_ring: 'Как формируется валидатор', w_you: 'Вы',
+  s_tag: 'Планы стейкинга', s_h2: 'Застейкай ETH. Выбери срок.',
+  s_p: 'Выберите срок стейкинга. Чем дольше период — тем выше APR. Доходность начисляется и выплачивается в ETH.',
+  s_30: 'Лок 30 дней', s_90: 'Лок 90 дней', s_180: 'Лок 180 дней',
+  s_min: 'мин. 8 ETH · выплата в ETH',
+  s_why: '',
+  c_tag: 'Калькулятор', c_h2: 'Посчитайте доход в ETH',
+  c_p: 'Выберите сумму (от 8 ETH) и план — увидите начисление в ETH за период и в год.',
+  c_amt: 'Сумма депозита', c_hint: 'Минимальный депозит — 8 ETH (¼ валидатора).', c_plan: 'План',
+  c_outpre: 'Доход за период', c_dep: 'Депозит', c_apr: 'APR', c_year: 'Доход в год', c_total: 'Итого к выводу',
+  m_tag: 'Как работают валидаторы', m_h2: 'Валидация Ethereum — децентрализованно и прозрачно',
+  m_p: 'Ethereum использует Proof-of-Stake: валидаторы блокируют ETH и получают вознаграждение за подтверждение транзакций.',
+  m_c1: 'ETH требуется на один валидатор', m_c2: 'активных валидаторов в сети',
+  m_c3: 'среднее время финализации блока', m_c4: 'средний APR сети',
+  m_why: 'Валидаторы предлагают и аттестуют новые блоки. Сеть случайным образом выбирает, кто предлагает каждый блок — чем больше валидаторов, тем децентрализованнее Ethereum. Пул-стейкинг позволяет участвовать без запуска собственного узла.',
+  t_tag: 'Безопасность и прозрачность', t_h2: 'Не доверие, а проверяемость',
+  t_1h: 'Резервный фонд', t_1p: 'Часть прибыли идёт в страховой буфер, сглаживающий выплаты в слабые периоды.',
+  t_2h: 'Прозрачный учёт', t_2p: 'Отчётность по объединению депозитов в валидаторы и по фактической доходности.',
+  t_3h: 'Лимиты риска', t_3p: 'Ограничения по стратегиям, плечу и операциям зашиты в правила платформы.',
+  pr_1h: 'Кастоди и кошельки', pr_1p: 'MPC-инфраструктура для некастодиального хранения и подписи.',
+  pr_2h: 'Стейкинг-движок', pr_2p: 'Институциональный стейкинг и управление валидаторами.',
+  pr_3h: 'Аудит контрактов', pr_3p: 'Независимый аудит смарт-контрактов и инфраструктуры.',
+  f_h2: 'Частые вопросы',
+  f_q1: 'Почему минимальный депозит — 8 ETH?', f_a1: 'Полноценный валидатор Ethereum требует 32 ETH. Платформа объединяет четырёх участников по 8 ETH в один валидатор.',
+  f_q2: 'В чём начисляется доходность?', f_a2: 'Все планы номинированы и выплачиваются в ETH — независимо от курса к доллару.',
+  f_q3: 'Почему 90 дней — лучший план?', f_a3: 'Переход с 30 на 90 дней добавляет +2.0% APR, а с 90 на 180 — лишь +0.7%.',
+  f_q4: 'Можно ли вывести раньше срока?', f_a4: 'Да, досрочный вывод возможен — но инвестор теряет начисленную доходность.',
+  f_q5: 'Какие есть риски?', f_a5: 'Доходность зависит от результата стейкинга и не гарантирована; есть риск слэшинга и очередей валидаторов.',
+  cta_h2: 'Войди в будущее стейкинга ETH', cta_p: 'Застейкай от 8 ETH сегодня и стань частью валидации Ethereum.',
+  cta_ph: 'Введите email', cta_btn: 'Начать →',
+  disc: '',
+};
+
+function t(key: string, lang: 'en' | 'ru', fallback: string) {
+  return lang === 'ru' ? (RU[key] ?? fallback) : fallback;
+}
+
+/* ── Calculator hook ── */
+const APR_MAP: Record<number, number> = { 30: 8.2, 90: 10.2, 180: 10.9 };
+function useCalc() {
+  const [amount, setAmount] = useState(8);
+  const [days, setDays] = useState(90);
+  const apr = APR_MAP[days];
+  const yearGain = amount * apr / 100;
+  const periodGain = yearGain * days / 365;
+  return { amount, setAmount, days, setDays, apr, yearGain, periodGain, total: amount + periodGain };
+}
+
+/* ── Particle canvas ── */
+function ParticleBg() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    let W = 0, H = 0, raf = 0;
+    const COUNT = 70, MAX = 160, COLOR = '155,253,78';
+    type P = { x: number; y: number; vx: number; vy: number; r: number; pulse: number };
+    let pts: P[] = [];
+    const resize = () => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    };
+    const init = () => {
+      resize();
+      pts = Array.from({ length: COUNT }, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4,
+        r: Math.random() * 1.6 + .6, pulse: Math.random() * Math.PI * 2,
+      }));
+    };
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < MAX) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${COLOR},${(1 - d / MAX) * .22})`;
+            ctx.lineWidth = .8;
+            ctx.moveTo(pts[i].x, pts[i].y);
+            ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.pulse += .018;
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+        const a = .6 + Math.sin(p.pulse) * .4;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${COLOR},${a})`; ctx.fill();
+      });
+      raf = requestAnimationFrame(draw);
+    };
+    init(); draw();
+    window.addEventListener('resize', resize);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
+  }, []);
+  return <canvas ref={canvasRef} id="bg-canvas" />;
+}
+
+/* ── SVG helpers ── */
+const EthSvg = ({ w = 22 }: { w?: number }) => (
+  <svg viewBox="0 0 28 44" fill="none" width={w}>
+    <polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75" />
+    <polygon points="14,0 28,22 14,16" fill="#9bfd4e" />
+    <polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75" />
+    <polygon points="28,25 14,44 14,31" fill="#9bfd4e" />
+    <polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45" />
+    <polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65" />
+  </svg>
+);
+
+/* ── PAGE ── */
+export default function Home() {
+  const [lang, setLang] = useState<'en' | 'ru'>('en');
+  const calc = useCalc();
+
+  const fmt = (n: number, d = 4) =>
+    n.toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  const chipLabel = (d: number, apr: number) =>
+    `${d}${lang === 'ru' ? 'д' : 'd'} · ${apr}%`;
+
+  return (
+    <>
+      <ParticleBg />
+      <Navbar lang={lang} onLangChange={setLang} />
+
+      {/* ── Dashboard (public stats + personal) ── */}
+      <div className="dashboard-root">
+        <div className="wrap">
+          <Dashboard />
+        </div>
+      </div>
+
+      {/* ── HERO ── */}
+      <header className="hero">
+        <div className="wrap">
+          <div className="hero-grid">
+            <div>
+              <div className="eyebrow">
+                <span className="dotg" />
+                {t('hero_eyebrow', lang, 'Next-generation ETH staking')}
+              </div>
+              <h1 className="hero-h1">
+                {lang === 'ru' ? <>Стейкай.<br />Зарабатывай.<br /><span className="g">Владей<br />валидатором.</span></> : <>Stake.<br />Earn.<br /><span className="g">Own a<br />validator.</span></>}
+              </h1>
+              <p className="sub">{t('hero_sub', lang, 'gethstake.com pools retail participants into Ethereum validators. A full node needs 32 ETH, hardware and 24/7 uptime — your 8 ETH is a quarter of a validator, and you earn yield in ETH.')}</p>
+              <div className="hero-cta">
+                <a className="btn btn-primary" href="#stake">{t('hero_cta1', lang, 'Stake now →')}</a>
+                <a className="btn btn-ghost" href="#why8">{t('hero_cta2', lang, 'Explore →')}</a>
+              </div>
+              <div className="trusted">{t('hero_trusted', lang, 'Trusted by the community')}</div>
+              <div className="avatars">
+                <div className="av" /><div className="av" /><div className="av" /><div className="av" />
+                <span className="more">+12K</span>
+              </div>
+            </div>
+            <div className="hero-right">
+              <div className="hexwrap">
+                <div className="hexglow" />
+                <div className="hex-mini hm1"><EthSvg w={22} /></div>
+                <div className="hex-mini hm2"><EthSvg w={18} /></div>
+                <div className="hex-mini hm3"><EthSvg w={15} /></div>
+                <div className="hex"><EthLogo size={62} className="eth-svg" /></div>
+                <div className="ring" />
+              </div>
+              {[
+                { lbl: t('sc_tvl', lang, 'Total value locked'), val: '48,392 ETH', chg: '+24.35%', pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4', demo: true },
+                { lbl: t('sc_part', lang, 'Active participants'), val: '28,492', chg: '+18.27%', pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6', demo: true },
+                { lbl: t('sc_apr', lang, 'Best plan APR · 90 days'), val: '10.2%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6', demo: false },
+              ].map(s => (
+                <div key={s.lbl} className="stat-card">
+                  {s.demo && <span className="demo-tag">demo</span>}
+                  <div>
+                    <div className="lbl">{s.lbl}</div>
+                    <div className="val">{s.val}</div>
+                    <div className="chg">{s.chg}</div>
+                  </div>
+                  <svg className="spark" viewBox="0 0 84 38">
+                    <polyline fill="none" stroke="#9bfd4e" strokeWidth="2" points={s.pts} />
+                  </svg>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="powered">
+            <span className="pl">Powered by</span>
+            {['Custody partner', 'Staking engine', 'Audit partner', 'Data / oracle'].map(s => (
+              <span key={s} className="slot">{s}</span>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      {/* ── FEATURES ── */}
+      <section id="features">
+        <div className="wrap">
+          <div className="sec-head">
+            <div className="tag">{t('bf_tag', lang, 'Built for performance')}</div>
+            <h2>{t('bf_h2', lang, 'Why participants choose gethstake')}</h2>
+          </div>
+          <div className="feat">
+            {[
+              { icon: <EthSvg w={26} />, h: t('bf_1h', lang, 'Real ETH yield'), p: t('bf_1p', lang, 'Competitive staking-based returns, denominated and paid in ETH — not in points.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>, h: t('bf_2h', lang, 'Secure'), p: t('bf_2p', lang, 'Audited contracts and institutional-grade infrastructure with built-in risk limits.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M14 6l6 6-6 6"/><path d="M3 6v12"/></svg>, h: t('bf_3h', lang, 'Flexible exit'), p: t('bf_3p', lang, 'Early withdrawal available — you get your principal back, forfeiting accrued yield.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" strokeDasharray="2 3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>, h: t('bf_4h', lang, 'Pooled validators'), p: t('bf_4p', lang, 'Four 8 ETH deposits form one 32 ETH validator — retail access to Ethereum staking.') },
+            ].map(f => (
+              <div key={f.h} className="fcard">
+                <div className="fic">{f.icon}</div>
+                <h3>{f.h}</h3>
+                <p>{f.p}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── WHY 8 ETH ── */}
+      <section id="why8" style={{ background: 'var(--bg2)' }}>
+        <div className="wrap">
+          <div className="sec-head center">
+            <div className="tag">{t('w_tag', lang, 'Validator economics')}</div>
+            <h2>{t('w_h2', lang, 'Why the minimum deposit is 8 ETH')}</h2>
+            <p>{t('w_p', lang, "It isn't a paywall — it's the network's math. Becoming a solo validator is expensive and complex.")}</p>
+          </div>
+          <div className="panel">
+            <div className="vbox">
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+                  <EthLogo size={32} />
+                  <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', fontSize: 22 }}>
+                    {t('w_h3', lang, 'One validator = 32 ETH')}
+                  </h3>
+                </div>
+                <p>{t('w_p1', lang, 'To run your own Ethereum node you must deposit exactly 32 ETH and provide:')}</p>
+                <ul>
+                  {[
+                    t('w_li1', lang, 'reliable hardware running 24/7'),
+                    t('w_li2', lang, 'a stable connection and high uptime'),
+                    t('w_li3', lang, 'acceptance of slashing risk for downtime or errors'),
+                    t('w_li4', lang, 'ongoing technical maintenance of the node'),
+                  ].map(li => <li key={li}>{li}</li>)}
+                </ul>
+                <p style={{ marginTop: 16 }}>{t('w_p2', lang, 'For most private investors that is out of reach. gethstake.com removes the barrier: four deposits of 8 ETH combine into one 32 ETH validator.')}</p>
+              </div>
+              <div className="vsplit">
+                <div className="ringl">{t('w_ring', lang, 'How a validator is formed')}</div>
+                <div className="quarters">
+                  <div className="q you"><span>{t('w_you', lang, 'You')}</span><br />8</div>
+                  <div className="q">8</div><div className="q">8</div><div className="q">8</div>
+                </div>
+                <div className="veq">
+                  <b>8 ETH × 4 = 32 ETH</b> → 1 Ethereum validator.{' '}
+                  {lang === 'ru' ? 'Ваша доля — ' : 'Your share is '}<b>{lang === 'ru' ? '¼ валидатора' : '¼ of a validator'}</b>.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── STAKE ── */}
+      <section id="stake">
+        <div className="wrap">
+          <div className="sec-head center">
+            <div className="tag">{t('s_tag', lang, 'Staking plans')}</div>
+            <h2>{t('s_h2', lang, 'Stake your ETH. Pick a term.')}</h2>
+            <p>{t('s_p', lang, 'The longer the lock, the higher the APR. 90 days is the best value — beyond it the rate barely grows.')}</p>
+          </div>
+          <div className="stake-grid">
+            <div>
+              {[
+                { days: 30, apr: 8.2, name: t('s_30', lang, '30-day lock'), hot: false },
+                { days: 90, apr: 10.2, name: t('s_90', lang, '90-day lock'), hot: true },
+                { days: 180, apr: 10.9, name: t('s_180', lang, '180-day lock'), hot: false },
+              ].map(p => (
+                <div key={p.days} className={`prow${p.hot ? ' hot' : ''}`}>
+                  <div className="pl-left">
+                    <div className="picon">{p.days}</div>
+                    <div>
+                      <div className="pname">{p.name}</div>
+                      <div className="psub">{t('s_min', lang, 'min 8 ETH · paid in ETH')}</div>
+                    </div>
+                  </div>
+                  <div className="papr">{p.apr}%</div>
+                  <button className="pbtn">Stake</button>
+                </div>
+              ))}
+            </div>
+            <div className="globe-panel">
+              <span className="demo-tag">demo</span>
+              <div className="gl">{t('sc_tvl', lang, 'Total value locked')}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+                <EthLogo size={28} />
+                <div className="gv">48,392 ETH</div>
+              </div>
+              <div className="gsphere" />
+              <div className="gmini">
+                {[
+                  { v: 'Ethereum', l: lang === 'ru' ? 'Сеть' : 'Network' },
+                  { v: '28,492', l: lang === 'ru' ? 'Участники' : 'Participants' },
+                  { v: '3,271 ETH', l: lang === 'ru' ? 'Выплачено' : 'Rewards paid' },
+                ].map(g => (
+                  <div key={g.l} className="gm"><div className="v">{g.v}</div><div className="l">{g.l}</div></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CALCULATOR ── */}
+      <section id="calc" style={{ background: 'var(--bg2)' }}>
+        <div className="wrap">
+          <div className="sec-head center">
+            <div className="tag">{t('c_tag', lang, 'Calculator')}</div>
+            <h2>{t('c_h2', lang, 'Estimate your yield in ETH')}</h2>
+            <p>{t('c_p', lang, 'Pick an amount (from 8 ETH) and a plan — see the yield in ETH for the term and per year.')}</p>
+          </div>
+          <div className="panel">
+            <div className="calc">
+              <div>
+                <label>{t('c_amt', lang, 'Deposit amount')}</label>
+                <div className="input-eth">
+                  <input type="number" value={calc.amount} min={8} step={1}
+                    onChange={e => calc.setAmount(Math.max(8, Number(e.target.value)))} />
+                  <span className="tk">ETH</span>
+                </div>
+                <div className="hint">{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
+                <label>{t('c_plan', lang, 'Plan')}</label>
+                <div className="chips">
+                  {([30, 90, 180] as const).map(d => (
+                    <div key={d} className={`chip${calc.days === d ? ' on' : ''}`}
+                      onClick={() => calc.setDays(d)}>{chipLabel(d, APR_MAP[d])}</div>
+                  ))}
+                </div>
+              </div>
+              <div className="calc-out">
+                <div className="muted" style={{ fontSize: 12, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
+                  {t('c_outpre', lang, 'Yield for the term')} ({calc.days}{lang === 'ru' ? ' дней' : ' days'})
+                </div>
+                <div className="big">{fmt(calc.periodGain)} ETH</div>
+                <div style={{ marginTop: 18 }}>
+                  {[
+                    { l: t('c_dep', lang, 'Deposit'), v: `${fmt(calc.amount, calc.amount % 1 === 0 ? 0 : 2)} ETH` },
+                    { l: t('c_apr', lang, 'APR'), v: `${calc.apr}%` },
+                    { l: t('c_year', lang, 'Yield per year'), v: `${fmt(calc.yearGain, 2)} ETH` },
+                    { l: t('c_total', lang, 'Total payout'), v: `${fmt(calc.total)} ETH` },
+                  ].map(r => (
+                    <div key={r.l} className="row"><span>{r.l}</span><b>{r.v}</b></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MARKET ── */}
+      <section id="market">
+        <div className="wrap">
+          <div className="sec-head center">
+            <div className="tag">{t('m_tag', lang, 'How validators work')}</div>
+            <h2>{t('m_h2', lang, 'Ethereum validation — decentralized and transparent')}</h2>
+            <p>{t('m_p', lang, 'Ethereum uses Proof-of-Stake: validators lock ETH and earn rewards for confirming transactions.')}</p>
+          </div>
+          <div className="mkt">
+            {[
+              { mn: '32 ETH', ml: t('m_c1', lang, 'required per validator') },
+              { mn: '500K+', ml: t('m_c2', lang, 'active validators worldwide') },
+              { mn: '~12s', ml: t('m_c3', lang, 'block finalization time') },
+              { mn: '~4%', ml: t('m_c4', lang, 'average network APR') },
+            ].map(m => (
+              <div key={m.mn} className="mcard"><div className="mn">{m.mn}</div><div className="ml">{m.ml}</div></div>
+            ))}
+          </div>
+          <p className="why" style={{ textAlign: 'center', margin: '26px auto 0' }}>
+            {t('m_why', lang, 'Validators propose and attest to new blocks. The network randomly selects who proposes each block — the more validators, the more decentralized Ethereum becomes. Pooled staking lets anyone participate without running a full node.')}
+          </p>
+        </div>
+      </section>
+
+      {/* ── TRUST ── */}
+      <section id="trust" style={{ background: 'var(--bg2)' }}>
+        <div className="wrap">
+          <div className="sec-head center">
+            <div className="tag">{t('t_tag', lang, 'Security & transparency')}</div>
+            <h2>{t('t_h2', lang, 'Not trust — verifiability')}</h2>
+          </div>
+          {[
+            [
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg>, h: t('t_1h', lang, 'Reserve fund'), p: t('t_1p', lang, 'Part of the profit goes into an insurance buffer that smooths payouts in weak periods.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>, h: t('t_2h', lang, 'Transparent accounting'), p: t('t_2p', lang, 'Reporting on how deposits combine into validators and on actual yield.') },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
+            ],
+            [
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody & wallets'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: 'MetaMask · Trust Wallet' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Staking engine'), p: t('pr_2p', lang, 'Institutional staking and validator management.'), pwr: 'Everstake' },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: 'H-X Technologies' },
+            ],
+          ].map((row, ri) => (
+            <div key={ri} className="trust" style={ri > 0 ? { marginTop: 16 } : {}}>
+              {row.map((c: any) => (
+                <div key={c.h} className="tcard">
+                  <div className="ic">{c.icon}</div>
+                  <h3>{c.h}</h3><p>{c.p}</p>
+                  {c.pwr && <div className="pwr">{c.pwr}</div>}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FAQ ── */}
+      <section id="faq">
+        <div className="wrap">
+          <div className="sec-head center"><div className="tag">FAQ</div><h2>{t('f_h2', lang, 'Frequently asked questions')}</h2></div>
+          <div className="faq-wrap">
+            {[
+              { q: t('f_q1', lang, 'Why is the minimum deposit 8 ETH?'), a: t('f_a1', lang, 'A full Ethereum validator requires 32 ETH. The platform pools four 8 ETH participants into one validator, so 8 ETH is your quarter of the network\'s minimum threshold.') },
+              { q: t('f_q2', lang, 'What is the yield paid in?'), a: t('f_a2', lang, 'All plans are denominated and paid in ETH — regardless of the USD exchange rate.') },
+              { q: t('f_q3', lang, 'Why is 90 days the best plan?'), a: t('f_a3', lang, 'Moving from 30 to 90 days adds +2.0% APR, while 90 to 180 adds only +0.7%. So 90 days gives nearly the maximum yield at a moderate lock.') },
+              { q: t('f_q4', lang, 'Can I withdraw before the term ends?'), a: t('f_a4', lang, 'Yes, early withdrawal is available — but you forfeit the accrued yield. You receive your principal back without the plan\'s APR.') },
+              { q: t('f_q5', lang, 'What are the risks?'), a: t('f_a5', lang, 'Yield depends on staking results and the platform\'s strategies and is not guaranteed; the network carries slashing risk and validator entry/exit queues. This is not a bank deposit — assess the risk before participating.') },
+            ].map((f, i) => (
+              <details key={i} className="faq-item">
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section>
+        <div className="wrap">
+          <div className="cta-band">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
+              <EthLogo size={40} />
+              <div>
+                <h2>{t('cta_h2', lang, 'Join the future of ETH staking')}</h2>
+                <p>{t('cta_p', lang, 'Stake from 8 ETH today and take part in Ethereum validation.')}</p>
+              </div>
+            </div>
+            <div className="cta-form">
+              <input type="email" placeholder={t('cta_ph', lang, 'Enter your email')} />
+              <a className="btn btn-primary" href="#stake">{t('cta_btn', lang, 'Get started →')}</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer>
+        <div className="wrap">
+          <div className="foot-in">
+            <div className="logo">
+              <span className="dot"><EthLogo size={14} /></span>
+              GETHSTAKE
+            </div>
+            <div className="socials">
+              <a href="#" aria-label="X">𝕏</a>
+              <a href="#" aria-label="Telegram">✈</a>
+              <a href="#" aria-label="Discord">◇</a>
+              <a href="#" aria-label="Docs">▤</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}

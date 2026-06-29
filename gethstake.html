@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gethstake.com — Stake. Earn. Own a validator.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060a07; --bg2:#0a0f0b; --card:#0d130e; --card2:#111a12;
+    --line:#1d2c1f; --txt:#eaf3ea; --mut:#8a9b8c; --mut2:#5f7062;
+    --acc:#9bfd4e; --acc2:#5dff9b; --green:#9bfd4e;
+    --glow:0 0 24px rgba(155,253,78,.35);
+    --grad:linear-gradient(135deg,#9bfd4e 0%,#4dff8f 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--txt);line-height:1.6;overflow-x:hidden;
+    background-image:radial-gradient(900px 500px at 80% -5%,rgba(155,253,78,.08),transparent 60%),radial-gradient(700px 400px at 0% 20%,rgba(77,255,143,.05),transparent 60%)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .muted{color:var(--mut)}
+  .head{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.5px}
+  .grad-txt{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* ── animated background canvas ── */
+  #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.5}
+  nav,header,section,footer{position:relative;z-index:1}
+
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(6,10,7,.8);border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:70px;gap:16px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:20px;font-family:'Chakra Petch',sans-serif;letter-spacing:1px}
+  .logo .dot{width:30px;height:30px;border:2px solid var(--acc);border-radius:7px;display:grid;place-items:center;color:var(--acc);box-shadow:var(--glow)}
+  .logo .dot svg{width:14px;height:auto;filter:drop-shadow(0 0 4px rgba(155,253,78,.8))}
+  .nav-links{display:flex;gap:26px;font-size:13.5px;color:var(--mut);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.8px}
+  .nav-links a:hover{color:var(--acc)}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .lang{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:12.5px;font-weight:700}
+  .lang button{background:transparent;color:var(--mut);border:none;padding:7px 10px;cursor:pointer;transition:.15s}
+  .lang button.on{background:var(--acc);color:#06210a}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:9px;font-weight:700;font-size:13.5px;cursor:pointer;border:none;transition:.18s;font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.6px}
+  .btn-primary{background:var(--acc);color:#06210a;box-shadow:var(--glow)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 34px rgba(155,253,78,.55)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn-ghost:hover{border-color:var(--acc);color:var(--acc)}
+  .btn-wallet{background:transparent;border:1px solid var(--acc);color:var(--acc);box-shadow:inset 0 0 14px rgba(155,253,78,.12)}
+  .btn-wallet:hover{background:var(--acc);color:#06210a}
+  @media(max-width:980px){.nav-links{display:none}}
+
+  /* hero */
+  .hero{padding:64px 0 60px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:12px;color:var(--acc);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:1.6px;margin-bottom:22px}
+  .eyebrow .dotg{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:var(--glow)}
+  h1.hero-h1{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-weight:700;font-size:60px;line-height:.98;letter-spacing:-.5px;margin-bottom:24px}
+  h1.hero-h1 .g{color:var(--acc);text-shadow:0 0 28px rgba(155,253,78,.45)}
+  .hero p.sub{font-size:16px;color:var(--mut);max-width:440px;margin-bottom:30px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:34px}
+  .trusted{font-size:11px;color:var(--mut2);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:1.4px;margin-bottom:12px}
+  .avatars{display:flex;align-items:center;gap:0}
+  .avatars .av{width:34px;height:34px;border-radius:50%;border:2px solid var(--bg);margin-left:-8px;background:linear-gradient(135deg,#1d2c1f,#2a3d2c)}
+  .avatars .av:first-child{margin-left:0}
+  .avatars .more{margin-left:10px;font-size:13px;color:var(--acc);font-weight:700}
+
+  .hero-right{display:flex;flex-direction:column;gap:14px}
+  .hexwrap{position:relative;height:280px;display:grid;place-items:center;margin-bottom:6px}
+  .hexglow{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(155,253,78,.3),transparent 65%);filter:blur(8px);animation:breathe 3.4s ease-in-out infinite}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.1);opacity:1}}
+  .hex{position:relative;width:160px;height:180px;display:grid;place-items:center;
+    background:linear-gradient(160deg,#0e1a0f,#080f09);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+    border:1px solid rgba(155,253,78,.45);box-shadow:0 0 50px rgba(155,253,78,.3),inset 0 0 40px rgba(155,253,78,.1)}
+  .eth-svg{width:62px;height:auto;filter:drop-shadow(0 0 14px rgba(155,253,78,.8));animation:ethpulse 4s ease-in-out infinite}
+  @keyframes ethpulse{0%,100%{filter:drop-shadow(0 0 10px rgba(155,253,78,.7))}50%{filter:drop-shadow(0 0 24px rgba(155,253,78,1))}}
+  .ring{position:absolute;bottom:0px;width:190px;height:32px;border:1px solid rgba(155,253,78,.4);border-radius:50%;box-shadow:0 0 28px rgba(155,253,78,.35);transform:perspective(200px) rotateX(62deg);animation:ringpulse 3.4s ease-in-out infinite}
+  @keyframes ringpulse{0%,100%{box-shadow:0 0 22px rgba(155,253,78,.3)}50%{box-shadow:0 0 40px rgba(155,253,78,.55)}}
+
+  /* satellite mini-hex */
+  .hex-mini{position:absolute;display:grid;place-items:center;
+    background:linear-gradient(160deg,#0e1a0f,#080f09);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+    border:1px solid rgba(155,253,78,.35);box-shadow:0 0 22px rgba(155,253,78,.2),inset 0 0 16px rgba(155,253,78,.08)}
+  .hex-mini.hm1{width:68px;height:76px;top:10px;left:4px;animation:floatA 5.5s ease-in-out infinite}
+  .hex-mini.hm2{width:52px;height:58px;top:8px;right:8px;animation:floatB 6.2s ease-in-out infinite}
+  .hex-mini.hm3{width:44px;height:50px;bottom:30px;left:16px;animation:floatA 7s ease-in-out infinite reverse}
+  @keyframes floatA{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes floatB{0%,100%{transform:translateY(-6px)}50%{transform:translateY(6px)}}
+  .stat-card{background:linear-gradient(135deg,rgba(17,26,18,.9),rgba(10,15,11,.9));border:1px solid var(--line);border-radius:14px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden}
+  .stat-card .lbl{font-size:10.5px;color:var(--mut);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:1px}
+  .stat-card .val{font-size:26px;font-weight:700;font-family:'Chakra Petch',sans-serif;margin-top:3px}
+  .stat-card .chg{font-size:12px;color:var(--acc);font-weight:600}
+  .spark{width:84px;height:38px;opacity:.9}
+  .demo-tag{position:absolute;top:8px;right:10px;font-size:8.5px;letter-spacing:.6px;color:var(--mut2);text-transform:uppercase;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+  @media(max-width:880px){.hero-grid{grid-template-columns:1fr}h1.hero-h1{font-size:44px}.hero p.sub{max-width:none}}
+
+  /* powered strip */
+  .powered{display:flex;align-items:center;gap:26px;flex-wrap:wrap;justify-content:center;border:1px solid var(--line);border-radius:14px;padding:18px 24px;margin-top:34px;background:var(--card)}
+  .powered .pl{font-size:11px;color:var(--mut2);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:1.4px}
+  .powered .slot{font-size:13px;color:var(--mut);font-weight:600;border:1px dashed var(--line);border-radius:8px;padding:7px 14px}
+
+  section{padding:74px 0}
+  .sec-head{margin:0 auto 46px;max-width:680px}
+  .sec-head.center{text-align:center}
+  .sec-head .tag{font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--acc);margin-bottom:12px;font-family:'Chakra Petch',sans-serif}
+  .sec-head h2{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-size:34px;font-weight:700;letter-spacing:-.3px;margin-bottom:12px}
+  .sec-head p{color:var(--mut);font-size:16px}
+
+  .panel{border:1px solid var(--line);border-radius:20px;background:var(--card);padding:36px}
+
+  .feat{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .fcard{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:24px 20px;transition:.2s}
+  .fcard:hover{border-color:rgba(155,253,78,.4);box-shadow:0 0 26px rgba(155,253,78,.1)}
+  .fcard .fic{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;font-size:24px;color:var(--acc);border:1px solid var(--line);background:#0a120b;box-shadow:inset 0 0 16px rgba(155,253,78,.12);margin-bottom:16px}
+  .fcard h3{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-size:15px;letter-spacing:.5px;margin-bottom:8px}
+  .fcard p{font-size:13.5px;color:var(--mut)}
+  @media(max-width:880px){.feat{grid-template-columns:1fr 1fr}}
+  @media(max-width:480px){.feat{grid-template-columns:1fr}}
+
+  /* why 8 eth */
+  .vbox{display:grid;grid-template-columns:1.1fr 1fr;gap:36px;align-items:center}
+  .vbox h3{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-size:22px;margin-bottom:14px}
+  .vbox p{color:var(--mut);font-size:15px;margin-bottom:14px}
+  .vbox ul{list-style:none;margin-top:10px}
+  .vbox li{font-size:14px;color:var(--mut);padding:7px 0 7px 26px;position:relative}
+  .vbox li::before{content:"▹";position:absolute;left:0;color:var(--acc)}
+  .vsplit{background:#0a120b;border:1px solid var(--line);border-radius:16px;padding:26px;text-align:center}
+  .vsplit .ringl{font-size:13px;color:var(--mut);margin-bottom:18px;font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.8px}
+  .quarters{display:flex;gap:8px;justify-content:center;margin-bottom:18px}
+  .q{flex:1;height:64px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:15px;background:var(--card2);line-height:1.1}
+  .q.you{background:var(--acc);border-color:transparent;color:#06210a;box-shadow:var(--glow)}
+  .veq{font-size:13.5px;color:var(--mut)}
+  .veq b{color:var(--txt)}
+  @media(max-width:760px){.vbox{grid-template-columns:1fr}}
+
+  /* plans as rows */
+  .stake-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .prow{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--card2);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:12px;transition:.18s}
+  .prow:hover{border-color:rgba(155,253,78,.4)}
+  .prow.hot{border-color:rgba(155,253,78,.55);box-shadow:0 0 24px rgba(155,253,78,.12)}
+  .prow .pl-left{display:flex;align-items:center;gap:13px}
+  .prow .picon{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;color:var(--acc);font-family:'Chakra Petch',sans-serif;font-weight:700;background:#0a120b}
+  .prow .pname{font-family:'Chakra Petch',sans-serif;font-weight:600;font-size:15px}
+  .prow .psub{font-size:11.5px;color:var(--mut)}
+  .prow .papr{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:16px;color:var(--acc);min-width:64px;text-align:right}
+  .prow .pbtn{background:transparent;border:1px solid var(--acc);color:var(--acc);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-size:11.5px;font-weight:700;letter-spacing:.6px;padding:9px 16px;border-radius:8px;cursor:pointer;transition:.16s}
+  .prow .pbtn:hover{background:var(--acc);color:#06210a}
+  .globe-panel{background:linear-gradient(135deg,#0a120b,#0c160d);border:1px solid var(--line);border-radius:18px;padding:28px;position:relative;overflow:hidden;min-height:300px}
+  .globe-panel .gv{font-family:'Chakra Petch',sans-serif;font-size:32px;font-weight:700}
+  .globe-panel .gl{font-size:11px;color:var(--mut);font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:1px}
+  .gsphere{position:absolute;right:-40px;bottom:-40px;width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle at 40% 35%,rgba(155,253,78,.22),transparent 60%);
+    border:1px solid rgba(155,253,78,.25);box-shadow:0 0 50px rgba(155,253,78,.18) inset}
+  .gmini{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+  .gmini .gm{background:#0a120b;border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:120px}
+  .gmini .gm .v{font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:16px}
+  .gmini .gm .l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+  @media(max-width:880px){.stake-grid{grid-template-columns:1fr}}
+  .why{margin-top:26px;font-size:14px;color:var(--mut);max-width:760px}
+
+  /* calculator */
+  .calc{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:center}
+  .calc label{display:block;font-size:12px;color:var(--mut);margin-bottom:9px;font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.8px}
+  .input-eth{display:flex;align-items:center;background:#0a120b;border:1px solid var(--line);border-radius:11px;padding:0 16px;margin-bottom:8px}
+  .input-eth input{flex:1;background:none;border:none;color:var(--txt);font-size:24px;font-weight:700;font-family:'Chakra Petch',sans-serif;padding:14px 0;outline:none;width:100%}
+  .input-eth .tk{font-weight:700;color:var(--mut);font-family:'Chakra Petch',sans-serif}
+  .hint{font-size:12px;color:var(--mut2);margin-bottom:22px}
+  .chips{display:flex;gap:9px;flex-wrap:wrap}
+  .chip{padding:10px 14px;border-radius:9px;border:1px solid var(--line);background:var(--card2);font-size:13px;cursor:pointer;transition:.16s;font-weight:700;font-family:'Chakra Petch',sans-serif}
+  .chip:hover{border-color:var(--acc)}
+  .chip.on{background:var(--acc);border-color:transparent;color:#06210a}
+  .calc-out{background:#0a120b;border:1px solid var(--line);border-radius:16px;padding:28px}
+  .calc-out .row{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--mut)}
+  .calc-out .row:last-child{border:none;padding-bottom:0}
+  .calc-out .row b{color:var(--txt);font-size:16px;font-family:'Chakra Petch',sans-serif}
+  .calc-out .big{font-size:36px;font-weight:700;font-family:'Chakra Petch',sans-serif;margin:6px 0 2px;color:var(--acc);text-shadow:0 0 22px rgba(155,253,78,.4)}
+  @media(max-width:760px){.calc{grid-template-columns:1fr}}
+
+  /* market */
+  .mkt{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .mcard{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:24px 18px;text-align:center}
+  .mcard .mn{font-size:25px;font-weight:700;font-family:'Chakra Petch',sans-serif;color:var(--acc)}
+  .mcard .ml{font-size:12.5px;color:var(--mut);margin-top:6px}
+  @media(max-width:760px){.mkt{grid-template-columns:1fr 1fr}}
+
+  .trust{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .tcard{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .tcard .ic{width:48px;height:48px;border-radius:12px;background:#0a120b;border:1px solid rgba(155,253,78,.25);display:grid;place-items:center;margin-bottom:16px;box-shadow:inset 0 0 14px rgba(155,253,78,.08)}
+  .tcard .ic svg{filter:drop-shadow(0 0 5px rgba(155,253,78,.5))}
+  .tcard h3{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-size:15px;margin-bottom:8px}
+  .tcard p{font-size:13.5px;color:var(--mut)}
+  .pwr{margin-top:16px;height:46px;border:1px dashed var(--line);border-radius:10px;display:grid;place-items:center;font-size:12px;color:var(--mut2)}
+  @media(max-width:760px){.trust{grid-template-columns:1fr}}
+
+  .faq{max-width:800px;margin:0 auto}
+  details{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px 22px;margin-bottom:12px}
+  summary{cursor:pointer;padding:18px 0;font-weight:600;font-size:15.5px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:'Chakra Petch',sans-serif}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:22px;color:var(--acc);font-weight:400}
+  details[open] summary::after{content:"–"}
+  details p{padding:0 0 18px;color:var(--mut);font-size:14px}
+
+  .cta-band{border:1px solid rgba(155,253,78,.35);border-radius:20px;padding:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    background:linear-gradient(135deg,rgba(155,253,78,.08),rgba(10,15,11,.6));box-shadow:0 0 50px rgba(155,253,78,.1)}
+  .cta-band h2{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;font-size:26px;font-weight:700}
+  .cta-band p{color:var(--mut);font-size:14px;margin-top:6px}
+  .cta-form{display:flex;gap:10px;flex-wrap:wrap}
+  .cta-form input{background:#0a120b;border:1px solid var(--line);border-radius:9px;padding:13px 16px;color:var(--txt);font-size:14px;outline:none;min-width:220px}
+  .cta-form input:focus{border-color:var(--acc)}
+
+  footer{border-top:1px solid var(--line);padding:34px 0;margin-top:30px;color:var(--mut);font-size:13px}
+  .foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;align-items:center}
+  .socials{display:flex;gap:12px}
+  .socials a{width:36px;height:36px;border:1px solid var(--line);border-radius:9px;display:grid;place-items:center;color:var(--mut);transition:.16s}
+  .socials a:hover{border-color:var(--acc);color:var(--acc)}
+  .disclaimer{font-size:12px;color:#4f5f51;max-width:1040px;margin:22px auto 0;text-align:center;line-height:1.55}
+
+  /* ── Mobile: ≤ 640px ── */
+  @media(max-width:640px){
+    .wrap{padding:0 16px}
+    section{padding:52px 0}
+
+    /* nav */
+    .nav-in{height:58px}
+    .logo{font-size:16px}
+    .logo .dot{width:26px;height:26px}
+    .lang{display:none}
+    .btn-wallet{font-size:11.5px;padding:9px 14px;letter-spacing:.3px}
+
+    /* hero */
+    .hero{padding:36px 0 44px}
+    h1.hero-h1{font-size:36px;letter-spacing:-.3px}
+    .hero p.sub{font-size:14px;margin-bottom:22px}
+    .hero-cta{gap:10px}
+    .btn{padding:11px 18px;font-size:12.5px}
+
+    /* hexwrap */
+    .hexwrap{height:220px}
+    .hex{width:130px;height:146px}
+    .eth-svg{width:50px}
+    .hexglow{width:200px;height:200px}
+    .ring{width:160px;height:26px}
+    .hex-mini.hm1{width:56px;height:63px}
+    .hex-mini.hm2{width:42px;height:47px}
+    .hex-mini.hm3{width:34px;height:38px}
+
+    /* stat cards */
+    .stat-card .val{font-size:20px}
+    .stat-card{padding:14px 16px}
+
+    /* powered */
+    .powered{gap:10px;padding:14px 16px}
+    .powered .slot{font-size:11.5px;padding:6px 10px}
+
+    /* section heads */
+    .sec-head h2{font-size:24px}
+    .sec-head p{font-size:14px}
+
+    /* features */
+    .fcard{padding:18px 16px}
+    .fcard .fic{width:44px;height:44px;font-size:20px;margin-bottom:12px}
+
+    /* plans */
+    .prow{flex-wrap:wrap;padding:14px}
+    .prow .papr{min-width:auto}
+    .prow .pbtn{flex:1;text-align:center;justify-content:center}
+    .globe-panel{padding:20px;min-height:auto}
+    .gsphere{width:160px;height:160px;right:-30px;bottom:-30px}
+    .gmini{flex-direction:column}
+    .gmini .gm{min-width:auto;width:100%}
+
+    /* panel / why 8 eth */
+    .panel{padding:22px 18px}
+
+    /* calculator */
+    .calc-out{padding:20px 18px}
+    .calc-out .big{font-size:28px}
+    .input-eth input{font-size:20px}
+
+    /* market cards */
+    .mcard{padding:18px 14px}
+    .mcard .mn{font-size:21px}
+
+    /* trust cards */
+    .tcard{padding:18px 16px}
+
+    /* faq */
+    summary{font-size:14px;padding:16px 0}
+
+    /* cta-band */
+    .cta-band{padding:24px 20px;flex-direction:column;align-items:flex-start;gap:20px}
+    .cta-band h2{font-size:20px}
+    .cta-form{width:100%;flex-direction:column}
+    .cta-form input{width:100%;min-width:auto}
+    .cta-form .btn{width:100%;justify-content:center}
+
+    /* footer */
+    .foot-in{flex-direction:column;align-items:flex-start;gap:16px}
+    .disclaimer{font-size:11px}
+  }
+
+  /* ── Tablet: 641px–880px ── */
+  @media(min-width:641px) and (max-width:880px){
+    h1.hero-h1{font-size:46px}
+    .sec-head h2{font-size:28px}
+    .cta-band{flex-direction:column;align-items:flex-start;gap:20px}
+    .cta-form{flex-direction:column;width:100%}
+    .cta-form input{min-width:auto;width:100%}
+    .cta-form .btn{width:100%;justify-content:center}
+  }
+</style>
+</head>
+<body>
+
+<!-- animated particle network background -->
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <div class="wrap nav-in">
+    <div class="logo"><span class="dot"><svg viewBox="0 0 28 44" fill="none"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".7"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".7"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".4"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".6"/></svg></span> GETHSTAKE</div>
+    <div class="nav-links">
+      <a href="#stake" data-i18n="nav_stake">Stake</a>
+      <a href="#why8" data-i18n="nav_why8">Why 8 ETH</a>
+      <a href="#calc" data-i18n="nav_calc">Calculator</a>
+      <a href="#market" data-i18n="nav_market">Market</a>
+      <a href="#faq" data-i18n="nav_faq">FAQ</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang">
+        <button id="lng-en" class="on" onclick="setLang('en')">EN</button>
+        <button id="lng-ru" onclick="setLang('ru')">RU</button>
+      </div>
+      <a class="btn btn-wallet" href="#stake" data-i18n="nav_wallet">Connect wallet</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow"><span class="dotg"></span> <span data-i18n="hero_eyebrow">Next-generation ETH staking</span></div>
+        <h1 class="hero-h1" data-i18n-html="hero_h1">Stake.<br>Earn.<br><span class="g">Own a<br>validator.</span></h1>
+        <p class="sub" data-i18n="hero_sub">gethstake.com pools retail participants into Ethereum validators. A full node needs 32 ETH, hardware and 24/7 uptime — your 8 ETH is a quarter of a validator, and you earn yield in ETH.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#stake" data-i18n="hero_cta1">Stake now →</a>
+          <a class="btn btn-ghost" href="#why8" data-i18n="hero_cta2">Explore →</a>
+        </div>
+        <div class="trusted" data-i18n="hero_trusted">Trusted by the community</div>
+        <div class="avatars">
+          <div class="av"></div><div class="av"></div><div class="av"></div><div class="av"></div>
+          <span class="more">+12K</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hexwrap">
+          <div class="hexglow"></div>
+          <!-- satellite mini hexes -->
+          <div class="hex-mini hm1"><svg viewBox="0 0 28 44" fill="none" width="22"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".7"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".7"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".4"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".6"/></svg></div>
+          <div class="hex-mini hm2"><svg viewBox="0 0 28 44" fill="none" width="18"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".7"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".7"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".4"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".6"/></svg></div>
+          <div class="hex-mini hm3"><svg viewBox="0 0 28 44" fill="none" width="15"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".7"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".7"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".4"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".6"/></svg></div>
+          <!-- main hex with ETH logo -->
+          <div class="hex">
+            <svg class="eth-svg" viewBox="0 0 28 44" fill="none">
+              <polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75"/>
+              <polygon points="14,0 28,22 14,16" fill="#9bfd4e"/>
+              <polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75"/>
+              <polygon points="28,25 14,44 14,31" fill="#9bfd4e"/>
+              <polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45"/>
+              <polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65"/>
+            </svg>
+          </div>
+          <div class="ring"></div>
+        </div>
+        <div class="stat-card">
+          <span class="demo-tag" data-i18n="demo">demo</span>
+          <div><div class="lbl" data-i18n="sc_tvl">Total value locked</div><div class="val">48,392 ETH</div><div class="chg">+24.35%</div></div>
+          <svg class="spark" viewBox="0 0 84 38"><polyline fill="none" stroke="#9bfd4e" stroke-width="2" points="0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4"/></svg>
+        </div>
+        <div class="stat-card">
+          <span class="demo-tag" data-i18n="demo">demo</span>
+          <div><div class="lbl" data-i18n="sc_part">Active participants</div><div class="val">28,492</div><div class="chg">+18.27%</div></div>
+          <svg class="spark" viewBox="0 0 84 38"><polyline fill="none" stroke="#9bfd4e" stroke-width="2" points="0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6"/></svg>
+        </div>
+        <div class="stat-card">
+          <div><div class="lbl" data-i18n="sc_apr">Best plan APR · 90 days</div><div class="val">10.2%</div><div class="chg" data-i18n="sc_aprsub">in ETH</div></div>
+          <svg class="spark" viewBox="0 0 84 38"><polyline fill="none" stroke="#9bfd4e" stroke-width="2" points="0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="powered">
+      <span class="pl">Powered by</span>
+      <span class="slot" data-i18n="pw_custody">Custody partner</span>
+      <span class="slot" data-i18n="pw_staking">Staking engine</span>
+      <span class="slot" data-i18n="pw_audit">Audit partner</span>
+      <span class="slot" data-i18n="pw_oracle">Data / oracle</span>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head"><div class="tag" data-i18n="bf_tag">Built for performance</div><h2 data-i18n="bf_h2">Why participants choose gethstake</h2></div>
+    <div class="feat">
+      <div class="fcard"><div class="fic"><svg viewBox="0 0 28 44" fill="none" width="26"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65"/></svg></div><h3 data-i18n="bf_1h">Real ETH yield</h3><p data-i18n="bf_1p">Competitive staking-based returns, denominated and paid in ETH — not in points.</p></div>
+      <div class="fcard"><div class="fic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i18n="bf_2h">Secure</h3><p data-i18n="bf_2p">Audited contracts and institutional-grade infrastructure with built-in risk limits.</p></div>
+      <div class="fcard"><div class="fic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M14 6l6 6-6 6"/><path d="M3 6v12"/></svg></div><h3 data-i18n="bf_3h">Flexible exit</h3><p data-i18n="bf_3p">Early withdrawal available — you get your principal back, forfeiting accrued yield.</p></div>
+      <div class="fcard"><div class="fic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg></div><h3 data-i18n="bf_4h">Pooled validators</h3><p data-i18n="bf_4p">Four 8 ETH deposits form one 32 ETH validator — retail access to Ethereum staking.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="why8" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="sec-head center"><div class="tag" data-i18n="w_tag">Validator economics</div><h2 data-i18n="w_h2">Why the minimum deposit is 8 ETH</h2><p data-i18n="w_p">It isn't a paywall — it's the network's math. Becoming a solo validator is expensive and complex.</p></div>
+    <div class="panel">
+      <div class="vbox">
+        <div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+            <svg viewBox="0 0 28 44" fill="none" width="32" style="flex-shrink:0;filter:drop-shadow(0 0 10px rgba(155,253,78,.65))"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65"/></svg>
+            <h3 data-i18n="w_h3">One validator = 32 ETH</h3>
+          </div>
+          <p data-i18n="w_p1">To run your own Ethereum node you must deposit exactly 32 ETH and provide:</p>
+          <ul>
+            <li data-i18n="w_li1">reliable hardware running 24/7</li>
+            <li data-i18n="w_li2">a stable connection and high uptime</li>
+            <li data-i18n="w_li3">acceptance of slashing risk for downtime or errors</li>
+            <li data-i18n="w_li4">ongoing technical maintenance of the node</li>
+          </ul>
+          <p style="margin-top:16px" data-i18n="w_p2">For most private investors that is out of reach. gethstake.com removes the barrier: four deposits of 8 ETH combine into one 32 ETH validator.</p>
+        </div>
+        <div class="vsplit">
+          <div class="ringl" data-i18n="w_ring">How a validator is formed</div>
+          <div class="quarters">
+            <div class="q you"><span data-i18n="w_you">You</span><br>8</div>
+            <div class="q">8</div><div class="q">8</div><div class="q">8</div>
+          </div>
+          <div class="veq" data-i18n-html="w_eq"><b>8 ETH × 4 = 32 ETH</b> → 1 Ethereum validator. Your share is <b>¼ of a validator</b>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stake">
+  <div class="wrap">
+    <div class="sec-head center"><div class="tag" data-i18n="s_tag">Staking plans</div><h2 data-i18n="s_h2">Stake your ETH. Pick a term.</h2><p data-i18n="s_p">The longer the lock, the higher the APR. 90 days is the best value — beyond it the rate barely grows.</p></div>
+    <div class="stake-grid">
+      <div>
+        <div class="prow">
+          <div class="pl-left"><div class="picon">30</div><div><div class="pname" data-i18n="s_30">30-day lock</div><div class="psub" data-i18n="s_min">min 8 ETH · paid in ETH</div></div></div>
+          <div class="papr">8.2%</div>
+          <button class="pbtn" data-i18n="s_btn">Stake</button>
+        </div>
+        <div class="prow hot">
+          <div class="pl-left"><div class="picon">90</div><div><div class="pname" data-i18n="s_90">90-day lock · Best value ★</div><div class="psub" data-i18n="s_min2">min 8 ETH · paid in ETH</div></div></div>
+          <div class="papr">10.2%</div>
+          <button class="pbtn" data-i18n="s_btn2">Stake</button>
+        </div>
+        <div class="prow">
+          <div class="pl-left"><div class="picon">180</div><div><div class="pname" data-i18n="s_180">180-day lock</div><div class="psub" data-i18n="s_min3">min 8 ETH · paid in ETH</div></div></div>
+          <div class="papr">10.9%</div>
+          <button class="pbtn" data-i18n="s_btn3">Stake</button>
+        </div>
+        <p class="why" data-i18n="s_why">The rate step peaks at 90 days (+2.0% over 30d), then drops to +0.7%. Doubling the lock barely adds APR — so 90 days is the smart choice.</p>
+      </div>
+      <div class="globe-panel">
+        <span class="demo-tag" data-i18n="demo">demo</span>
+        <div class="gl" data-i18n="g_tvl">Total value locked</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+          <svg viewBox="0 0 28 44" fill="none" width="28" style="flex-shrink:0;filter:drop-shadow(0 0 10px rgba(155,253,78,.7))"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65"/></svg>
+          <div class="gv">48,392 ETH</div>
+        </div>
+        <div class="gsphere"></div>
+        <div class="gmini">
+          <div class="gm"><div class="v">Ethereum</div><div class="l" data-i18n="g_net">Network</div></div>
+          <div class="gm"><div class="v">28,492</div><div class="l" data-i18n="g_part">Participants</div></div>
+          <div class="gm"><div class="v">3,271 ETH</div><div class="l" data-i18n="g_paid">Rewards paid</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="calc" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="sec-head center"><div class="tag" data-i18n="c_tag">Calculator</div><h2 data-i18n="c_h2">Estimate your yield in ETH</h2><p data-i18n="c_p">Pick an amount (from 8 ETH) and a plan — see the yield in ETH for the term and per year.</p></div>
+    <div class="panel">
+      <div class="calc">
+        <div>
+          <label data-i18n="c_amt">Deposit amount</label>
+          <div class="input-eth"><input id="amt" type="number" value="8" min="8" step="1"><span class="tk">ETH</span></div>
+          <div class="hint" data-i18n="c_hint">Minimum deposit — 8 ETH (¼ of a validator).</div>
+          <label data-i18n="c_plan">Plan</label>
+          <div class="chips" id="chips">
+            <div class="chip" data-apr="8.2" data-days="30" data-en="30 days" data-ru="30 дней">30d · 8.2%</div>
+            <div class="chip on" data-apr="10.2" data-days="90" data-en="90 days" data-ru="90 дней">90d · 10.2%</div>
+            <div class="chip" data-apr="10.9" data-days="180" data-en="180 days" data-ru="180 дней">180d · 10.9%</div>
+          </div>
+        </div>
+        <div class="calc-out">
+          <div class="muted" style="font-size:12px;font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.8px"><span data-i18n="c_outpre">Yield for the term</span> (<span id="oTerm">90 days</span>)</div>
+          <div class="big"><span id="oPeriod">0.2012</span> ETH</div>
+          <div style="margin-top:18px">
+            <div class="row"><span data-i18n="c_dep">Deposit</span><b><span id="oDep">8</span> ETH</b></div>
+            <div class="row"><span data-i18n="c_apr">APR</span><b><span id="oApr">10.2</span>%</b></div>
+            <div class="row"><span data-i18n="c_year">Yield per year</span><b><span id="oYear">0.82</span> ETH</b></div>
+            <div class="row"><span data-i18n="c_total">Total payout</span><b><span id="oTotal">8.2012</span> ETH</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="market">
+  <div class="wrap">
+    <div class="sec-head center"><div class="tag" data-i18n="m_tag">Market context</div><h2 data-i18n="m_h2">Why ETH staking is relevant now</h2><p data-i18n="m_p">Facts about the Ethereum market as of June 2026. This is information, not investment advice.</p></div>
+    <div class="mkt">
+      <div class="mcard"><div class="mn">~$1,566</div><div class="ml" data-i18n="m_c1">ETH price (28 Jun 2026)</div></div>
+      <div class="mcard"><div class="mn">≈3.2×</div><div class="ml" data-i18n="m_c2">below the all-time high ($4,946)</div></div>
+      <div class="mcard"><div class="mn">~32%</div><div class="ml" data-i18n="m_c3">of ETH supply already staked</div></div>
+      <div class="mcard"><div class="mn">~60d</div><div class="ml" data-i18n="m_c4">validator entry queue</div></div>
+    </div>
+    <p class="why" style="text-align:center;margin-left:auto;margin-right:auto" data-i18n="m_why">~38.9M ETH is locked in staking. The validator entry queue sits around two months on strong demand, including from institutions (ETFs and corporate treasuries). Pooled staking gives retail access without the full 32 ETH deposit.</p>
+  </div>
+</section>
+
+<section id="trust" style="background:var(--bg2)">
+  <div class="wrap">
+    <div class="sec-head center"><div class="tag" data-i18n="t_tag">Security &amp; transparency</div><h2 data-i18n="t_h2">Not trust — verifiability</h2></div>
+    <div class="trust">
+      <div class="tcard">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 6v5.5c0 5.1 3.4 9.8 8 11.5 4.6-1.7 8-6.4 8-11.5V6L12 2z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3 data-i18n="t_1h">Reserve fund</h3><p data-i18n="t_1p">Part of the profit goes into an insurance buffer that smooths payouts in weak periods.</p>
+      </div>
+      <div class="tcard">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/><rect x="2" y="2" width="20" height="20" rx="3" stroke="none"/></svg></div>
+        <h3 data-i18n="t_2h">Transparent accounting</h3><p data-i18n="t_2p">Reporting on how deposits combine into validators and on actual yield.</p>
+      </div>
+      <div class="tcard">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg></div>
+        <h3 data-i18n="t_3h">Risk limits</h3><p data-i18n="t_3p">Limits on strategies, leverage and permitted operations are built into platform rules.</p>
+      </div>
+    </div>
+    <div class="trust" style="margin-top:16px">
+      <div class="tcard">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg></div>
+        <h3 data-i18n="pr_1h">Custody &amp; wallets</h3><p data-i18n="pr_1p">MPC infrastructure for non-custodial storage and signing.</p><div class="pwr" data-i18n="pr_logo">Partner logo</div>
+      </div>
+      <div class="tcard">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg></div>
+        <h3 data-i18n="pr_2h">Staking engine</h3><p data-i18n="pr_2p">Institutional staking and validator management.</p><div class="pwr" data-i18n="pr_logo2">Partner logo</div>
+      </div>
+      <div class="tcard">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg></div>
+        <h3 data-i18n="pr_3h">Contract audit</h3><p data-i18n="pr_3p">Independent audit of smart contracts and infrastructure.</p><div class="pwr" data-i18n="pr_logo3">Auditor logo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head center"><div class="tag">FAQ</div><h2 data-i18n="f_h2">Frequently asked questions</h2></div>
+    <div class="faq">
+      <details open><summary data-i18n="f_q1">Why is the minimum deposit 8 ETH?</summary><p data-i18n="f_a1">A full Ethereum validator requires 32 ETH. The platform pools four 8 ETH participants into one validator, so 8 ETH is your quarter of the network's minimum threshold.</p></details>
+      <details><summary data-i18n="f_q2">What is the yield paid in?</summary><p data-i18n="f_a2">All plans are denominated and paid in ETH — regardless of the USD exchange rate.</p></details>
+      <details><summary data-i18n="f_q3">Why is 90 days the best plan?</summary><p data-i18n="f_a3">Moving from 30 to 90 days adds +2.0% APR, while 90 to 180 adds only +0.7%. So 90 days gives nearly the maximum yield at a moderate lock.</p></details>
+      <details><summary data-i18n="f_q4">Can I withdraw before the term ends?</summary><p data-i18n="f_a4">Yes, early withdrawal is available — but you forfeit the accrued yield. You receive your principal back without the plan's APR.</p></details>
+      <details><summary data-i18n="f_q5">What are the risks?</summary><p data-i18n="f_a5">Yield depends on staking results and the platform's strategies and is not guaranteed; the network carries slashing risk and validator entry/exit queues. This is not a bank deposit — assess the risk before participating.</p></details>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-band">
+      <div style="display:flex;align-items:center;gap:22px">
+        <svg viewBox="0 0 28 44" fill="none" width="40" style="flex-shrink:0;filter:drop-shadow(0 0 16px rgba(155,253,78,.75))"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".75"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".75"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".45"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".65"/></svg>
+        <div>
+          <h2 data-i18n="cta_h2">Join the future of ETH staking</h2>
+          <p data-i18n="cta_p">Stake from 8 ETH today and take part in Ethereum validation.</p>
+        </div>
+      </div>
+      <div class="cta-form">
+        <input type="email" data-i18n-ph="cta_ph" placeholder="Enter your email">
+        <a class="btn btn-primary" href="#stake" data-i18n="cta_btn">Get started →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-in">
+      <div class="logo"><span class="dot"><svg viewBox="0 0 28 44" fill="none"><polygon points="14,0 0,22 14,16" fill="#9bfd4e" opacity=".7"/><polygon points="14,0 28,22 14,16" fill="#9bfd4e"/><polygon points="0,25 14,44 14,31" fill="#9bfd4e" opacity=".7"/><polygon points="28,25 14,44 14,31" fill="#9bfd4e"/><polygon points="0,22 14,16 14,31 0,25" fill="#9bfd4e" opacity=".4"/><polygon points="28,22 14,16 14,31 28,25" fill="#9bfd4e" opacity=".6"/></svg></span> GETHSTAKE</div>
+      <div class="socials">
+        <a href="#" aria-label="X">𝕏</a><a href="#" aria-label="Telegram">✈</a><a href="#" aria-label="Discord">◇</a><a href="#" aria-label="Docs">▤</a>
+      </div>
+    </div>
+    <p class="disclaimer" data-i18n="disc">This material is for information only and is not a public offer or investment/financial advice. APR figures are target benchmarks, not guaranteed returns; actual results depend on staking, market conditions and the platform's strategies. Metrics marked "demo" are placeholders and must reflect real on-chain data before launch. Participation carries the risk of partial or total loss of funds, including Ethereum slashing and validator queue risks. Market data is as of 28 Jun 2026. Consult an independent financial and legal advisor before deciding. The final product structure requires legal and regulatory review.</p>
+  </div>
+</footer>
+
+<script>
+/* ─── particle network background ─── */
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  const COUNT = 70;
+  const MAX_DIST = 160;
+  const COLOR = '155,253,78';
+
+  let W, H, particles;
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function Particle(){
+    this.x = Math.random()*W;
+    this.y = Math.random()*H;
+    this.vx = (Math.random()-.5)*.4;
+    this.vy = (Math.random()-.5)*.4;
+    this.r = Math.random()*1.6+.6;
+    this.pulse = Math.random()*Math.PI*2;
+  }
+
+  Particle.prototype.update = function(){
+    this.x += this.vx;
+    this.y += this.vy;
+    this.pulse += .018;
+    if(this.x < 0) this.x = W;
+    if(this.x > W) this.x = 0;
+    if(this.y < 0) this.y = H;
+    if(this.y > H) this.y = 0;
+  };
+
+  function init(){
+    resize();
+    particles = Array.from({length:COUNT}, ()=> new Particle());
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // draw connections
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const a=particles[i], b=particles[j];
+        const dx=a.x-b.x, dy=a.y-b.y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<MAX_DIST){
+          const alpha=(1-dist/MAX_DIST)*.25;
+          ctx.beginPath();
+          ctx.strokeStyle=`rgba(${COLOR},${alpha})`;
+          ctx.lineWidth=.8;
+          ctx.moveTo(a.x,a.y);
+          ctx.lineTo(b.x,b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // draw nodes
+    particles.forEach(p=>{
+      p.update();
+      const pulse = .6 + Math.sin(p.pulse)*.4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(${COLOR},${pulse})`;
+      ctx.fill();
+
+      // soft glow halo on some nodes
+      if(p.r > 1.8){
+        const grd = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*5);
+        grd.addColorStop(0,`rgba(${COLOR},.14)`);
+        grd.addColorStop(1,`rgba(${COLOR},0)`);
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r*5,0,Math.PI*2);
+        ctx.fillStyle=grd;
+        ctx.fill();
+      }
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  init();
+  draw();
+  window.addEventListener('resize', ()=>{ resize(); });
+})();
+
+/* ─── i18n ─── */
+  const I18N={ru:{
+    nav_stake:"Стейкинг",nav_why8:"Почему 8 ETH",nav_calc:"Калькулятор",nav_market:"Рынок",nav_faq:"FAQ",nav_wallet:"Подключить кошелёк",
+    hero_eyebrow:"Стейкинг ETH нового поколения",
+    hero_h1:'Стейкай.<br>Зарабатывай.<br><span class="g">Владей<br>валидатором.</span>',
+    hero_sub:"gethstake.com объединяет ритейл-участников в валидаторы Ethereum. Узел требует 32 ETH, оборудования и аптайма 24/7 — ваши 8 ETH это четверть валидатора, а доход вы получаете в ETH.",
+    hero_cta1:"Начать стейкинг →",hero_cta2:"Подробнее →",hero_trusted:"Нам доверяет сообщество",
+    demo:"демо",sc_tvl:"Всего застейкано",sc_part:"Активных участников",sc_apr:"APR лучшего плана · 90 дней",sc_aprsub:"в ETH",
+    pw_custody:"Кастоди-партнёр",pw_staking:"Стейкинг-движок",pw_audit:"Аудит-партнёр",pw_oracle:"Данные / оракул",
+    bf_tag:"Создано для результата",bf_h2:"Почему выбирают gethstake",
+    bf_1h:"Реальный доход в ETH",bf_1p:"Конкурентная доходность на базе стейкинга, номинированная и выплачиваемая в ETH — не в баллах.",
+    bf_2h:"Безопасно",bf_2p:"Проверенные аудитом контракты и институциональная инфраструктура со встроенными лимитами риска.",
+    bf_3h:"Гибкий выход",bf_3p:"Досрочный вывод возможен — вы получаете депозит обратно, теряя начисленную доходность.",
+    bf_4h:"Пул валидаторов",bf_4p:"Четыре депозита по 8 ETH формируют один валидатор на 32 ETH — ритейл-доступ к стейкингу Ethereum.",
+    w_tag:"Экономика валидатора",w_h2:"Почему минимальный депозит — 8 ETH",w_p:"Это не барьер, а математика сети. Стать валидатором в одиночку дорого и сложно.",
+    w_h3:"Один валидатор = 32 ETH",w_p1:"Чтобы запустить собственный узел Ethereum, нужно внести ровно 32 ETH и обеспечить:",
+    w_li1:"надёжное оборудование, работающее 24/7",w_li2:"стабильное соединение и аптайм",w_li3:"принятие риска слэшинга за простой или ошибки",w_li4:"техническое сопровождение узла",
+    w_p2:"Для большинства частных инвесторов это недостижимо. gethstake.com снимает барьер: четыре депозита по 8 ETH объединяются в один валидатор на 32 ETH.",
+    w_ring:"Как формируется валидатор",w_you:"Вы",
+    w_eq:'<b>8 ETH × 4 = 32 ETH</b> → 1 валидатор Ethereum. Ваша доля — <b>¼ валидатора</b>.',
+    s_tag:"Планы стейкинга",s_h2:"Застейкай ETH. Выбери срок.",s_p:"Чем дольше лок, тем выше APR. 90 дней — лучший выбор: дальше ставка почти не растёт.",
+    s_30:"Лок 30 дней",s_min:"мин. 8 ETH · выплата в ETH",s_90:"Лок 90 дней · Лучший выбор ★",s_min2:"мин. 8 ETH · выплата в ETH",s_180:"Лок 180 дней",s_min3:"мин. 8 ETH · выплата в ETH",
+    s_btn:"Стейк",s_btn2:"Стейк",s_btn3:"Стейк",
+    s_why:"Прирост ставки максимален на 90 днях (+2.0% к 30д), дальше падает до +0.7%. Удвоение лока почти не добавляет APR — поэтому 90 дней оптимальны.",
+    g_tvl:"Всего застейкано",g_net:"Сеть",g_part:"Участники",g_paid:"Выплачено наград",
+    c_tag:"Калькулятор",c_h2:"Посчитайте доход в ETH",c_p:"Выберите сумму (от 8 ETH) и план — увидите начисление в ETH за период и в год.",
+    c_amt:"Сумма депозита",c_hint:"Минимальный депозит — 8 ETH (¼ валидатора).",c_plan:"План",
+    c_outpre:"Доход за период",c_dep:"Депозит",c_apr:"APR",c_year:"Доход в год",c_total:"Итого к выводу",
+    m_tag:"Контекст рынка",m_h2:"Почему стейкинг ETH сейчас актуален",m_p:"Факты о рынке Ethereum на июнь 2026 года. Это информация, а не инвестиционная рекомендация.",
+    m_c1:"цена ETH (28.06.2026)",m_c2:"ниже исторического максимума ($4 946)",m_c3:"предложения ETH уже в стейкинге",m_c4:"очередь на вход в валидаторы",
+    m_why:"В стейкинге заблокировано ~38.9M ETH. Очередь на вход держится около двух месяцев из-за высокого спроса, в т.ч. институционалов (ETF и корп. казначейства). Пул-стейкинг даёт ритейлу доступ без полного депозита в 32 ETH.",
+    t_tag:"Безопасность и прозрачность",t_h2:"Не доверие, а проверяемость",
+    t_1h:"Резервный фонд",t_1p:"Часть прибыли идёт в страховой буфер, сглаживающий выплаты в слабые периоды.",
+    t_2h:"Прозрачный учёт",t_2p:"Отчётность по объединению депозитов в валидаторы и по фактической доходности.",
+    t_3h:"Лимиты риска",t_3p:"Ограничения по стратегиям, плечу и операциям зашиты в правила платформы.",
+    pr_1h:"Кастоди и кошельки",pr_1p:"MPC-инфраструктура для некастодиального хранения и подписи.",
+    pr_2h:"Стейкинг-движок",pr_2p:"Институциональный стейкинг и управление валидаторами.",
+    pr_3h:"Аудит контрактов",pr_3p:"Независимый аудит смарт-контрактов и инфраструктуры.",
+    pr_logo:"Логотип партнёра",pr_logo2:"Логотип партнёра",pr_logo3:"Логотип аудитора",
+    f_h2:"Частые вопросы",
+    f_q1:"Почему минимальный депозит — 8 ETH?",f_a1:"Полноценный валидатор Ethereum требует 32 ETH. Платформа объединяет четырёх участников по 8 ETH в один валидатор, поэтому 8 ETH — ваша четверть от минимального порога сети.",
+    f_q2:"В чём начисляется доходность?",f_a2:"Все планы номинированы и выплачиваются в ETH — независимо от курса к доллару.",
+    f_q3:"Почему 90 дней — лучший план?",f_a3:"Переход с 30 на 90 дней добавляет +2.0% APR, а с 90 на 180 — лишь +0.7%. То есть 90 дней дают почти максимальную доходность при умеренном сроке блокировки.",
+    f_q4:"Можно ли вывести раньше срока?",f_a4:"Да, досрочный вывод возможен — но инвестор теряет начисленную доходность. Депозит возвращается без процентов по APR плана.",
+    f_q5:"Какие есть риски?",f_a5:"Доходность зависит от результата стейкинга и стратегий платформы и не гарантирована; в сети есть риск слэшинга и очередей валидаторов. Это не банковский вклад — оценивайте риск перед участием.",
+    cta_h2:"Войди в будущее стейкинга ETH",cta_p:"Застейкай от 8 ETH сегодня и стань частью валидации Ethereum.",cta_ph:"Введите email",cta_btn:"Начать →",
+    disc:"Материал носит информационный характер и не является публичной офертой, инвестиционной или финансовой рекомендацией. Ставки APR — целевые ориентиры, а не гарантированная доходность; результат зависит от стейкинга, рынка и стратегий платформы. Метрики с пометкой «демо» — это плейсхолдеры, перед запуском они должны отражать реальные ончейн-данные. Участие сопряжено с риском частичной или полной потери средств, включая риски слэшинга и очередей валидаторов Ethereum. Рыночные данные на 28.06.2026. Перед решением проконсультируйтесь с независимым финансовым и юридическим советником. Финальная структура продукта требует юридической и регуляторной проработки."
+  }};
+
+  let LANG='en';
+  function applyLang(){
+    document.documentElement.lang=LANG;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const k=el.getAttribute('data-i18n');
+      if(LANG==='en'){if(el.dataset.en0!==undefined)el.textContent=el.dataset.en0;}
+      else if(I18N.ru[k]!==undefined){if(el.dataset.en0===undefined)el.dataset.en0=el.textContent;el.textContent=I18N.ru[k];}
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-html');
+      if(LANG==='en'){if(el.dataset.enh0!==undefined)el.innerHTML=el.dataset.enh0;}
+      else if(I18N.ru[k]!==undefined){if(el.dataset.enh0===undefined)el.dataset.enh0=el.innerHTML;el.innerHTML=I18N.ru[k];}
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+      const k=el.getAttribute('data-i18n-ph');
+      if(LANG==='en'){if(el.dataset.ph0!==undefined)el.placeholder=el.dataset.ph0;}
+      else if(I18N.ru[k]!==undefined){if(el.dataset.ph0===undefined)el.dataset.ph0=el.placeholder;el.placeholder=I18N.ru[k];}
+    });
+    document.querySelectorAll('.chip').forEach(c=>{
+      const apr=c.dataset.apr,d=c.dataset.days;
+      c.dataset.name=LANG==='ru'?c.dataset.ru:c.dataset.en;
+      c.textContent=(LANG==='ru'?(d+'д'):(d+'d'))+' · '+apr+'%';
+    });
+    document.getElementById('lng-en').classList.toggle('on',LANG==='en');
+    document.getElementById('lng-ru').classList.toggle('on',LANG==='ru');
+    calc();
+  }
+  function setLang(l){LANG=l;try{localStorage.setItem('gs_lang',l)}catch(e){}applyLang();}
+
+  const chips=document.querySelectorAll('.chip');
+  const amt=document.getElementById('amt');
+  function fmt(n,d=4){return Number(n).toLocaleString(LANG==='ru'?'ru-RU':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+  let apr=10.2,days=90;
+  function curName(){const on=document.querySelector('.chip.on');return on?on.dataset.name:(LANG==='ru'?'90 дней':'90 days');}
+  function calc(){
+    const dep=Math.max(0,parseFloat(amt.value)||0);
+    const yearGain=dep*apr/100,periodGain=yearGain*days/365;
+    document.getElementById('oTerm').textContent=curName();
+    document.getElementById('oPeriod').textContent=fmt(periodGain);
+    document.getElementById('oDep').textContent=fmt(dep,dep%1===0?0:2);
+    document.getElementById('oApr').textContent=apr;
+    document.getElementById('oYear').textContent=fmt(yearGain,2);
+    document.getElementById('oTotal').textContent=fmt(dep+periodGain);
+  }
+  chips.forEach(c=>c.addEventListener('click',()=>{
+    chips.forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    apr=parseFloat(c.dataset.apr);days=parseInt(c.dataset.days);calc();
+  }));
+  amt.addEventListener('input',calc);
+  try{const s=localStorage.getItem('gs_lang');if(s)LANG=s;}catch(e){}
+  applyLang();
+</script>
+</body>
+</html>
