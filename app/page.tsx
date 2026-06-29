@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { Navbar } from '@/components/Navbar';
 import { EthLogo } from '@/components/EthLogo';
 import { Dashboard } from '@/components/Dashboard';
@@ -219,6 +221,16 @@ export default function Home() {
   const [ps, setPs] = useState<PlatformStats>({ tvl_eth: 227936, participants: 28492, active_validators: 7123, rewards_paid_eth: 5733.15 });
   const [showModal, setShowModal] = useState(false);
   const calc = useCalc();
+  const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
+
+  const handleStartStaking = () => {
+    if (!isConnected) {
+      openConnectModal?.();
+    } else {
+      setShowModal(true);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/platform').then(r => r.json()).then(d => {
@@ -414,6 +426,7 @@ export default function Home() {
                   <button className="pbtn" onClick={() => {
                     calc.setDays(p.days);
                     document.getElementById('calc')?.scrollIntoView({ behavior: 'smooth' });
+                    if (!isConnected) setTimeout(() => openConnectModal?.(), 600);
                   }}>Stake</button>
                 </div>
               ))}
@@ -521,10 +534,12 @@ export default function Home() {
                   ))}
                 </div>
                 <button
-                  onClick={() => setShowModal(true)}
+                  onClick={handleStartStaking}
                   style={{ width: '100%', marginTop: 22, background: 'var(--acc)', color: '#06210a', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
                 >
-                  {lang === 'ru' ? 'Запустить стейкинг →' : 'Start Staking →'}
+                  {lang === 'ru'
+                    ? (isConnected ? 'Запустить стейкинг →' : 'Подключить кошелёк →')
+                    : (isConnected ? 'Start Staking →' : 'Connect Wallet →')}
                 </button>
               </div>
               <div className="calc-out">
