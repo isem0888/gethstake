@@ -72,35 +72,43 @@ function t(key: string, lang: 'en' | 'ru', fallback: string) {
   return lang === 'ru' ? (RU[key] ?? fallback) : fallback;
 }
 
+/* ── Bonus APR by deposit size ── */
+export function getBonus(eth: number): number {
+  if (eth >= 128) return 3.1;
+  if (eth >= 96)  return 2.2;
+  if (eth >= 64)  return 1.5;
+  if (eth >= 32)  return 0.7;
+  return 0;
+}
+
 /* ── Calculator hook ── */
 const APR_MAP: Record<number, number> = { 30: 8.2, 90: 10.2, 180: 10.9 };
 function useCalc() {
   const [amount, setAmountRaw] = useState(8);
   const [inputVal, setInputValRaw] = useState('8');
   const [days, setDays] = useState(90);
-  const apr = APR_MAP[days];
+  const baseApr = APR_MAP[days];
+  const bonus = getBonus(amount);
+  const apr = baseApr + bonus;           // effective APR shown everywhere
   const yearGain = amount * apr / 100;
   const periodGain = yearGain * days / 365;
 
-  // Set amount programmatically (from "Stake" button clicks)
   const setAmount = (n: number) => {
     setAmountRaw(n);
     setInputValRaw(String(n));
   };
-  // Handle raw typing — allow partial input like "3" while typing "32"
   const handleInputChange = (v: string) => {
     setInputValRaw(v);
     const n = parseFloat(v);
     if (!isNaN(n) && n > 0) setAmountRaw(n);
   };
-  // Clamp to minimum on blur
   const handleInputBlur = () => {
-    const n = Math.max(8, parseFloat(inputVal) || 8);
+    const n = Math.max(8, Math.min(128, parseFloat(inputVal) || 8));
     setAmountRaw(n);
     setInputValRaw(String(n));
   };
 
-  return { amount, setAmount, inputVal, handleInputChange, handleInputBlur, days, setDays, apr, yearGain, periodGain, total: amount + periodGain };
+  return { amount, setAmount, inputVal, handleInputChange, handleInputBlur, days, setDays, baseApr, bonus, apr, yearGain, periodGain, total: amount + periodGain };
 }
 
 /* ── Particle canvas ── */
@@ -408,38 +416,50 @@ export default function Home() {
         <div className="wrap">
           <div className="sec-head center">
             <div className="tag">{lang === 'ru' ? 'Владение узлом' : 'Node ownership'}</div>
-            <h2>{lang === 'ru' ? 'Ваша доля — ваша часть сети' : 'Your stake — your share of the network'}</h2>
+            <h2>{lang === 'ru' ? 'Больше ETH — выше бонус к APR' : 'More ETH — higher APR bonus'}</h2>
             <p>{lang === 'ru'
-              ? 'Четыре участника по 8 ETH формируют один валидатор на 32 ETH. Чем больше ваш депозит — тем больше доля. При депозите 32 ETH вы получаете полный контроль над узлом и бонус +0.7% к APR.'
-              : 'Four 8 ETH participants form one 32 ETH validator. The more you stake, the larger your share. At 32 ETH you gain full node control and an APR bonus of +0.7%.'
+              ? 'Чем больше узлов вы контролируете, тем выше бонус к базовой ставке. Четыре участника по 8 ETH формируют один валидатор. Максимум — 128 ETH (4 валидатора, +3.1% к APR).'
+              : 'The more validator nodes you control, the higher your APR bonus on top of the base rate. Four 8 ETH deposits form one validator. Maximum — 128 ETH (4 validators, +3.1% APR).'
             }</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginTop: 8 }}>
+          {/* Quarter-node info */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10, marginBottom: 28 }}>
             {[
-              { eth: 8,  share: '¼', pct: 25,  label: lang === 'ru' ? 'Четверть узла' : 'Quarter node',      bonus: null },
-              { eth: 16, share: '½', pct: 50,  label: lang === 'ru' ? 'Половина узла' : 'Half node',         bonus: null },
-              { eth: 24, share: '¾', pct: 75,  label: lang === 'ru' ? 'Три четверти'  : 'Three-quarter node', bonus: null },
-              { eth: 32, share: '1', pct: 100, label: lang === 'ru' ? 'Полный узел'   : 'Full node control',  bonus: '+0.7% APR' },
+              { eth: 8,  share: '¼', label: lang === 'ru' ? 'Четверть узла' : 'Quarter node' },
+              { eth: 16, share: '½', label: lang === 'ru' ? 'Половина узла' : 'Half node' },
+              { eth: 24, share: '¾', label: lang === 'ru' ? 'Три четверти'  : 'Three-quarter' },
+              { eth: 32, share: '1×', label: lang === 'ru' ? 'Полный узел' : 'Full node' },
             ].map(tier => (
-              <div key={tier.eth} className="fcard" style={{ position: 'relative', border: tier.bonus ? '1px solid var(--acc)' : undefined }}>
-                {tier.bonus && (
-                  <span style={{ position: 'absolute', top: -10, right: 12, background: 'var(--acc)', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 6 }}>
-                    {tier.bonus}
-                  </span>
-                )}
+              <div key={tier.eth} style={{ background: 'var(--bg)', border: '1px solid #1d2c1f', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
+                <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 22, fontWeight: 700, color: 'var(--acc)' }}>{tier.share}</div>
+                <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 15, fontWeight: 700, marginTop: 4 }}>{tier.eth} ETH</div>
+                <div style={{ fontSize: 12, color: 'var(--mut)', marginTop: 4 }}>{tier.label}</div>
+              </div>
+            ))}
+          </div>
+          {/* Bonus tiers */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
+            {[
+              { eth: 32,  nodes: 1, bonus: 0.7,  pct: 25,  label: lang === 'ru' ? '1 полный валидатор' : '1 full validator',  highlight: false },
+              { eth: 64,  nodes: 2, bonus: 1.5,  pct: 50,  label: lang === 'ru' ? '2 валидатора'       : '2 validators',      highlight: false },
+              { eth: 96,  nodes: 3, bonus: 2.2,  pct: 75,  label: lang === 'ru' ? '3 валидатора'       : '3 validators',      highlight: false },
+              { eth: 128, nodes: 4, bonus: 3.1,  pct: 100, label: lang === 'ru' ? '4 валидатора (макс)' : '4 validators (max)', highlight: true  },
+            ].map(tier => (
+              <div key={tier.eth} className="fcard" style={{ position: 'relative', border: tier.highlight ? '1px solid var(--acc)' : undefined }}>
+                <span style={{ position: 'absolute', top: -11, right: 12, background: 'var(--acc)', color: '#06210a', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 6 }}>
+                  +{tier.bonus}% APR
+                </span>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 26, fontWeight: 700, color: 'var(--acc)' }}>{tier.share}</span>
-                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700 }}>{tier.eth} ETH</span>
+                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700, color: 'var(--acc)' }}>{tier.nodes} {lang === 'ru' ? 'узл.' : 'node'}{tier.nodes > 1 ? (lang === 'ru' ? '' : 's') : ''}</span>
+                  <span style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, fontWeight: 700 }}>{tier.eth} ETH</span>
                 </div>
                 <div style={{ background: 'var(--bg)', borderRadius: 6, height: 6, marginBottom: 10 }}>
-                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'var(--acc)', opacity: 0.7 + tier.pct / 400 }} />
+                  <div style={{ width: `${tier.pct}%`, height: '100%', borderRadius: 6, background: 'var(--acc)', opacity: 0.65 + tier.pct / 400 }} />
                 </div>
                 <div style={{ fontSize: 13, color: 'var(--mut)' }}>{tier.label}</div>
-                {tier.bonus && (
-                  <div style={{ fontSize: 12, color: 'var(--acc)', marginTop: 6, fontWeight: 600 }}>
-                    {lang === 'ru' ? 'Полный контроль + бонус к APR' : 'Full control + APR bonus'}
-                  </div>
-                )}
+                <div style={{ fontSize: 12, color: 'var(--acc)', marginTop: 6, fontWeight: 600 }}>
+                  {lang === 'ru' ? `Бонус +${tier.bonus}% к базовому APR` : `+${tier.bonus}% on top of base APR`}
+                </div>
               </div>
             ))}
           </div>
@@ -484,14 +504,20 @@ export default function Home() {
                   {t('c_outpre', lang, 'Yield for the term')} ({calc.days}{lang === 'ru' ? ' дней' : ' days'})
                 </div>
                 <div className="big">{fmt(calc.periodGain)} ETH</div>
+                {calc.bonus > 0 && (
+                  <div style={{ marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(155,253,78,.12)', border: '1px solid rgba(155,253,78,.3)', borderRadius: 6, padding: '3px 10px' }}>
+                    <span style={{ color: '#9bfd4e', fontSize: 12, fontWeight: 700 }}>+{calc.bonus}% {lang === 'ru' ? 'бонус' : 'bonus'}</span>
+                    <span style={{ color: '#5f7062', fontSize: 11 }}>{lang === 'ru' ? 'за объём' : 'volume APR'}</span>
+                  </div>
+                )}
                 <div style={{ marginTop: 18 }}>
                   {[
                     { l: t('c_dep', lang, 'Deposit'), v: `${fmt(calc.amount, calc.amount % 1 === 0 ? 0 : 2)} ETH` },
-                    { l: t('c_apr', lang, 'APR'), v: `${calc.apr}%` },
+                    { l: t('c_apr', lang, 'APR'), v: calc.bonus > 0 ? `${calc.baseApr}% + ${calc.bonus}% = ${calc.apr.toFixed(1)}%` : `${calc.apr}%` },
                     { l: t('c_year', lang, 'Yield per year'), v: `${fmt(calc.yearGain, 2)} ETH` },
                     { l: t('c_total', lang, 'Total payout'), v: `${fmt(calc.total)} ETH` },
                   ].map(r => (
-                    <div key={r.l} className="row"><span>{r.l}</span><b>{r.v}</b></div>
+                    <div key={r.l} className="row"><span>{r.l}</span><b style={{ color: r.l === t('c_apr', lang, 'APR') && calc.bonus > 0 ? '#9bfd4e' : undefined }}>{r.v}</b></div>
                   ))}
                 </div>
               </div>

@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSendTransaction, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 
-// Replace with your real staking contract address
-const STAKING_ADDRESS = (process.env.NEXT_PUBLIC_STAKING_ADDRESS || '0xD8f24D419153E6a439E53F99b612F15A6f0A8d62') as `0x${string}`;
+const STAKING_ADDRESS = (process.env.NEXT_PUBLIC_STAKING_ADDRESS || '0x82913f7e6da031f5b9c23834a3384FEe2E36c8d7') as `0x${string}`;
 
 interface Props {
   amount: number;
@@ -17,10 +16,21 @@ interface Props {
   onClose: () => void;
 }
 
+function getBonus(eth: number): number {
+  if (eth >= 128) return 3.1;
+  if (eth >= 96)  return 2.2;
+  if (eth >= 64)  return 1.5;
+  if (eth >= 32)  return 0.7;
+  return 0;
+}
+
 function ownershipLabel(eth: number, lang: 'en' | 'ru') {
-  if (eth >= 32) return lang === 'ru' ? 'Полный узел' : 'Full node';
-  if (eth >= 24) return lang === 'ru' ? '¾ узла' : '¾ node';
-  if (eth >= 16) return lang === 'ru' ? '½ узла' : '½ node';
+  if (eth >= 128) return lang === 'ru' ? '4 валидатора (макс)' : '4 validators (max)';
+  if (eth >= 96)  return lang === 'ru' ? '3 валидатора' : '3 validators';
+  if (eth >= 64)  return lang === 'ru' ? '2 валидатора' : '2 validators';
+  if (eth >= 32)  return lang === 'ru' ? '1 полный узел' : '1 full validator';
+  if (eth >= 24)  return lang === 'ru' ? '¾ узла' : '¾ node';
+  if (eth >= 16)  return lang === 'ru' ? '½ узла' : '½ node';
   return lang === 'ru' ? '¼ узла' : '¼ node';
 }
 
@@ -33,7 +43,8 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   const [step, setStep] = useState<'confirm' | 'pending' | 'success' | 'error'>('confirm');
   const [errMsg, setErrMsg] = useState('');
 
-  const effectiveApr = amount >= 32 ? apr + 0.7 : apr;
+  const bonus = getBonus(amount);
+  const effectiveApr = apr + bonus;
   const effectivePeriodGain = amount * effectiveApr / 100 * days / 365;
   const effectiveTotal = amount + effectivePeriodGain;
 
@@ -110,7 +121,7 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
                 { l: lang === 'ru' ? 'Доход за период' : 'Yield for period', v: `+${fmtEth(effectivePeriodGain)} ETH`, color: '#9bfd4e' },
                 { l: lang === 'ru' ? 'Итого к выводу' : 'Total payout', v: `${fmtEth(effectiveTotal)} ETH` },
                 { l: lang === 'ru' ? 'Доля узла' : 'Node ownership', v: ownershipLabel(amount, lang) },
-                ...(amount >= 32 ? [{ l: 'Bonus', v: '+0.7% APR (Full node)', color: '#9bfd4e' }] : []),
+                ...(bonus > 0 ? [{ l: lang === 'ru' ? 'Бонус к APR' : 'APR bonus', v: `+${bonus}% (${ownershipLabel(amount, lang)})`, color: '#9bfd4e' }] : []),
               ].map((r: any) => (
                 <div key={r.l} style={row}>
                   <span style={{ color: '#8a9b8c' }}>{r.l}</span>
@@ -162,7 +173,7 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
             <p style={{ color: '#8a9b8c', fontSize: 13, marginBottom: 24 }}>
               {amount} ETH · {days}-day · {effectiveApr.toFixed(1)}% APR
             </p>
-            <button onClick={onClose} style={{ background: '#9bfd4e', color: '#06210a', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+            <button onClick={() => { onClose(); window.location.href = '/dashboard'; }} style={{ background: '#9bfd4e', color: '#06210a', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
               {lang === 'ru' ? 'Открыть кабинет' : 'Open Dashboard'}
             </button>
           </div>
