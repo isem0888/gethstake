@@ -184,7 +184,7 @@ function BonusTooltip({ lang }: { lang: 'en' | 'ru' }) {
       {open && (
         <span style={{ position: 'absolute', bottom: 22, left: '50%', transform: 'translateX(-50%)', width: 240, background: '#0d1f0f', border: '1px solid #2a3f2c', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: '#b8ccba', lineHeight: 1.55, zIndex: 50, pointerEvents: 'none', boxShadow: '0 4px 24px rgba(0,0,0,.5)' }}>
           {text}
-          <span style={{ position: 'absolute', bottom: -5, left: '50%', transform: 'translateX(-50%)', width: 8, height: 8, background: '#0d1f0f', border: '1px solid #2a3f2c', borderRight: 'none', borderTop: 'none', transform: 'translateX(-50%) rotate(-45deg)' }} />
+          <span style={{ position: 'absolute', bottom: -5, left: '50%', width: 8, height: 8, background: '#0d1f0f', border: '1px solid #2a3f2c', borderRight: 'none', borderTop: 'none', transform: 'translateX(-50%) rotate(-45deg)' }} />
         </span>
       )}
     </span>
