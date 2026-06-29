@@ -659,29 +659,58 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[8, 16, 32, 64, 96, 128].map((eth, i) => (
-                    <tr key={eth} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(96,165,250,.03)' }}>
-                      <td style={{ padding: '9px 14px', color: 'var(--txt)', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, borderBottom: '1px solid var(--line)', fontSize: 13 }}>
-                        {eth} ETH
-                        {eth >= 32 && <span style={{ marginLeft: 6, fontSize: 9, color: '#60a5fa', background: 'rgba(96,165,250,.1)', border: '1px solid rgba(96,165,250,.25)', borderRadius: 4, padding: '1px 5px', fontFamily: 'Inter,sans-serif', fontWeight: 600 }}>
-                          {eth >= 128 ? '4 val' : eth >= 96 ? '3 val' : eth >= 64 ? '2 val' : '1 val'}
-                        </span>}
-                      </td>
-                      {[
-                        { days: 30,  apr: 5.5  },
-                        { days: 90,  apr: 8.3  },
-                        { days: 180, apr: 9.7  },
-                      ].map(p => {
-                        const gain = eth * p.apr / 100 * p.days / 365;
-                        return (
-                          <td key={p.days} style={{ padding: '9px 14px', textAlign: 'right', borderBottom: '1px solid var(--line)' }}>
-                            <span style={{ color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{gain.toFixed(4)}</span>
-                            <span style={{ color: 'var(--mut2)', fontSize: 10, marginLeft: 4 }}>ETH</span>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
+                  {[8, 16, 32, 64, 96, 128].map((eth, i) => {
+                    const bonusMap: Record<number, Record<number, number>> = {
+                      8:   { 30: 0,   90: 0,   180: 0   },
+                      16:  { 30: 0,   90: 0,   180: 0   },
+                      32:  { 30: 0.4, 90: 0.5, 180: 1.0 },
+                      64:  { 30: 0.8, 90: 1.5, 180: 1.5 },
+                      96:  { 30: 1.0, 90: 1.7, 180: 1.8 },
+                      128: { 30: 1.1, 90: 2.0, 180: 2.2 },
+                    };
+                    const hasBonus = eth >= 32;
+                    return (
+                      <tr key={eth} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(96,165,250,.03)' }}>
+                        <td style={{ padding: '9px 14px', borderBottom: '1px solid var(--line)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                            <span style={{ color: 'var(--txt)', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>{eth} ETH</span>
+                            {eth >= 32 && (
+                              <span style={{ fontSize: 9, color: '#60a5fa', background: 'rgba(96,165,250,.1)', border: '1px solid rgba(96,165,250,.25)', borderRadius: 4, padding: '1px 5px', fontFamily: 'Inter,sans-serif', fontWeight: 600 }}>
+                                {eth >= 128 ? '4 val' : eth >= 96 ? '3 val' : eth >= 64 ? '2 val' : '1 val'}
+                              </span>
+                            )}
+                          </div>
+                          {hasBonus && (
+                            <div style={{ fontSize: 10, color: '#a78bfa', marginTop: 3 }}>
+                              ✦ {lang === 'ru' ? 'бонус активен' : 'bonus active'}
+                            </div>
+                          )}
+                        </td>
+                        {[
+                          { days: 30,  apr: 5.5  },
+                          { days: 90,  apr: 8.3  },
+                          { days: 180, apr: 9.7  },
+                        ].map(p => {
+                          const bonus = bonusMap[eth][p.days];
+                          const effectiveApr = p.apr + bonus;
+                          const gain = eth * effectiveApr / 100 * p.days / 365;
+                          return (
+                            <td key={p.days} style={{ padding: '9px 14px', textAlign: 'right', borderBottom: '1px solid var(--line)' }}>
+                              <div>
+                                <span style={{ color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{gain.toFixed(4)}</span>
+                                <span style={{ color: 'var(--mut2)', fontSize: 10, marginLeft: 4 }}>ETH</span>
+                              </div>
+                              {bonus > 0 && (
+                                <div style={{ fontSize: 10, color: '#a78bfa', marginTop: 2 }}>
+                                  {p.apr}% + <span style={{ fontWeight: 700 }}>+{bonus}%</span> = {effectiveApr.toFixed(1)}%
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
