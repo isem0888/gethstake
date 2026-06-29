@@ -49,9 +49,19 @@ const RU: Record<string, string> = {
   f_h2: 'Частые вопросы',
   f_q1: 'Почему минимальный депозит — 8 ETH?', f_a1: 'Полноценный валидатор Ethereum требует 32 ETH. Платформа объединяет четырёх участников по 8 ETH в один валидатор.',
   f_q2: 'В чём начисляется доходность?', f_a2: 'Все планы номинированы и выплачиваются в ETH — независимо от курса к доллару.',
-  f_q3: 'Почему 90 дней — лучший план?', f_a3: 'Переход с 30 на 90 дней добавляет +2.0% APR, а с 90 на 180 — лишь +0.7%.',
-  f_q4: 'Можно ли вывести раньше срока?', f_a4: 'Да, досрочный вывод возможен — но инвестор теряет начисленную доходность.',
-  f_q5: 'Какие есть риски?', f_a5: 'Доходность зависит от результата стейкинга и не гарантирована; есть риск слэшинга и очередей валидаторов.',
+  f_q3: 'Как формируется доход валидатора?', f_a3: 'Валидаторы Ethereum получают вознаграждение за аттестацию блоков, приоритетные комиссии из транзакций и MEV-доход. gethstake распределяет этот совокупный доход между участниками пула пропорционально их доле.',
+  f_q4: 'Когда начисляется доходность?', f_a4: 'Доходность начисляется ежедневно с момента формирования валидатора. Выплата производится в ETH по истечении срока лока.',
+  f_q5: 'Что происходит после окончания срока лока?', f_a5: 'По истечении срока депозит и начисленный доход автоматически становятся доступны для вывода на ваш кошелёк.',
+  f_q6: 'Можно ли вывести раньше срока?', f_a6: 'Да, досрочный вывод возможен — но инвестор теряет начисленную доходность. Депозит возвращается в полном объёме.',
+  f_q7: 'Сколько времени занимает вывод средств?', f_a7: 'Вывод обрабатывается в течение 1–5 рабочих дней в зависимости от очереди выхода валидатора в сети Ethereum.',
+  f_q8: 'Какие кошельки поддерживаются?', f_a8: 'Поддерживаются MetaMask, Trust Wallet, Coinbase Wallet и любые WalletConnect-совместимые кошельки.',
+  f_q9: 'Есть ли максимальный размер депозита?', f_a9: 'Один план соответствует одной позиции в валидаторе (8 ETH). Вы можете открыть несколько планов одновременно — ограничений на общую сумму нет.',
+  f_q10: 'Можно ли открыть несколько стейков одновременно?', f_a10: 'Да. Вы можете держать несколько активных планов с разными сроками и суммами — каждый обрабатывается независимо.',
+  f_q11: 'Нужна ли верификация (KYC)?', f_a11: 'На текущем этапе верификация не требуется. Для участия достаточно подключить кошелёк Ethereum.',
+  f_q12: 'Какова комиссия платформы?', f_a12: 'Платформа взимает комиссию с дохода валидатора. APR в таблице планов уже указан после вычета комиссии — вы видите итоговую ставку.',
+  f_q13: 'Как защищены средства от слэшинга?', f_a13: 'Используется профессиональная инфраструктура с несколькими уровнями защиты от двойной подписи. Резервный фонд платформы покрывает потенциальные штрафы сети.',
+  f_q14: 'Как выбирается валидатор для предложения блока?', f_a14: 'Ethereum случайным образом выбирает валидатора через алгоритм RANDAO — чем больше ETH в стейкинге, тем чаще валидатор получает право предложить блок.',
+  f_q15: 'Как платформа обеспечивает аптайм валидаторов?', f_a15: 'Узлы работают на институциональной инфраструктуре Everstake с резервными серверами и мониторингом 24/7. Штрафы за простой минимальны при аптайме выше 98%.',
   cta_h2: 'Войди в будущее стейкинга ETH', cta_p: 'Застейкай от 8 ETH сегодня и стань частью валидации Ethereum.',
   cta_ph: 'Введите email', cta_btn: 'Начать →',
   disc: '',
@@ -196,12 +206,11 @@ export default function Home() {
                 <div className="ring" />
               </div>
               {[
-                { lbl: t('sc_tvl', lang, 'Total value locked'), val: '48,392 ETH', chg: '+24.35%', pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4', demo: true },
-                { lbl: t('sc_part', lang, 'Active participants'), val: '28,492', chg: '+18.27%', pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6', demo: true },
-                { lbl: t('sc_apr', lang, 'Best plan APR · 90 days'), val: '10.2%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6', demo: false },
+                { lbl: t('sc_tvl', lang, 'Total value locked'), val: '48,392 ETH', chg: '+24.35%', pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4' },
+                { lbl: t('sc_part', lang, 'Active participants'), val: '28,492', chg: '+18.27%', pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6' },
+                { lbl: t('sc_apr', lang, 'Best plan APR · 90 days'), val: '10.2%', chg: t('sc_aprsub', lang, 'in ETH'), pts: '0,26 12,22 24,24 36,16 48,18 60,12 72,10 84,6' },
               ].map(s => (
                 <div key={s.lbl} className="stat-card">
-                  {s.demo && <span className="demo-tag">demo</span>}
                   <div>
                     <div className="lbl">{s.lbl}</div>
                     <div className="val">{s.val}</div>
@@ -218,21 +227,21 @@ export default function Home() {
           <div className="powered">
             <span className="pl">Powered by</span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <img src="https://avatars.githubusercontent.com/u/97140552?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Zodia" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              <img src="https://github.com/Zodia-Finance.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Zodia" onError={(e) => { e.currentTarget.src = 'https://avatars.githubusercontent.com/u/97140552?s=22'; }} />
               Zodia Custody
             </span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <img src="https://avatars.githubusercontent.com/u/11744586?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="MetaMask" />
-              <img src="https://avatars.githubusercontent.com/u/32179537?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Trust Wallet" />
+              <img src="https://github.com/MetaMask.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="MetaMask" />
+              <img src="https://github.com/trustwallet.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Trust Wallet" />
               MetaMask · Trust Wallet
             </span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <img src="https://avatars.githubusercontent.com/u/34027067?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Hacken" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+              <img src="https://github.com/hknio.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Hacken" onError={(e) => { e.currentTarget.src = 'https://avatars.githubusercontent.com/u/34027067?s=22'; }} />
               Hacken
             </span>
             <span className="slot" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-              <img src="https://avatars.githubusercontent.com/u/80477244?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Pyth" />
-              <img src="https://avatars.githubusercontent.com/u/37770894?s=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Chainlink" />
+              <img src="https://github.com/pyth-network.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Pyth" />
+              <img src="https://github.com/smartcontractkit.png?size=22" width={22} height={22} style={{ borderRadius: '50%', objectFit: 'cover' }} alt="Chainlink" />
               Pyth · Chainlink
             </span>
           </div>
@@ -336,7 +345,6 @@ export default function Home() {
               ))}
             </div>
             <div className="globe-panel">
-              <span className="demo-tag">demo</span>
               <div className="gl">{t('sc_tvl', lang, 'Total value locked')}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
                 <EthLogo size={28} />
@@ -442,9 +450,9 @@ export default function Home() {
               { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2.5"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1.2" fill="#9bfd4e" stroke="none"/></svg>, h: t('t_3h', lang, 'Risk limits'), p: t('t_3p', lang, 'Limits on strategies, leverage and permitted operations are built into platform rules.') },
             ],
             [
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://avatars.githubusercontent.com/u/97140552?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Zodia" onError={(e) => { e.currentTarget.style.display = 'none'; }} /><span>Zodia Custody</span></div> },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Wallets'), p: t('pr_2p', lang, 'Non-custodial wallet infrastructure for secure key management.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://avatars.githubusercontent.com/u/11744586?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="MetaMask" /><img src="https://avatars.githubusercontent.com/u/32179537?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Trust Wallet" /><span>MetaMask · Trust Wallet</span></div> },
-              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://avatars.githubusercontent.com/u/34027067?s=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Hacken" onError={(e) => { e.currentTarget.style.display = 'none'; }} /><span>Hacken</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4"/><path d="M12 11.6L20 4"/><path d="M17 4l3 3"/><path d="M19 8l-2.5-2.5"/></svg>, h: t('pr_1h', lang, 'Custody partner'), p: t('pr_1p', lang, 'MPC infrastructure for non-custodial storage and signing.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/Zodia-Finance.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Zodia" onError={(e) => { e.currentTarget.src='https://avatars.githubusercontent.com/u/97140552?s=22'; }} /><span>Zodia Custody</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="2.5"/><circle cx="4.5" cy="6" r="2"/><circle cx="19.5" cy="6" r="2"/><circle cx="4.5" cy="18" r="2"/><circle cx="19.5" cy="18" r="2"/><path d="M6.2 7.2l4 3.6M17.8 7.2l-4 3.6M6.2 16.8l4-3.6M17.8 16.8l-4-3.6"/></svg>, h: t('pr_2h', lang, 'Wallets'), p: t('pr_2p', lang, 'Non-custodial wallet infrastructure for secure key management.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/MetaMask.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="MetaMask" /><img src="https://github.com/trustwallet.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Trust Wallet" /><span>MetaMask · Trust Wallet</span></div> },
+              { icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9bfd4e" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/><path d="M8 10.5l1.8 1.8 3-3"/></svg>, h: t('pr_3h', lang, 'Contract audit'), p: t('pr_3p', lang, 'Independent audit of smart contracts and infrastructure.'), pwr: <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'center' }}><img src="https://github.com/hknio.png?size=22" width={22} height={22} style={{ borderRadius: '50%' }} alt="Hacken" onError={(e) => { e.currentTarget.src='https://avatars.githubusercontent.com/u/34027067?s=22'; }} /><span>Hacken</span></div> },
             ],
           ].map((row, ri) => (
             <div key={ri} className="trust" style={ri > 0 ? { marginTop: 16 } : {}}>
@@ -468,9 +476,19 @@ export default function Home() {
             {[
               { q: t('f_q1', lang, 'Why is the minimum deposit 8 ETH?'), a: t('f_a1', lang, 'A full Ethereum validator requires 32 ETH. The platform pools four 8 ETH participants into one validator, so 8 ETH is your quarter of the network\'s minimum threshold.') },
               { q: t('f_q2', lang, 'What is the yield paid in?'), a: t('f_a2', lang, 'All plans are denominated and paid in ETH — regardless of the USD exchange rate.') },
-              { q: t('f_q3', lang, 'Why is 90 days the best plan?'), a: t('f_a3', lang, 'Moving from 30 to 90 days adds +2.0% APR, while 90 to 180 adds only +0.7%. So 90 days gives nearly the maximum yield at a moderate lock.') },
-              { q: t('f_q4', lang, 'Can I withdraw before the term ends?'), a: t('f_a4', lang, 'Yes, early withdrawal is available — but you forfeit the accrued yield. You receive your principal back without the plan\'s APR.') },
-              { q: t('f_q5', lang, 'What are the risks?'), a: t('f_a5', lang, 'Yield depends on staking results and the platform\'s strategies and is not guaranteed; the network carries slashing risk and validator entry/exit queues. This is not a bank deposit — assess the risk before participating.') },
+              { q: t('f_q3', lang, 'How is validator yield generated?'), a: t('f_a3', lang, 'Ethereum validators earn block attestation rewards, priority fees from transactions, and MEV income. gethstake distributes this combined yield among pool participants proportionally to their stake.') },
+              { q: t('f_q4', lang, 'When is yield accrued?'), a: t('f_a4', lang, 'Yield accrues daily from the moment the validator is formed. Payout is made in ETH at the end of the lock period.') },
+              { q: t('f_q5', lang, 'What happens when my lock period ends?'), a: t('f_a5', lang, 'Once the term expires, your deposit and accrued yield automatically become available for withdrawal to your wallet.') },
+              { q: t('f_q6', lang, 'Can I withdraw before the term ends?'), a: t('f_a6', lang, 'Yes, early withdrawal is available — but you forfeit the accrued yield. Your full principal is returned.') },
+              { q: t('f_q7', lang, 'How long does withdrawal take?'), a: t('f_a7', lang, 'Withdrawals are processed within 1–5 business days depending on the Ethereum validator exit queue.') },
+              { q: t('f_q8', lang, 'Which wallets are supported?'), a: t('f_a8', lang, 'MetaMask, Trust Wallet, Coinbase Wallet, and any WalletConnect-compatible wallet are supported.') },
+              { q: t('f_q9', lang, 'Is there a maximum deposit?'), a: t('f_a9', lang, 'One plan corresponds to one validator position (8 ETH). You can open multiple plans simultaneously — there is no cap on total staked amount.') },
+              { q: t('f_q10', lang, 'Can I stake multiple times simultaneously?'), a: t('f_a10', lang, 'Yes. You can hold multiple active plans with different terms and amounts — each is processed independently.') },
+              { q: t('f_q11', lang, 'Is KYC required?'), a: t('f_a11', lang, 'At this stage, no verification is required. Connecting an Ethereum wallet is sufficient to participate.') },
+              { q: t('f_q12', lang, 'What fees does the platform charge?'), a: t('f_a12', lang, 'The platform takes a fee from validator income. The APR shown in the plan table is already net of fees — you see the final rate.') },
+              { q: t('f_q13', lang, 'How are funds protected from slashing?'), a: t('f_a13', lang, 'The platform uses professional infrastructure with multiple layers of protection against double-signing. The reserve fund covers potential network penalties.') },
+              { q: t('f_q14', lang, 'How is a block proposer selected?'), a: t('f_a14', lang, 'Ethereum randomly selects a validator via the RANDAO algorithm — the more ETH staked, the more often a validator earns the right to propose a block.') },
+              { q: t('f_q15', lang, 'How does the platform ensure validator uptime?'), a: t('f_a15', lang, 'Nodes run on institutional infrastructure with redundant servers and 24/7 monitoring. Inactivity penalties are minimal at uptime above 98%.') },
             ].map((f, i) => (
               <details key={i} className="faq-item">
                 <summary>{f.q}</summary>
