@@ -66,13 +66,23 @@ function useEthNetwork() {
   return data;
 }
 
-function useEthNews() {
+// Fetch broad news — all categories, filter client-side
+function useNews() {
   const [news, setNews] = useState<NewsItem[]>([]);
   useEffect(() => {
-    fetch('https://min-api.cryptocompare.com/data/v2/news/?categories=ETH,Ethereum&lang=EN&sortOrder=latest&extraParams=gethstake')
-      .then(r => r.json())
-      .then(d => setNews((d.Data || []).slice(0, 4)))
-      .catch(() => {});
+    // Two requests in parallel: latest general + ETH-specific
+    Promise.all([
+      fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&sortOrder=latest&extraParams=gethstake').then(r => r.json()),
+      fetch('https://min-api.cryptocompare.com/data/v2/news/?categories=Regulation,Business,Trading,Market,Blockchain&lang=EN&sortOrder=latest&extraParams=gethstake').then(r => r.json()),
+    ]).then(([all, market]) => {
+      const combined: NewsItem[] = [...(all.Data || []), ...(market.Data || [])];
+      // Deduplicate by id
+      const seen = new Set<string>();
+      const unique = combined.filter(n => { if (seen.has(n.id)) return false; seen.add(n.id); return true; });
+      // Sort by published desc
+      unique.sort((a, b) => b.published - a.published);
+      setNews(unique.slice(0, 24));
+    }).catch(() => {});
   }, []);
   return news;
 }
@@ -207,7 +217,8 @@ export default function DashboardPage() {
 
   const market = useEthMarket();
   const network = useEthNetwork();
-  const news = useEthNews();
+  const allNews = useNews();
+  const [newsTab, setNewsTab] = useState<'all' | 'eth' | 'market' | 'regulation'>('all');
 
   useEffect(() => {
     fetch('/api/platform').then(r => r.json()).then(setPlatform).catch(() => {});
@@ -248,134 +259,17 @@ export default function DashboardPage() {
 
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-        {/* ── ETH Market + Network Stats ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-
-          {/* ETH Price */}
-          <div style={card}>
-            <div style={tag}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
-              ETH / USD · Live
-              <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3d5040' }}>updates every 30s</span>
-            </div>
-            {market ? (
-              <>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 16 }}>
-                  <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 32, fontWeight: 700 }}>
-                    {fmtUsd(market.price)}
-                  </div>
-                  <div style={{ paddingBottom: 5, fontSize: 14, fontWeight: 700, color: market.change24h >= 0 ? '#9bfd4e' : '#ff5555' }}>
-                    {market.change24h >= 0 ? '▲' : '▼'} {Math.abs(market.change24h).toFixed(2)}%
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  {[
-                    { l: 'Market cap', v: fmtBig(market.marketCap) },
-                    { l: '24h volume', v: fmtBig(market.volume24h) },
-                  ].map(r => (
-                    <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
-                      <div style={{ fontSize: 12, color: '#8a9b8c', marginBottom: 3 }}>{r.l}</div>
-                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700 }}>{r.v}</div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading market data…</div>
-            )}
-          </div>
-
-          {/* Network Stats */}
-          <div style={card}>
-            <div style={tag}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-              Ethereum Network · Real-time
-            </div>
-            {network ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                {[
-                  { l: 'Pending transactions', v: fmtNum(network.pendingTx), accent: true },
-                  { l: 'Block height', v: `#${fmtNum(network.blockHeight)}` },
-                  { l: 'Gas · fast (Gwei)', v: `${network.highGas}` },
-                  { l: 'Gas · standard', v: `${network.medGas}` },
-                  { l: 'Gas · slow', v: `${network.lowGas}` },
-                  { l: 'Consensus', v: 'Proof-of-Stake' },
-                ].map(r => (
-                  <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
-                    <div style={{ fontSize: 12, color: '#5f7062', marginBottom: 3 }}>{r.l}</div>
-                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: (r as any).accent ? '#9bfd4e' : undefined }}>{r.v}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading network data…</div>
-            )}
-          </div>
-        </div>
-
-        {/* ── News ── */}
-        <div style={card}>
-          <div style={tag}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
-            Ethereum News
-          </div>
-          {news.length === 0 ? (
-            <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>Loading news…</div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
-              {news.map(item => (
-                <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer"
-                  style={{ display: 'flex', flexDirection: 'column', gap: 8, background: '#0a0f0b', borderRadius: 10, overflow: 'hidden', textDecoration: 'none', border: '1px solid #1d2c1f', transition: 'border-color .2s' }}
-                  onMouseEnter={e => (e.currentTarget.style.borderColor = '#2d4a30')}
-                  onMouseLeave={e => (e.currentTarget.style.borderColor = '#1d2c1f')}
-                >
-                  {item.imageurl && (
-                    <img src={item.imageurl} alt="" style={{ width: '100%', height: 120, objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none'; }} />
-                  )}
-                  <div style={{ padding: '0 12px 12px' }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf3ea', lineHeight: 1.4, marginBottom: 6 }}>
-                      {item.title}
-                    </div>
-                    <div style={{ fontSize: 11, color: '#5f7062' }}>
-                      {item.source} · {timeAgo(item.published)}
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-
+        {/* ── Portfolio (top) ── */}
         {!isConnected ? (
-          <div style={{ ...card, textAlign: 'center', padding: '60px 24px' }}>
-            <EthLogo size={40} />
-            <p style={{ marginTop: 20, marginBottom: 24, color: '#8a9b8c', fontSize: 15 }}>Connect your wallet to view your personal dashboard</p>
-            <WalletButton />
+          <div style={{ ...card, display: 'flex', alignItems: 'center', gap: 16, padding: '18px 24px' }}>
+            <EthLogo size={28} />
+            <p style={{ color: '#5f7062', fontSize: 14, margin: 0 }}>Connect your wallet to view your portfolio and validator nodes</p>
+            <div style={{ marginLeft: 'auto' }}><WalletButton /></div>
           </div>
         ) : loading ? (
-          <div style={{ ...card, textAlign: 'center', color: '#5f7062', padding: 40 }}>Loading…</div>
+          <div style={{ ...card, textAlign: 'center', color: '#5f7062', padding: 32 }}>Loading portfolio…</div>
         ) : (
           <>
-            {/* ── Platform Stats ── */}
-            {platform && (
-              <div style={card}>
-                <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Platform stats <span style={{ marginLeft: 'auto', fontSize: 10, color: '#5f7062' }}>updated {new Date(platform.updated_at).toLocaleTimeString()}</span></div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16 }}>
-                  {[
-                    { l: 'Total value locked', v: `${fmtEth(platform.tvl_eth)} ETH` },
-                    { l: 'Participants', v: fmtNum(platform.participants) },
-                    { l: 'Validators active', v: fmtNum(platform.active_validators) },
-                    { l: 'Rewards paid', v: `${fmtEth(platform.rewards_paid_eth)} ETH` },
-                  ].map(s => (
-                    <div key={s.l}>
-                      <div style={{ ...val, fontSize: 18 }}>{s.v}</div>
-                      <div style={{ fontSize: 11, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{s.l}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* ── Portfolio ── */}
             <div style={card}>
               <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Your portfolio</div>
@@ -492,6 +386,158 @@ export default function DashboardPage() {
               })}
             </div>
           </>
+        )}
+
+        {/* ── ETH Market + Network Stats ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+
+          {/* ETH Price */}
+          <div style={card}>
+            <div style={tag}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
+              ETH / USD · Live
+              <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3d5040' }}>updates every 30s</span>
+            </div>
+            {market ? (
+              <>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 16 }}>
+                  <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 32, fontWeight: 700 }}>
+                    {fmtUsd(market.price)}
+                  </div>
+                  <div style={{ paddingBottom: 5, fontSize: 14, fontWeight: 700, color: market.change24h >= 0 ? '#9bfd4e' : '#ff5555' }}>
+                    {market.change24h >= 0 ? '▲' : '▼'} {Math.abs(market.change24h).toFixed(2)}%
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {[
+                    { l: 'Market cap', v: fmtBig(market.marketCap) },
+                    { l: '24h volume', v: fmtBig(market.volume24h) },
+                  ].map(r => (
+                    <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
+                      <div style={{ fontSize: 12, color: '#8a9b8c', marginBottom: 3 }}>{r.l}</div>
+                      <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700 }}>{r.v}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading market data…</div>
+            )}
+          </div>
+
+          {/* Network Stats */}
+          <div style={card}>
+            <div style={tag}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+              Ethereum Network · Real-time
+            </div>
+            {network ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                {[
+                  { l: 'Pending transactions', v: fmtNum(network.pendingTx), accent: true },
+                  { l: 'Block height', v: `#${fmtNum(network.blockHeight)}` },
+                  { l: 'Gas · fast (Gwei)', v: `${network.highGas}` },
+                  { l: 'Gas · standard', v: `${network.medGas}` },
+                  { l: 'Gas · slow', v: `${network.lowGas}` },
+                  { l: 'Consensus', v: 'Proof-of-Stake' },
+                ].map(r => (
+                  <div key={r.l} style={{ background: '#0a0f0b', borderRadius: 8, padding: '10px 12px' }}>
+                    <div style={{ fontSize: 12, color: '#5f7062', marginBottom: 3 }}>{r.l}</div>
+                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: (r as any).accent ? '#9bfd4e' : undefined }}>{r.v}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '20px 0' }}>Loading network data…</div>
+            )}
+          </div>
+        </div>
+
+        {/* ── News ── */}
+        <div style={card}>
+          <div style={tag}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} />
+            Crypto & Market News
+            <span style={{ marginLeft: 'auto', fontSize: 9, color: '#3d5040' }}>via CryptoCompare</span>
+          </div>
+
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+            {([
+              { key: 'all',        label: '🌐 All' },
+              { key: 'eth',        label: '⟠ Ethereum' },
+              { key: 'market',     label: '📈 Market' },
+              { key: 'regulation', label: '🏛 Regulation' },
+            ] as const).map(tab => (
+              <button key={tab.key} onClick={() => setNewsTab(tab.key)}
+                style={{ padding: '5px 14px', borderRadius: 20, fontSize: 12, cursor: 'pointer', fontFamily: "'Chakra Petch',sans-serif", border: '1px solid', transition: 'all .15s',
+                  background: newsTab === tab.key ? 'var(--acc, #9bfd4e)' : 'transparent',
+                  color: newsTab === tab.key ? '#06210a' : '#5f7062',
+                  borderColor: newsTab === tab.key ? 'var(--acc, #9bfd4e)' : '#1d2c1f',
+                }}
+              >{tab.label}</button>
+            ))}
+          </div>
+
+          {(() => {
+            const filtered = allNews.filter(item => {
+              const cats = (item as any).categories?.toLowerCase() || '';
+              const title = item.title.toLowerCase();
+              if (newsTab === 'eth') return cats.includes('eth') || cats.includes('ethereum') || title.includes('ethereum') || title.includes(' eth');
+              if (newsTab === 'market') return cats.includes('market') || cats.includes('trading') || cats.includes('business') || cats.includes('price');
+              if (newsTab === 'regulation') return cats.includes('regulation') || cats.includes('legal') || cats.includes('sec') || title.includes('sec ') || title.includes('regulation') || title.includes('law') || title.includes('ban');
+              return true;
+            }).slice(0, 8);
+
+            return allNews.length === 0 ? (
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>Loading news…</div>
+            ) : filtered.length === 0 ? (
+              <div style={{ color: '#3d5040', fontSize: 13, padding: '8px 0' }}>No recent articles in this category.</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+                {filtered.map(item => (
+                  <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', flexDirection: 'column', background: '#0a0f0b', borderRadius: 10, overflow: 'hidden', textDecoration: 'none', border: '1px solid #1d2c1f', transition: 'border-color .2s' }}
+                    onMouseEnter={e => (e.currentTarget.style.borderColor = '#2d4a30')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = '#1d2c1f')}
+                  >
+                    {item.imageurl && (
+                      <img src={item.imageurl} alt="" style={{ width: '100%', height: 110, objectFit: 'cover', flexShrink: 0 }} onError={e => { e.currentTarget.style.display = 'none'; }} />
+                    )}
+                    <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf3ea', lineHeight: 1.4, marginBottom: 8, flex: 1 }}>
+                        {item.title}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 11, color: '#5f7062', fontWeight: 600 }}>{item.source}</span>
+                        <span style={{ fontSize: 11, color: '#3d5040' }}>{timeAgo(item.published)}</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* ── Platform Stats (always visible) ── */}
+        {platform && (
+          <div style={card}>
+            <div style={tag}><span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9bfd4e', display: 'inline-block' }} /> Platform stats <span style={{ marginLeft: 'auto', fontSize: 10, color: '#5f7062' }}>updated {new Date(platform.updated_at).toLocaleTimeString()}</span></div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: 16 }}>
+              {[
+                { l: 'Total value locked', v: `${fmtEth(platform.tvl_eth)} ETH` },
+                { l: 'Participants', v: fmtNum(platform.participants) },
+                { l: 'Validators active', v: fmtNum(platform.active_validators) },
+                { l: 'Rewards paid', v: `${fmtEth(platform.rewards_paid_eth)} ETH` },
+              ].map(s => (
+                <div key={s.l}>
+                  <div style={{ ...val, fontSize: 18 }}>{s.v}</div>
+                  <div style={{ fontSize: 11, color: '#5f7062', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{s.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </div>
