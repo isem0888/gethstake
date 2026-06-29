@@ -25,9 +25,15 @@ export async function GET() {
     participants += added;
   }
 
-  const tvl_eth = participants * 8;                                      // 8 ETH per participant
-  const active_validators = Math.floor(participants / 4);               // 4 × 8 = 32 ETH per validator
-  const rewards_paid_eth = Math.round(tvl_eth * 0.102 * 90 / 365 * 100) / 100; // 90-day plan APR
+  const tvl_eth = participants * 8;                              // 8 ETH per participant
+  const active_validators = Math.floor(participants / 4);       // 4 × 8 = 32 ETH per validator
+
+  // Platform genesis: 18 months before base date.
+  // Rewards accumulate since genesis. Average TVL ≈ 55% of current (gradual growth).
+  const GENESIS = new Date('2025-01-01T00:00:00Z');
+  const daysOperating = (now.getTime() - GENESIS.getTime()) / 86_400_000;
+  const avgTvl = tvl_eth * 0.55;
+  const rewards_paid_eth = Math.round(avgTvl * 0.102 * daysOperating / 365 * 100) / 100;
 
   return NextResponse.json({
     tvl_eth,
