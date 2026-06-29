@@ -5,7 +5,14 @@ import { Providers } from './providers';
 export const metadata: Metadata = {
   title: 'GethStake — Stake. Earn. Own a validator.',
   description: 'Pool your ETH with others to run Ethereum validators. Start from 8 ETH, earn real yield paid in ETH.',
-  icons: { icon: '/favicon.ico' },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

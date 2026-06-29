@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar';
 import { EthLogo } from '@/components/EthLogo';
 import { Dashboard } from '@/components/Dashboard';
 import { StakeModal } from '@/components/StakeModal';
+import { HeroNetwork } from '@/components/HeroNetwork';
 
 /* ── i18n ── */
 const RU: Record<string, string> = {
@@ -280,14 +281,7 @@ export default function Home() {
               </div>
             </div>
             <div className="hero-right">
-              <div className="hexwrap">
-                <div className="hexglow" />
-                <div className="hex-mini hm1"><EthSvg w={22} /></div>
-                <div className="hex-mini hm2"><EthSvg w={18} /></div>
-                <div className="hex-mini hm3"><EthSvg w={15} /></div>
-                <div className="hex"><EthLogo size={62} className="eth-svg" /></div>
-                <div className="ring" />
-              </div>
+              <HeroNetwork />
               {[
                 { lbl: t('sc_tvl', lang, 'Total value locked'), val: `${fmtStat(ps.tvl_eth)} ETH`, chg: `${fmtStat(ps.participants, 0)} ${lang === 'ru' ? 'участников' : 'participants'}`, pts: '0,30 12,26 24,28 36,18 48,20 60,10 72,12 84,4' },
                 { lbl: t('sc_part', lang, 'Active participants'), val: fmtStat(ps.participants, 0), chg: `${fmtStat(ps.active_validators, 0)} ${lang === 'ru' ? 'валидаторов' : 'validators'}`, pts: '0,28 12,24 24,26 36,20 48,14 60,16 72,8 84,6' },
