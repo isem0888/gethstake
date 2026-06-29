@@ -305,8 +305,13 @@ export default function DashboardPage() {
   }, [address]);
 
   const now = Date.now();
-  const active = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() > now);
-  const expired = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() <= now);
+  // Stakes with pending withdrawal requests
+  const pendingWithdrawalStakeIds = new Set(
+    withdrawals.filter((w: any) => w.status === 'pending').map((w: any) => w.stake_id)
+  );
+  const active = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() > now && !pendingWithdrawalStakeIds.has(s.id));
+  const withdrawing = stakes.filter(s => pendingWithdrawalStakeIds.has(s.id));
+  const expired = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() <= now && !pendingWithdrawalStakeIds.has(s.id));
   const totalStaked = active.reduce((a, s) => a + s.amount_eth, 0);
   const totalEarned = active.reduce((a, s) => a + earned(s), 0);
   const totalDailyYield = active.reduce((a, s) => {
@@ -391,13 +396,13 @@ export default function DashboardPage() {
                 {totalDailyYield > 0 && (
                   <div style={{ background: '#0a0e20', border: '1px solid #22c55e44', borderRadius: 10, padding: '16px 18px' }}>
                     <div style={{ ...val, fontSize: 22, color: '#22c55e' }}>+{fmtEth(totalDailyYield)} ETH</div>
-                    <div style={{ fontSize: 11, color: '#22c55e99', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Начисление в день</div>
+                    <div style={{ fontSize: 11, color: '#22c55e99', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>Daily accrual</div>
                   </div>
                 )}
                 {maxBonus > 0 && (
                   <div style={{ background: '#0a0e20', border: '1px solid #60a5fa', borderRadius: 10, padding: '16px 18px' }}>
                     <div style={{ ...val, fontSize: 22, color: '#60a5fa' }}>+{maxBonus}%</div>
-                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{maxBonusTier} лучший бонус</div>
+                    <div style={{ fontSize: 11, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '.6px', marginTop: 4 }}>{maxBonusTier} · best bonus</div>
                   </div>
                 )}
               </div>
@@ -443,7 +448,7 @@ export default function DashboardPage() {
                         contentStyle={{ background: '#0d1121', border: '1px solid #1a2040', borderRadius: 8, fontSize: 11 }}
                         labelStyle={{ color: '#8a93b8', marginBottom: 4 }}
                         itemStyle={{ color: '#60a5fa' }}
-                        formatter={(v: number) => [`+${v.toFixed(6)} ETH`, 'Начислено']}
+                        formatter={(v: number) => [`+${v.toFixed(6)} ETH`, 'Yield']}
                       />
                       <Bar dataKey="earned" name="ETH" radius={[2, 2, 0, 0]} maxBarSize={8}>
                         {chart.map((entry, idx) => (
@@ -499,7 +504,7 @@ export default function DashboardPage() {
                         { l: 'Node ownership', v: `${ownershipLabel(s.amount_eth)} (${pct}%)` },
                         { l: 'Effective APR', v: `${effectiveApy.toFixed(1)}%` },
                         { l: 'Plan', v: `${s.plan_days}-day lock` },
-                        { l: 'Итого к выплате', v: `${fmtEth(s.amount_eth + s.amount_eth * effectiveApy / 100 * s.plan_days / 365)} ETH`, highlight: true },
+                        { l: 'Total payout', v: `${fmtEth(s.amount_eth + s.amount_eth * effectiveApy / 100 * s.plan_days / 365)} ETH`, highlight: true },
                         { l: 'Txs processed (node)', v: fmtNum(tx) },
                         { l: 'Validator uptime', v: `${up.toFixed(1)}%` },
                       ].map(r => (
@@ -524,6 +529,56 @@ export default function DashboardPage() {
               })}
 
               {/* ── Expired stakes ── */}
+              {/* ── Withdrawing stakes ── */}
+              {withdrawing.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontSize: 10, color: '#fbbf24', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 10 }}>
+                    Withdrawal in processing
+                  </div>
+                  {withdrawing.map(s => {
+                    const w = withdrawals.find((w: any) => w.stake_id === s.id);
+                    const stakeBonus = getBonus(s.amount_eth, s.plan_days);
+                    const effectiveApy = getBaseApr(s.plan_days) + stakeBonus;
+                    return (
+                      <div key={s.id} style={{ background: '#080b14', border: '1px solid rgba(251,191,36,.3)', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
+                        <span style={{ position: 'absolute', top: -10, right: 16, background: '#fbbf24', color: '#1a0a00', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 12px', borderRadius: 6 }}>
+                          WITHDRAWAL · PROCESSING
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 4 }}>Validator public key</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#8a93b8' }}>{validatorKey(s.id).slice(0, 20)}…{validatorKey(s.id).slice(-8)}</div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, fontWeight: 700, color: '#fbbf24' }}>—</div>
+                            <div style={{ fontSize: 11, color: '#5a6480', marginTop: 2 }}>accrual paused</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 10, marginBottom: 16 }}>
+                          {[
+                            { l: 'Your stake', v: `${s.amount_eth} ETH` },
+                            { l: 'Plan', v: `${s.plan_days}-day lock` },
+                            { l: 'APR', v: `${effectiveApy.toFixed(1)}%` },
+                            { l: 'Payout amount', v: `${fmtEth(w?.amount_eth ?? s.amount_eth)} ETH` },
+                          ].map(r => (
+                            <div key={r.l} style={{ background: '#0d1121', borderRadius: 8, padding: '8px 12px' }}>
+                              <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: '#e8eaf8' }}>{r.v}</div>
+                              <div style={{ fontSize: 10, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 2 }}>{r.l}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ background: 'rgba(251,191,36,.07)', border: '1px solid rgba(251,191,36,.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                          <span style={{ fontSize: 12, color: '#8a93b8', lineHeight: 1.5 }}>
+                            Withdrawal request received. Funds will be sent to <code style={{ color: '#fbbf24', fontSize: 10 }}>{w?.to_address?.slice(0,10)}…{w?.to_address?.slice(-6)}</code> within <b style={{ color: '#fbbf24' }}>1–3 business days</b>.
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               {expired.length > 0 && (
                 <div style={{ marginTop: 8 }}>
                   <div style={{ fontSize: 10, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 10 }}>
@@ -745,16 +800,16 @@ export default function DashboardPage() {
             }).slice(0, 9);
 
             if (newsError) return (
-              <div style={{ color: '#5a6480', fontSize: 13, padding: '12px 0' }}>Не удалось загрузить новости. Попробуйте обновить страницу.</div>
+              <div style={{ color: '#5a6480', fontSize: 13, padding: '12px 0' }}>Failed to load news. Try refreshing the page.</div>
             );
 
             return allNews.length === 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#3a4566', fontSize: 13, padding: '10px 0' }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                Загрузка новостей…
+                Loading news…
               </div>
             ) : filtered.length === 0 ? (
-              <div style={{ color: '#3a4566', fontSize: 13, padding: '8px 0' }}>В этой категории пока нет свежих статей.</div>
+              <div style={{ color: '#3a4566', fontSize: 13, padding: '8px 0' }}>No recent articles in this category.</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
                 {filtered.map(item => (
