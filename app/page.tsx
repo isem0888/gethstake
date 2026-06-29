@@ -633,6 +633,60 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* ── Yield table ── */}
+          <div style={{ marginTop: 24 }}>
+            <div style={{ fontSize: 11, color: 'var(--mut)', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 12, textAlign: 'center' }}>
+              {lang === 'ru' ? 'Доход в ETH по планам и сумме депозита' : 'ETH yield by plan and deposit amount'}
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: '8px 14px', color: 'var(--mut)', fontSize: 11, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.6px', borderBottom: '1px solid var(--line)', fontWeight: 600 }}>
+                      {lang === 'ru' ? 'Депозит' : 'Deposit'}
+                    </th>
+                    {[
+                      { days: 30,  apr: 5.5  },
+                      { days: 90,  apr: 8.3  },
+                      { days: 180, apr: 9.7  },
+                    ].map(p => (
+                      <th key={p.days} style={{ textAlign: 'right', padding: '8px 14px', borderBottom: '1px solid var(--line)', fontWeight: 600 }}>
+                        <div style={{ color: 'var(--txt)', fontFamily: "'Chakra Petch',sans-serif", fontSize: 12 }}>{p.days}d</div>
+                        <div style={{ color: '#60a5fa', fontSize: 11, fontWeight: 700 }}>{p.apr}% APR</div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[8, 16, 32, 64, 96, 128].map((eth, i) => (
+                    <tr key={eth} style={{ background: i % 2 === 0 ? 'transparent' : 'rgba(96,165,250,.03)' }}>
+                      <td style={{ padding: '9px 14px', color: 'var(--txt)', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, borderBottom: '1px solid var(--line)', fontSize: 13 }}>
+                        {eth} ETH
+                        {eth >= 32 && <span style={{ marginLeft: 6, fontSize: 9, color: '#60a5fa', background: 'rgba(96,165,250,.1)', border: '1px solid rgba(96,165,250,.25)', borderRadius: 4, padding: '1px 5px', fontFamily: 'Inter,sans-serif', fontWeight: 600 }}>
+                          {eth >= 128 ? '4 val' : eth >= 96 ? '3 val' : eth >= 64 ? '2 val' : '1 val'}
+                        </span>}
+                      </td>
+                      {[
+                        { days: 30,  apr: 5.5  },
+                        { days: 90,  apr: 8.3  },
+                        { days: 180, apr: 9.7  },
+                      ].map(p => {
+                        const gain = eth * p.apr / 100 * p.days / 365;
+                        return (
+                          <td key={p.days} style={{ padding: '9px 14px', textAlign: 'right', borderBottom: '1px solid var(--line)' }}>
+                            <span style={{ color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13 }}>+{gain.toFixed(4)}</span>
+                            <span style={{ color: 'var(--mut2)', fontSize: 10, marginLeft: 4 }}>ETH</span>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
       </section>
 
