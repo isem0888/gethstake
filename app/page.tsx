@@ -322,7 +322,7 @@ export default function Home() {
           <div className="sec-head center">
             <div className="tag">{t('s_tag', lang, 'Staking plans')}</div>
             <h2>{t('s_h2', lang, 'Stake your ETH. Pick a term.')}</h2>
-            <p>{t('s_p', lang, 'The longer the lock, the higher the APR. 90 days is the best value — beyond it the rate barely grows.')}</p>
+            <p>{t('s_p', lang, 'Choose your staking term. Each plan earns yield in ETH — the longer the period, the higher the APR.')}</p>
           </div>
           <div className="stake-grid">
             <div>
@@ -511,7 +511,6 @@ export default function Home() {
               </div>
             </div>
             <div className="cta-form">
-              <input type="email" placeholder={t('cta_ph', lang, 'Enter your email')} />
               <a className="btn btn-primary" href="#stake">{t('cta_btn', lang, 'Get started →')}</a>
             </div>
           </div>

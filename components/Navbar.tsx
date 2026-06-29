@@ -23,10 +23,10 @@ export function Navbar({ lang, onLangChange }: NavbarProps) {
   return (
     <nav>
       <div className="wrap nav-in">
-        <div className="logo">
+        <a className="logo" href="/" style={{ textDecoration: 'none', cursor: 'pointer' }}>
           <span className="dot"><EthLogo size={14} /></span>
           GETHSTAKE
-        </div>
+        </a>
 
         <div className="nav-links">
           {links.map(l => (
