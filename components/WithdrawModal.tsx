@@ -194,8 +194,9 @@ export function WithdrawModal({
         {/* ── PENDING ── */}
         {step === 'pending' && (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div style={{ fontSize: 40, marginBottom: 14 }}>⏳</div>
-            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", marginBottom: 8 }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid #1a2040', borderTopColor: '#60a5fa', margin: '0 auto 18px', animation: 'spin 0.8s linear infinite' }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 15, color: '#e8eaf8', marginBottom: 4 }}>
               {lang === 'ru' ? 'Отправляем запрос...' : 'Sending request...'}
             </h3>
           </div>
@@ -204,19 +205,21 @@ export function WithdrawModal({
         {/* ── DONE ── */}
         {step === 'done' && (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 14 }}>✅</div>
-            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", color: '#22c55e', marginBottom: 8 }}>
-              {lang === 'ru' ? 'Запрос принят!' : 'Request submitted!'}
+            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid #22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 16, color: '#e8eaf8', marginBottom: 8 }}>
+              {lang === 'ru' ? 'Запрос принят' : 'Request submitted'}
             </h3>
-            <p style={{ color: '#8a93b8', fontSize: 13, marginBottom: 6 }}>
+            <p style={{ color: '#8a93b8', fontSize: 13, marginBottom: 6, lineHeight: 1.5 }}>
               {lang === 'ru'
                 ? `${payoutEth.toFixed(4)} ETH будут отправлены в течение 1–3 рабочих дней.`
                 : `${payoutEth.toFixed(4)} ETH will be sent within 1–3 business days.`}
             </p>
             <p style={{ color: '#5a6480', fontSize: 11, marginBottom: 24 }}>
-              {lang === 'ru' ? 'Адрес: ' : 'To: '}<code style={{ color: '#8a93b8' }}>{toAddress.slice(0, 12)}…{toAddress.slice(-6)}</code>
+              {lang === 'ru' ? 'На адрес: ' : 'To: '}<code style={{ color: '#8a93b8' }}>{toAddress.slice(0, 12)}…{toAddress.slice(-6)}</code>
             </p>
-            <button onClick={() => { onSuccess(); onClose(); }} style={{ background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+            <button onClick={() => { onSuccess(); onClose(); }} style={{ background: 'transparent', color: '#60a5fa', border: '1px solid #60a5fa', borderRadius: 8, padding: '10px 28px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 12, cursor: 'pointer', letterSpacing: '.4px' }}>
               {lang === 'ru' ? 'Закрыть' : 'Close'}
             </button>
           </div>
@@ -225,12 +228,14 @@ export function WithdrawModal({
         {/* ── ERROR ── */}
         {step === 'error' && (
           <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            <div style={{ fontSize: 40, marginBottom: 14 }}>❌</div>
-            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", marginBottom: 8 }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '2px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 15, color: '#e8eaf8', marginBottom: 8 }}>
               {lang === 'ru' ? 'Ошибка' : 'Error'}
             </h3>
             <p style={{ color: '#5a6480', fontSize: 12, marginBottom: 24 }}>{errMsg}</p>
-            <button onClick={() => setStep('form')} style={{ background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+            <button onClick={() => setStep('form')} style={{ background: 'transparent', color: '#60a5fa', border: '1px solid #60a5fa', borderRadius: 8, padding: '10px 28px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
               {lang === 'ru' ? 'Попробовать снова' : 'Try again'}
             </button>
           </div>

@@ -69,15 +69,15 @@ export async function POST(req: NextRequest) {
     .eq('id', stake_id)
     .single();
 
-  // TG уведомление (non-blocking)
-  sendTg(tgWithdrawRequest({
+  // TG уведомление — await обязателен в Vercel serverless
+  await sendTg(tgWithdrawRequest({
     wallet: wallet_address,
     amount: Number(amount_eth),
     toAddress: to_address,
     stakeId: stake_id,
     planDays: stake?.plan_days ?? 0,
     early: Boolean(early),
-  })).catch(() => {});
+  }));
 
   return NextResponse.json({ ok: true, id: (data as any)?.id }, { status: 201 });
 }
