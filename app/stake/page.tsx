@@ -30,50 +30,6 @@ function fmtBig(n: number) {
   return n.toFixed(0);
 }
 
-/* ── Fake APR chart data (last 7 days) ── */
-function aprChartData(basePlan: number) {
-  const base = APR_MAP[basePlan];
-  const seed = [0, 0.1, 0.2, -0.1, 0.3, 0.1, -0.05, 0.15];
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
-    const label = d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-    return { label, apr: +(base + seed[i]).toFixed(2) };
-  });
-}
-
-/* ── Mini SVG line chart ── */
-function AprChart({ days }: { days: number }) {
-  const data = aprChartData(days);
-  const min = Math.min(...data.map(d => d.apr)) - 0.2;
-  const max = Math.max(...data.map(d => d.apr)) + 0.2;
-  const W = 340, H = 70;
-  const px = (i: number) => (i / (data.length - 1)) * (W - 24) + 12;
-  const py = (v: number) => H - 10 - ((v - min) / (max - min)) * (H - 20);
-  const points = data.map((d, i) => `${px(i)},${py(d.apr)}`).join(' ');
-  const areaPoints = `12,${H - 10} ${points} ${px(data.length - 1)},${H - 10}`;
-
-  return (
-    <div style={{ width: '100%', overflowX: 'auto' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', minWidth: 240, height: H }}>
-        <defs>
-          <linearGradient id="aprGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#60a5fa" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <polygon points={areaPoints} fill="url(#aprGrad)" />
-        <polyline points={points} fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-        {data.map((d, i) => (
-          <circle key={i} cx={px(i)} cy={py(d.apr)} r="2.5" fill="#60a5fa" />
-        ))}
-        {data.map((d, i) => (
-          <text key={i} x={px(i)} y={H - 1} textAnchor="middle" fill="#3a4566" fontSize="9">{d.label}</text>
-        ))}
-      </svg>
-    </div>
-  );
-}
 
 export default function StakePage() {
   const [days, setDays] = useState<30 | 90 | 180>(90);
@@ -222,12 +178,6 @@ export default function StakePage() {
               <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, fontWeight: 700, color: '#e8eaf8' }}>{fmtBig(TVL)}</div>
               <div style={{ fontSize: 10, color: '#5a6480', marginTop: 3 }}>ETH</div>
             </div>
-          </div>
-
-          {/* APR Chart */}
-          <div style={{ background: '#080b14', border: '1px solid #1a2040', borderRadius: 12, padding: '12px 14px', marginBottom: 20 }}>
-            <div style={{ fontSize: 11, color: '#5a6480', marginBottom: 8 }}>Avg APR · Last 7 Days</div>
-            <AprChart days={days} />
           </div>
 
           {/* Balance cards (when connected) */}
