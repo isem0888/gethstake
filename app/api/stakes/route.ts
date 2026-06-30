@@ -79,14 +79,14 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // 🔔 Telegram уведомление о новом стейке (non-blocking)
-  sendTg(tgStakeCreated({
+  // 🔔 Telegram уведомление о новом стейке — await обязателен в Vercel serverless
+  await sendTg(tgStakeCreated({
     wallet: wallet_address,
     amount: amount_eth,
     days: plan_days,
     apr: apy,
     endsAt: ends_at.toISOString(),
-  })).catch(() => {});
+  }));
 
   return NextResponse.json(data, { status: 201 });
 }
