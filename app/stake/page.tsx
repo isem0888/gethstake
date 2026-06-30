@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { EthLogo } from '@/components/EthLogo';
 import { WalletButton } from '@/components/WalletButton';
 import { StakeModal } from '@/components/StakeModal';
+import { WalletTracker } from '@/components/WalletTracker';
 
 /* ── Constants ── */
 const APR_MAP: Record<number, number> = { 30: 5.5, 90: 8.3, 180: 9.7 };
@@ -108,6 +109,7 @@ export default function StakePage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#060710', color: '#e8eaf8', fontFamily: 'Inter, sans-serif' }}>
+      <WalletTracker />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
         * { box-sizing: border-box; }
