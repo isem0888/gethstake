@@ -509,86 +509,51 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── STAKE + CALCULATOR (combined) ── */}
+      {/* ── CALCULATOR ── */}
       <section id="stake">
         <div className="wrap">
           <div className="sec-head center">
-            <div className="tag">{t('s_tag', lang, 'Staking plans')}</div>
-            <h2>{t('s_h2', lang, 'Stake your ETH. Pick a term.')}</h2>
-            <p>{t('s_p', lang, 'Choose your staking term. Each plan earns yield in ETH — the longer the period, the higher the APR.')}</p>
+            <div className="tag">{t('c_tag', lang, 'Calculator')}</div>
+            <h2>{t('c_h2', lang, 'Calculate your ETH yield')}</h2>
+            <p>{t('c_p', lang, 'Choose an amount (from 8 ETH) and a plan — see your ETH accrual for the period and per year.')}</p>
           </div>
 
-          <div className="panel">
-            {/* ── Deposit + Calculator ── */}
-            <div className="calc">
-              {/* LEFT: plan cards + deposit input + button */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {([
-                  { days: 30,  apr: 5.5,  label: t('s_30',  lang, '30-day lock'),  hot: false },
-                  { days: 90,  apr: 8.3,  label: t('s_90',  lang, '90-day lock'),  hot: true  },
-                  { days: 180, apr: 9.7,  label: t('s_180', lang, '180-day lock'), hot: false },
-                ] as const).map(p => {
-                  const active = calc.days === p.days;
-                  return (
-                    <div
-                      key={p.days}
-                      onClick={() => calc.setDays(p.days)}
-                      style={{
-                        background: active ? 'rgba(96,165,250,.12)' : 'var(--card2)',
-                        border: `1px solid ${active ? 'var(--acc)' : p.hot ? 'rgba(96,165,250,.35)' : 'var(--line)'}`,
-                        borderRadius: 12,
-                        padding: '12px 16px',
-                        cursor: 'pointer',
-                        transition: '.18s',
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        boxShadow: active ? '0 0 16px rgba(96,165,250,.12)' : 'none',
-                      }}
-                    >
-                      {p.hot && (
-                        <span style={{ position: 'absolute', top: -8, left: 14, background: 'var(--acc)', color: '#040e24', fontSize: 8, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 8px', borderRadius: 4, letterSpacing: '.5px' }}>
-                          {lang === 'ru' ? 'ПОПУЛЯРНЫЙ' : 'POPULAR'}
-                        </span>
-                      )}
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: active ? 'var(--txt)' : 'var(--mut)' }}>{p.label}</div>
-                        <div style={{ fontSize: 10, color: 'var(--mut2)', marginTop: 1 }}>min 8 ETH · paid in ETH</div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 20, fontWeight: 700, color: active ? 'var(--acc)' : 'var(--txt)', lineHeight: 1 }}>
-                          {p.apr}%
-                        </div>
-                        <div style={{ fontSize: 10, color: active ? 'var(--acc)' : 'var(--mut)', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.6px' }}>
-                          APR{active ? ' ✓' : ''}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div style={{ marginTop: 4 }}>
-                  <label style={{ fontSize: 11 }}>{t('c_amt', lang, 'Deposit amount')}</label>
-                  <div className="input-eth">
-                    <input type="number" value={calc.inputVal} min={8} step={1}
-                      onChange={e => calc.handleInputChange(e.target.value)}
-                      onBlur={calc.handleInputBlur} />
-                    <span className="tk">ETH</span>
-                  </div>
-                  <div className="hint" style={{ fontSize: 11, marginTop: 6 }}>{t('c_hint', lang, 'Minimum deposit — 8 ETH (¼ of a validator).')}</div>
-                  <button
-                    onClick={handleStartStaking}
-                    style={{ width: '100%', marginTop: 12, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase' }}
-                  >
-                    {lang === 'ru'
-                      ? (isConnected ? 'Запустить стейкинг →' : 'Подключить кошелёк →')
-                      : (isConnected ? 'Start Staking →' : 'Connect Wallet →')}
+          <div style={{ maxWidth: 520, margin: '0 auto' }}>
+            {/* Plan tabs */}
+            <div style={{ display: 'flex', background: 'var(--card2)', border: '1px solid var(--line)', borderRadius: 12, padding: 4, gap: 4, marginBottom: 16 }}>
+              {([
+                { days: 30  as const, apr: 5.5, label: lang === 'ru' ? '30 дней' : '30 days' },
+                { days: 90  as const, apr: 8.3, label: lang === 'ru' ? '90 дней' : '90 days', hot: true },
+                { days: 180 as const, apr: 9.7, label: lang === 'ru' ? '180 дней' : '180 days' },
+              ]).map(p => {
+                const active = calc.days === p.days;
+                return (
+                  <button key={p.days} onClick={() => calc.setDays(p.days)} style={{ flex: 1, background: active ? 'rgba(96,165,250,.15)' : 'transparent', border: active ? '1px solid rgba(96,165,250,.4)' : '1px solid transparent', borderRadius: 9, padding: '9px 4px', cursor: 'pointer', transition: '.15s', textAlign: 'center', position: 'relative' }}>
+                    {(p as any).hot && !active && <span style={{ position: 'absolute', top: -7, right: 6, background: 'var(--acc)', color: '#040e24', fontSize: 8, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '1px 6px', borderRadius: 4 }}>{lang === 'ru' ? 'ТОП' : 'TOP'}</span>}
+                    <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, color: active ? '#60a5fa' : 'var(--mut)' }}>{p.label}</div>
+                    <div style={{ fontSize: 11, color: active ? '#a0b8f0' : 'var(--mut2)', marginTop: 2 }}>{p.apr}% APR</div>
                   </button>
-                </div>
-              </div>
+                );
+              })}
+            </div>
 
-              <div className="calc-out">
+            {/* Amount input */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11 }}>{t('c_amt', lang, 'Deposit amount')}</label>
+              <div className="input-eth">
+                <input type="number" value={calc.inputVal} min={8} step={1}
+                  onChange={e => calc.handleInputChange(e.target.value)}
+                  onBlur={calc.handleInputBlur} />
+                <span className="tk">ETH</span>
+              </div>
+              <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+                {[8, 16, 32, 64, 96, 128].map(v => (
+                  <button key={v} onClick={() => { calc.setAmount(v); }} style={{ background: calc.amount === v ? 'rgba(96,165,250,.15)' : 'var(--card2)', border: `1px solid ${calc.amount === v ? 'rgba(96,165,250,.4)' : 'var(--line)'}`, borderRadius: 7, padding: '4px 10px', color: calc.amount === v ? '#60a5fa' : 'var(--mut)', fontSize: 12, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, cursor: 'pointer' }}>{v}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="calc-out">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6, marginBottom: 2 }}>
                   <div className="muted" style={{ fontSize: 11, fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>
                     {lang === 'ru' ? `Доход за ${calc.days} дней` : `Yield for ${calc.days} days`}
@@ -631,7 +596,14 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </div>
+
+            {/* CTA */}
+            <a
+              href="/stake"
+              style={{ display: 'block', width: '100%', marginTop: 16, background: 'var(--acc)', color: '#040e24', border: 'none', borderRadius: 10, padding: '13px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', cursor: 'pointer', textTransform: 'uppercase', textAlign: 'center', textDecoration: 'none' }}
+            >
+              {lang === 'ru' ? 'Начать стейкинг →' : 'Start Staking →'}
+            </a>
           </div>
 
           {/* ── Yield table ── */}
