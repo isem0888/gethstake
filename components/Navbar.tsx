@@ -15,9 +15,9 @@ export function Navbar({ lang, onLangChange }: NavbarProps) {
   const { isConnected } = useAccount();
 
   const links = [
-    { href: '#stake',  en: 'Stake',      ru: 'Стейкинг' },
+    { href: '/stake',  en: 'Stake',      ru: 'Стейкинг' },
     { href: '#why8',   en: 'Why 8 ETH',  ru: 'Почему 8 ETH' },
-    { href: '#calc',   en: 'Calculator', ru: 'Калькулятор' },
+    { href: '#stake',  en: 'Calculator', ru: 'Калькулятор' },
     { href: '#market', en: 'Market',     ru: 'Рынок' },
     { href: '#faq',    en: 'FAQ',        ru: 'FAQ' },
   ];
