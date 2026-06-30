@@ -6,7 +6,7 @@
 const TOKEN   = process.env.TELEGRAM_BOT_TOKEN;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-export async function sendTg(text: string): Promise<void> {
+export async function sendTg(text: string, replyMarkup?: object): Promise<void> {
   if (!TOKEN || !CHAT_ID) {
     console.warn('[Telegram] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set');
     return;
@@ -15,12 +15,41 @@ export async function sendTg(text: string): Promise<void> {
     await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML' }),
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text,
+        parse_mode: 'HTML',
+        ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+      }),
       signal: AbortSignal.timeout(5000),
     });
   } catch (e) {
     console.error('[Telegram] Failed to send message:', e);
   }
+}
+
+export async function answerCallback(callbackQueryId: string, text?: string): Promise<void> {
+  if (!TOKEN) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${TOKEN}/answerCallbackQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ callback_query_id: callbackQueryId, text: text || '✅ Done' }),
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {}
+}
+
+export async function editTgMessage(chatId: string | number, messageId: number, text: string): Promise<void> {
+  if (!TOKEN) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${TOKEN}/editMessageText`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, message_id: messageId, text, parse_mode: 'HTML' }),
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {}
 }
 
 function now(): string {

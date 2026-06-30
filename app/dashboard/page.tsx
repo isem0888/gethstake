@@ -305,13 +305,16 @@ export default function DashboardPage() {
   }, [address]);
 
   const now = Date.now();
-  // Stakes with pending withdrawal requests
   const pendingWithdrawalStakeIds = new Set(
     withdrawals.filter((w: any) => w.status === 'pending').map((w: any) => w.stake_id)
   );
-  const active = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() > now && !pendingWithdrawalStakeIds.has(s.id));
+  const completedWithdrawalStakeIds = new Set(
+    withdrawals.filter((w: any) => w.status === 'completed').map((w: any) => w.stake_id)
+  );
+  const active = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() > now && !pendingWithdrawalStakeIds.has(s.id) && !completedWithdrawalStakeIds.has(s.id));
   const withdrawing = stakes.filter(s => pendingWithdrawalStakeIds.has(s.id));
-  const expired = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() <= now && !pendingWithdrawalStakeIds.has(s.id));
+  const withdrawn = stakes.filter(s => completedWithdrawalStakeIds.has(s.id));
+  const expired = stakes.filter(s => s.status === 'active' && new Date(s.ends_at).getTime() <= now && !pendingWithdrawalStakeIds.has(s.id) && !completedWithdrawalStakeIds.has(s.id));
   const totalStaked = active.reduce((a, s) => a + s.amount_eth, 0);
   const totalEarned = active.reduce((a, s) => a + earned(s), 0);
   const totalDailyYield = active.reduce((a, s) => {
@@ -571,6 +574,62 @@ export default function DashboardPage() {
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                           <span style={{ fontSize: 12, color: '#8a93b8', lineHeight: 1.5 }}>
                             Withdrawal request received. Funds will be sent to <code style={{ color: '#fbbf24', fontSize: 10 }}>{w?.to_address?.slice(0,10)}…{w?.to_address?.slice(-6)}</code> within <b style={{ color: '#fbbf24' }}>1–3 business days</b>.
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* ── Withdrawn (completed) stakes ── */}
+              {withdrawn.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontSize: 10, color: '#22c55e', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 10 }}>
+                    Withdrawal completed
+                  </div>
+                  {withdrawn.map(s => {
+                    const w = withdrawals.find((w: any) => w.stake_id === s.id && w.status === 'completed');
+                    const stakeBonus = getBonus(s.amount_eth, s.plan_days);
+                    const effectiveApy = getBaseApr(s.plan_days) + stakeBonus;
+                    const processedDate = w?.processed_at
+                      ? new Date(w.processed_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                      : '';
+                    return (
+                      <div key={s.id} style={{ background: '#050e0a', border: '1px solid rgba(34,197,94,.3)', borderRadius: 12, padding: '18px 20px', marginBottom: 12, position: 'relative' }}>
+                        <span style={{ position: 'absolute', top: -10, right: 16, background: '#22c55e', color: '#011a08', fontSize: 10, fontWeight: 700, fontFamily: "'Chakra Petch',sans-serif", padding: '2px 12px', borderRadius: 6 }}>
+                          ✓ WITHDRAWAL COMPLETED
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+                          <div>
+                            <div style={{ fontSize: 10, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: 4 }}>Validator public key</div>
+                            <div style={{ fontFamily: 'monospace', fontSize: 11, color: '#8a93b8' }}>{validatorKey(s.id).slice(0, 20)}…{validatorKey(s.id).slice(-8)}</div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, fontWeight: 700, color: '#22c55e' }}>{fmtEth(w?.amount_eth ?? s.amount_eth)} ETH</div>
+                            <div style={{ fontSize: 11, color: '#5a6480', marginTop: 2 }}>funds sent</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 10, marginBottom: 16 }}>
+                          {[
+                            { l: 'Deposit', v: `${s.amount_eth} ETH` },
+                            { l: 'Plan', v: `${s.plan_days}-day lock` },
+                            { l: 'APR', v: `${effectiveApy.toFixed(1)}%` },
+                            { l: 'Sent to', v: w?.to_address ? `${w.to_address.slice(0,8)}…${w.to_address.slice(-6)}` : '—' },
+                          ].map(r => (
+                            <div key={r.l} style={{ background: '#0d1121', borderRadius: 8, padding: '8px 12px' }}>
+                              <div style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 13, fontWeight: 700, color: '#e8eaf8' }}>{r.v}</div>
+                              <div style={{ fontSize: 10, color: '#5a6480', textTransform: 'uppercase', letterSpacing: '.5px', marginTop: 2 }}>{r.l}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ background: 'rgba(34,197,94,.07)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 8, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ width: 20, height: 20, borderRadius: '50%', border: '1.5px solid #22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                          </div>
+                          <span style={{ fontSize: 12, color: '#8a93b8', lineHeight: 1.5 }}>
+                            Funds successfully sent to <code style={{ color: '#22c55e', fontSize: 10 }}>{w?.to_address?.slice(0,10)}…{w?.to_address?.slice(-6)}</code>
+                            {processedDate && <span style={{ color: '#5a6480' }}> · {processedDate}</span>}
                           </span>
                         </div>
                       </div>

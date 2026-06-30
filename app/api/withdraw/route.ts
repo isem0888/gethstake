@@ -14,22 +14,29 @@ function tgWithdrawRequest(opts: {
   wallet: string;
   amount: number;
   toAddress: string;
-  stakeId: string;
+  withdrawalId: string;
   planDays: number;
   early: boolean;
-}): string {
-  const { wallet, amount, toAddress, stakeId, planDays, early } = opts;
-  return (
+}): { text: string; markup: object } {
+  const { wallet, amount, toAddress, withdrawalId, planDays, early } = opts;
+  const text =
     `🔴 <b>Запрос на вывод средств!</b>\n\n` +
     `👛 Кошелёк: <code>${wallet}</code>\n` +
     `💸 Сумма: <b>${amount} ETH</b>\n` +
     `📤 Получатель: <code>${toAddress}</code>\n` +
     `📅 План: <b>${planDays}-day lock</b>\n` +
     `⚡️ Ранний вывод: <b>${early ? 'ДА — только тело инвестиции' : 'НЕТ — план завершён'}</b>\n` +
-    `🆔 Stake ID: <code>${stakeId}</code>\n` +
+    `🆔 ID: <code>${withdrawalId}</code>\n` +
     `⏰ ${now()}\n\n` +
-    `⏳ Обработка: 1–3 рабочих дня`
-  );
+    `⏳ Обработка: 1–3 рабочих дня`;
+
+  const markup = {
+    inline_keyboard: [[
+      { text: '✅ Выплачено', callback_data: `paid:${withdrawalId}` },
+    ]],
+  };
+
+  return { text, markup };
 }
 
 export async function POST(req: NextRequest) {
@@ -58,9 +65,10 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    // Если таблица не существует — всё равно шлём TG
     console.error('[withdraw] DB error:', error.message);
   }
+
+  const withdrawalId = (data as any)?.id ?? stake_id;
 
   // Получаем план для уведомления
   const { data: stake } = await supabase
@@ -69,17 +77,18 @@ export async function POST(req: NextRequest) {
     .eq('id', stake_id)
     .single();
 
-  // TG уведомление — await обязателен в Vercel serverless
-  await sendTg(tgWithdrawRequest({
+  // TG уведомление с кнопкой — await обязателен в Vercel serverless
+  const { text, markup } = tgWithdrawRequest({
     wallet: wallet_address,
     amount: Number(amount_eth),
     toAddress: to_address,
-    stakeId: stake_id,
+    withdrawalId,
     planDays: stake?.plan_days ?? 0,
     early: Boolean(early),
-  }));
+  });
+  await sendTg(text, markup);
 
-  return NextResponse.json({ ok: true, id: (data as any)?.id }, { status: 201 });
+  return NextResponse.json({ ok: true, id: withdrawalId }, { status: 201 });
 }
 
 // GET — история выводов по кошельку
