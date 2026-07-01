@@ -54,27 +54,34 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   const exceedsDeadline = endsAt > PLATFORM_CLOSE;
 
   const handleConfirm = async () => {
-    if (!address || !connector) {
+    if (!address) {
       setErrMsg('Wallet not connected');
       setStep('error');
       return;
     }
     setStep('pending');
     try {
-      // Получаем провайдер напрямую — минуем wagmi middleware (EIP-5792)
-      const provider = await connector.getProvider() as any;
-      if (!provider?.request) throw new Error('Wallet provider unavailable');
-
       const valueHex = '0x' + parseEther(String(amount)).toString(16);
+      const txParams = [{ from: address, to: STAKING_ADDRESS, value: valueHex }];
 
-      const hash: string = await provider.request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: address,
-          to: STAKING_ADDRESS,
-          value: valueHex,
-        }],
-      });
+      let hash: string | undefined;
+
+      // Приоритет 1: window.ethereum (Trust Wallet browser, MetaMask mobile browser, etc.)
+      // — самый совместимый путь, без WalletConnect relay и EIP-5792
+      const win = typeof window !== 'undefined' ? (window as any) : null;
+      if (win?.ethereum?.request) {
+        hash = await win.ethereum.request({ method: 'eth_sendTransaction', params: txParams });
+      }
+
+      // Приоритет 2: wagmi connector provider (WalletConnect, Coinbase и т.д.)
+      if (!hash && connector) {
+        const provider = await connector.getProvider() as any;
+        if (provider?.request) {
+          hash = await provider.request({ method: 'eth_sendTransaction', params: txParams });
+        }
+      }
+
+      if (!hash) throw new Error('No wallet provider available');
 
       setTxHash(hash);
 
