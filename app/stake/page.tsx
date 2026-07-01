@@ -116,22 +116,25 @@ export default function StakePage() {
         ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0d1121; } ::-webkit-scrollbar-thumb { background: #1a2040; border-radius: 4px; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
         @keyframes pulse2 { 0%,100%{opacity:1} 50%{opacity:.5} }
+        @media (max-width: 480px) {
+          .stake-nav-label { display: none !important; }
+          .stake-nav-dash { display: none !important; }
+        }
       `}</style>
 
       {/* Nav */}
       <nav style={{ borderBottom: '1px solid #1a2040', background: 'rgba(6,7,15,.95)', backdropFilter: 'blur(14px)', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', height: 60, display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: 1, color: '#e8eaf8', textDecoration: 'none' }}>
-            <span style={{ width: 28, height: 28, border: '2px solid #60a5fa', borderRadius: 7, display: 'grid', placeItems: 'center' }}>
-              <EthLogo size={12} />
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px', height: 56, display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: 1, color: '#e8eaf8', textDecoration: 'none', flexShrink: 0 }}>
+            <span style={{ width: 26, height: 26, border: '2px solid #60a5fa', borderRadius: 7, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+              <EthLogo size={11} />
             </span>
             GETHSTAKE
           </Link>
-          <span style={{ color: '#1a2040', fontSize: 20 }}>·</span>
-          <span style={{ fontSize: 13, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px' }}>Staking</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span className="stake-nav-label" style={{ fontSize: 11, color: '#5a6480', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.8px', flexShrink: 0 }}>· Staking</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             {isConnected && (
-              <Link href="/dashboard" style={{ fontSize: 12, color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.5px', textDecoration: 'none', border: '1px solid #60a5fa33', borderRadius: 8, padding: '7px 14px' }}>
+              <Link href="/dashboard" className="stake-nav-dash" style={{ fontSize: 11, color: '#60a5fa', fontFamily: "'Chakra Petch',sans-serif", textTransform: 'uppercase', letterSpacing: '.5px', textDecoration: 'none', border: '1px solid #60a5fa33', borderRadius: 8, padding: '6px 12px', whiteSpace: 'nowrap' }}>
                 Dashboard
               </Link>
             )}
