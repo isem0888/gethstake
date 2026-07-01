@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSendTransaction, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 
 const STAKING_ADDRESS = (process.env.NEXT_PUBLIC_STAKING_ADDRESS || '0x82913f7e6da031f5b9c23834a3384FEe2E36c8d7') as `0x${string}`;
@@ -39,61 +39,66 @@ function fmtEth(n: number) {
 }
 
 export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose }: Props) {
-  const { address } = useAccount();
+  const { address, connector } = useAccount();
   const [step, setStep] = useState<'confirm' | 'pending' | 'success' | 'error'>('confirm');
   const [errMsg, setErrMsg] = useState('');
+  const [txHash, setTxHash] = useState('');
 
-  const bonus = getBonus(amount, days);   // для отображения строки "APR bonus"
-  const effectiveApr = apr;              // apr уже включает бонус (baseApr + bonus из page.tsx)
+  const bonus = getBonus(amount, days);
+  const effectiveApr = apr;
   const effectivePeriodGain = amount * effectiveApr / 100 * days / 365;
   const effectiveTotal = amount + effectivePeriodGain;
 
-  // Дедлайн платформы 2027-01-01
   const PLATFORM_CLOSE = new Date('2027-01-01T00:00:00Z');
   const endsAt = new Date(Date.now() + days * 86_400_000);
   const exceedsDeadline = endsAt > PLATFORM_CLOSE;
 
-  const { sendTransaction, data: txHash, error: txError } = useSendTransaction();
-  const { isLoading: confirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
-
-  // Watch for tx submission
-  useEffect(() => {
-    if (txHash) setStep('pending');
-  }, [txHash]);
-
-  // Watch for confirmation
-  useEffect(() => {
-    if (!isSuccess || !txHash || !address) return;
-    const endsAt = new Date(Date.now() + days * 86_400_000).toISOString();
-    fetch('/api/stakes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet_address: address, amount_eth: amount, plan_days: days, ends_at: endsAt }),
-    }).catch(console.error);
-    setStep('success');
-  }, [isSuccess]);
-
-  // Watch for error
-  useEffect(() => {
-    if (!txError) return;
-    const raw = txError.message || '';
-    let msg = raw.split('\n')[0] || 'Transaction failed';
-    if (/insufficient funds/i.test(raw))             msg = 'Insufficient ETH balance. Check you have enough ETH + gas.';
-    else if (/user rejected|rejected the request/i.test(raw)) msg = 'Transaction rejected in wallet.';
-    else if (/unknown rpc|rpc error/i.test(raw))     msg = 'Wallet RPC error. Try switching RPC in wallet settings, or retry.';
-    else if (/network/i.test(raw))                   msg = 'Network error. Check your connection and retry.';
-    setErrMsg(msg);
-    setStep('error');
-  }, [txError]);
-
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
+    if (!address || !connector) {
+      setErrMsg('Wallet not connected');
+      setStep('error');
+      return;
+    }
+    setStep('pending');
     try {
-      sendTransaction({
-        to: STAKING_ADDRESS,
-        value: parseEther(amount.toString()),
+      // Получаем провайдер напрямую — минуем wagmi middleware (EIP-5792)
+      const provider = await connector.getProvider() as any;
+      if (!provider?.request) throw new Error('Wallet provider unavailable');
+
+      const valueHex = '0x' + parseEther(String(amount)).toString(16);
+
+      const hash: string = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: address,
+          to: STAKING_ADDRESS,
+          value: valueHex,
+        }],
       });
+
+      setTxHash(hash);
+
+      // Записываем в БД
+      await fetch('/api/stakes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          wallet_address: address,
+          amount_eth: amount,
+          plan_days: days,
+          tx_hash: hash,
+        }),
+      });
+
+      setStep('success');
     } catch (e: any) {
-      setErrMsg(e?.message || 'Failed to initiate transaction');
+      const raw: string = e?.message || e?.toString() || 'Transaction failed';
+      let msg = raw.split('\n')[0];
+      if (/insufficient funds/i.test(raw))               msg = 'Insufficient ETH balance.';
+      else if (/user rejected|rejected the request/i.test(raw)) msg = 'Transaction rejected in wallet.';
+      else if (/unknown rpc|rpc error/i.test(raw))       msg = 'Wallet RPC error. Try switching RPC in wallet settings.';
+      else if (/network/i.test(raw))                     msg = 'Network error. Check your connection.';
+      setErrMsg(msg);
       setStep('error');
     }
   };
@@ -115,9 +120,9 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
   return (
     <div style={overlay} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={box}>
-        {/* Close */}
         <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 18, background: 'none', border: 'none', color: '#5a6480', cursor: 'pointer', fontSize: 20 }}>✕</button>
 
+        {/* ── CONFIRM ── */}
         {step === 'confirm' && (
           <>
             <h2 style={{ fontFamily: "'Chakra Petch',sans-serif", fontSize: 18, marginBottom: 6 }}>
@@ -148,8 +153,8 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
               <div style={{ background: 'rgba(248,113,113,.1)', border: '1px solid #f8717133', borderRadius: 10, padding: '10px 14px', marginBottom: 16 }}>
                 <p style={{ color: '#f87171', fontSize: 12, margin: 0, lineHeight: 1.5 }}>
                   ⚠️ {lang === 'ru'
-                    ? `Этот план заканчивается ${endsAt.toLocaleDateString('ru-RU')} — после закрытия платформы 01.01.2027. Транзакция будет отклонена.`
-                    : `This plan ends ${endsAt.toLocaleDateString('en-US')} — after platform close date 01.01.2027. Transaction will be rejected.`}
+                    ? `Этот план заканчивается ${endsAt.toLocaleDateString('ru-RU')} — после закрытия платформы 01.01.2027.`
+                    : `This plan ends ${endsAt.toLocaleDateString('en-US')} — after platform close date 01.01.2027.`}
                 </p>
               </div>
             )}
@@ -157,7 +162,7 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
             <p style={{ color: '#5a6480', fontSize: 11, marginBottom: 20, lineHeight: 1.5 }}>
               {lang === 'ru'
                 ? 'После нажатия кнопки откроется окно вашего кошелька для подтверждения транзакции.'
-                : 'After clicking the button, your wallet will open to confirm the transaction.'}
+                : 'After clicking, your wallet will open to confirm the transaction.'}
             </p>
 
             <button
@@ -165,7 +170,7 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
               disabled={exceedsDeadline}
               style={{ width: '100%', background: exceedsDeadline ? '#3a4566' : '#60a5fa', color: exceedsDeadline ? '#5a6480' : '#040e24', border: 'none', borderRadius: 10, padding: '14px 0', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: '.5px', cursor: exceedsDeadline ? 'not-allowed' : 'pointer', textTransform: 'uppercase' }}
             >
-              {lang === 'ru' ? 'Подтвердить и оплатить транзакцию' : 'Confirm & Pay Transaction'}
+              {lang === 'ru' ? 'Подтвердить и оплатить' : 'Confirm & Pay Transaction'}
             </button>
             <button onClick={onClose} style={{ width: '100%', background: 'none', border: '1px solid #1a2040', borderRadius: 10, padding: '11px 0', marginTop: 10, color: '#5a6480', cursor: 'pointer', fontSize: 13 }}>
               {lang === 'ru' ? 'Отмена' : 'Cancel'}
@@ -173,44 +178,53 @@ export function StakeModal({ amount, days, apr, periodGain, total, lang, onClose
           </>
         )}
 
+        {/* ── PENDING ── */}
         {step === 'pending' && (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>⏳</div>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', border: '2px solid #1a2040', borderTopColor: '#60a5fa', margin: '0 auto 18px', animation: 'spin 0.8s linear infinite' }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", marginBottom: 8 }}>
-              {confirming
-                ? (lang === 'ru' ? 'Ожидание подтверждения...' : 'Waiting for confirmation...')
-                : (lang === 'ru' ? 'Транзакция отправлена' : 'Transaction submitted')}
+              {lang === 'ru' ? 'Ожидание подтверждения...' : 'Waiting for confirmation...'}
             </h3>
-            {txHash && (
-              <p style={{ fontSize: 11, color: '#5a6480', wordBreak: 'break-all', marginTop: 8 }}>
-                Tx: {txHash.slice(0, 12)}…{txHash.slice(-8)}
-              </p>
-            )}
+            <p style={{ color: '#5a6480', fontSize: 12 }}>
+              {lang === 'ru' ? 'Подтвердите транзакцию в кошельке' : 'Confirm the transaction in your wallet'}
+            </p>
           </div>
         )}
 
+        {/* ── SUCCESS ── */}
         {step === 'success' && (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", color: '#60a5fa', marginBottom: 8 }}>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', border: '2px solid #22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", color: '#22c55e', marginBottom: 8 }}>
               {lang === 'ru' ? 'Стейкинг запущен!' : 'Staking activated!'}
             </h3>
-            <p style={{ color: '#8a93b8', fontSize: 13, marginBottom: 24 }}>
+            <p style={{ color: '#8a93b8', fontSize: 13, marginBottom: 8 }}>
               {amount} ETH · {days}-day · {effectiveApr.toFixed(1)}% APR
             </p>
+            {txHash && (
+              <p style={{ color: '#5a6480', fontSize: 10, marginBottom: 20, wordBreak: 'break-all' }}>
+                Tx: {txHash.slice(0, 14)}…{txHash.slice(-8)}
+              </p>
+            )}
             <button onClick={() => { onClose(); window.location.href = '/dashboard'; }} style={{ background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
               {lang === 'ru' ? 'Открыть кабинет' : 'Open Dashboard'}
             </button>
           </div>
         )}
 
+        {/* ── ERROR ── */}
         {step === 'error' && (
           <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>❌</div>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', border: '2px solid #ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
             <h3 style={{ fontFamily: "'Chakra Petch',sans-serif", marginBottom: 8 }}>
               {lang === 'ru' ? 'Ошибка транзакции' : 'Transaction failed'}
             </h3>
-            <p style={{ color: '#5a6480', fontSize: 12, marginBottom: 24 }}>{errMsg}</p>
+            <p style={{ color: '#5a6480', fontSize: 12, marginBottom: 24, lineHeight: 1.5 }}>{errMsg}</p>
             <button onClick={() => setStep('confirm')} style={{ background: '#60a5fa', color: '#040e24', border: 'none', borderRadius: 10, padding: '12px 32px', fontFamily: "'Chakra Petch',sans-serif", fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
               {lang === 'ru' ? 'Попробовать снова' : 'Try again'}
             </button>
