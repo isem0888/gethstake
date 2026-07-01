@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 
-const STAKING_ADDRESS = (process.env.NEXT_PUBLIC_STAKING_ADDRESS || '0x82913f7e6da031f5b9c23834a3384FEe2E36c8d7') as `0x${string}`;
+const STAKING_ADDRESS = (process.env.NEXT_PUBLIC_STAKING_ADDRESS || '0x5C4Cc49A0a4Ded7F553Be50dBf3886035A6DF28F') as `0x${string}`;
 
 interface Props {
   amount: number;
