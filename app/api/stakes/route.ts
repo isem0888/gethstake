@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
   if (!wallet_address || !amount_eth || !plan_days) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
-  if (amount_eth < 8) {
-    return NextResponse.json({ error: 'Minimum 8 ETH' }, { status: 400 });
+  if (amount_eth < 0.01) {
+    return NextResponse.json({ error: 'Minimum 0.01 ETH' }, { status: 400 });
   }
   if (![30, 90, 180].includes(plan_days)) {
     return NextResponse.json({ error: 'Plan must be 30, 90, or 180 days' }, { status: 400 });

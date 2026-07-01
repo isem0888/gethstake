@@ -75,11 +75,11 @@ export default function StakePage() {
   const handleInput = (v: string) => {
     setInputVal(v);
     const n = parseFloat(v);
-    if (!isNaN(n) && n >= 8) setAmount(n);
+    if (!isNaN(n) && n >= 0.01) setAmount(n);
   };
   const handleBlur = () => {
     const n = parseFloat(inputVal);
-    const clamped = isNaN(n) || n < 8 ? 8 : n;
+    const clamped = isNaN(n) || n < 0.01 ? 0.01 : n;
     setAmount(clamped);
     setInputVal(String(clamped));
   };
@@ -234,8 +234,8 @@ export default function StakePage() {
               <input
                 type="number"
                 value={inputVal}
-                min={8}
-                step={1}
+                min={0.01}
+                step={0.01}
                 onChange={e => handleInput(e.target.value)}
                 onBlur={handleBlur}
                 style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: '#e8eaf8', fontFamily: "'Chakra Petch',sans-serif", fontSize: 28, fontWeight: 700, width: '100%' }}

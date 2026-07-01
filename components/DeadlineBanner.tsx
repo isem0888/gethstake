@@ -1,4 +1,7 @@
-// Server component — вычисляет даты на сервере, нет гидрации
+'use client';
+
+import { useState, useEffect } from 'react';
+
 const PLATFORM_CLOSE = new Date('2027-01-01T00:00:00Z');
 
 function daysUntil(targetDate: Date): number {
@@ -14,6 +17,14 @@ function fmtDate(d: Date): string {
 }
 
 export function DeadlineBanner() {
+  const [, setTick] = useState(0);
+
+  // Обновляем раз в минуту чтобы счётчик был актуальным
+  useEffect(() => {
+    const t = setInterval(() => setTick(n => n + 1), 60_000);
+    return () => clearInterval(t);
+  }, []);
+
   const plans = [
     { days: 180, label: '180-day' },
     { days: 90,  label: '90-day'  },

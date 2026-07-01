@@ -37,7 +37,7 @@ const RU: Record<string, string> = {
   s_why: '',
   c_tag: 'Калькулятор', c_h2: 'Посчитайте доход в ETH',
   c_p: 'Выберите сумму (от 8 ETH) и план — увидите начисление в ETH за период и в год.',
-  c_amt: 'Сумма депозита', c_hint: 'Минимальный депозит — 8 ETH (¼ валидатора).', c_plan: 'План',
+  c_amt: 'Сумма депозита', c_hint: 'Минимальный депозит — 0.01 ETH.', c_plan: 'План',
   c_outpre: 'Доход за период', c_dep: 'Депозит', c_apr: 'APR', c_year: 'Доход в год', c_total: 'Итого к выводу',
   m_tag: 'Как работают валидаторы', m_h2: 'Валидация Ethereum — децентрализованно и прозрачно',
   m_p: 'Ethereum использует Proof-of-Stake: валидаторы блокируют ETH и получают вознаграждение за подтверждение транзакций.',
@@ -108,10 +108,10 @@ function useCalc() {
   const handleInputChange = (v: string) => {
     setInputValRaw(v);
     const n = parseFloat(v);
-    if (!isNaN(n) && n > 0) setAmountRaw(n);
+    if (!isNaN(n) && n >= 0.01) setAmountRaw(n);
   };
   const handleInputBlur = () => {
-    const n = Math.max(8, Math.min(128, parseFloat(inputVal) || 8));
+    const n = Math.max(0.01, Math.min(128, parseFloat(inputVal) || 0.01));
     setAmountRaw(n);
     setInputValRaw(String(n));
   };
@@ -541,7 +541,7 @@ export default function Home() {
             <div style={{ marginBottom: 16 }}>
               <label style={{ fontSize: 11 }}>{t('c_amt', lang, 'Deposit amount')}</label>
               <div className="input-eth">
-                <input type="number" value={calc.inputVal} min={8} step={1}
+                <input type="number" value={calc.inputVal} min={0.01} step={0.01}
                   onChange={e => calc.handleInputChange(e.target.value)}
                   onBlur={calc.handleInputBlur} />
                 <span className="tk">ETH</span>
